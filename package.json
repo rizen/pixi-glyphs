@@ -42,12 +42,12 @@
   },
   "devDependencies": {
     "@jest-runner/electron": "^3.0.1",
+    "@napi-rs/canvas": "^0.1.44",
     "@types/emoji-regex": "^9.2.0",
     "@types/jest": "^29.5.11",
     "@typescript-eslint/eslint-plugin": "^6.18.1",
     "@typescript-eslint/parser": "^6.18.1",
     "ansi-regex": "^6.0.1",
-    "canvas": "^2.10.2",
     "commitizen": "^4.2.4",
     "cz-conventional-changelog": "3.3.0",
     "electron": "^28.1.3",
@@ -55,7 +55,6 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
     "http-server": "^14.0.0",
-    "husky": "^9.0.7",
     "install-peers-cli": "^2.2.0",
     "jest": "^26",
     "jest-canvas-mock": "^2.3.1",
@@ -70,7 +69,7 @@
     "typescript": "^4"
   },
   "scripts": {
-    "prepare": "install-peers && husky install",
+    "prepare": "install-peers",
     "dev": "microbundle watch -f umd --name TaggedText --external 'pixi.js' --globals 'pixi.js'=PIXI",
     "test": "jest",
     "test:watch": "jest --watch",
