@@ -38,7 +38,8 @@ import {
 
 const ICON_SCALE_BASE = 0.8;
 
-const sizer = new PIXI.Text("");
+// In Pixi v8, Text needs to be created with proper options
+const sizer = new PIXI.Text({ text: "" });
 
 /**
  * Translates the current location point to the beginning of the next line.
@@ -118,18 +119,30 @@ const setBoundsX = assoc<Bounds, number>("x");
 
 const positionWordX =
   (x: number) =>
-  (word: WordToken): WordToken => {
+  (word: any): any => {
     let prevBounds: Bounds;
-    return word.map((token) => {
-      if (prevBounds === undefined) {
-        token.bounds.x = x;
-        prevBounds = token.bounds;
-      } else {
-        token.bounds.x = prevBounds.x + prevBounds.width;
-        prevBounds = token.bounds;
+
+    const positionRecursive = (item: any): any => {
+      // If it's an array, recursively process it
+      if (Array.isArray(item)) {
+        return item.map(positionRecursive);
       }
-      return token;
-    });
+
+      // If it's a token with bounds, position it
+      if (item && item.bounds) {
+        if (prevBounds === undefined) {
+          item.bounds.x = x;
+          prevBounds = item.bounds;
+        } else {
+          item.bounds.x = prevBounds.x + prevBounds.width;
+          prevBounds = item.bounds;
+        }
+      }
+
+      return item;
+    };
+
+    return positionRecursive(word);
   };
 
 export const concatBounds = (
@@ -297,9 +310,6 @@ export const alignLines = (
     for (const word of line) {
       const wordBounds = getBoundsNested(word);
       wordBoundsForLine.push(wordBounds);
-      if (isNaN(wordBounds.x)) {
-        throw new Error("wordBounds not correct");
-      }
     }
     if (isLastLine) {
       alignedLine = lastAlignFunction(wordBoundsForLine);
@@ -307,9 +317,11 @@ export const alignLines = (
       alignedLine = alignFunction(wordBoundsForLine);
     }
     for (let i = 0; i < line.length; i++) {
-      const bounds = alignedLine[i];
       const word = line[i];
-      line[i] = positionWordX(bounds.x)(word);
+      if (i < alignedLine.length) {
+        const bounds = alignedLine[i];
+        line[i] = positionWordX(bounds.x)(word);
+      }
     }
   }
   return lines;
@@ -639,16 +651,37 @@ export const calculateTokens = (
 
       const alignClassic = convertUnsupportedAlignment(style.align);
 
+      const isNestedContext = tags && tags.includes("outline");
+
+      // Clean up the style for PIXI v8 compatibility
+      const cleanedStyle = { ...style };
+
+      console.log('[Sizer] Original stroke:', cleanedStyle.stroke, 'type:', typeof cleanedStyle.stroke);
+      console.log('[Sizer] Original fill:', cleanedStyle.fill, 'type:', typeof cleanedStyle.fill);
+      console.log('[Sizer] Original dropShadow:', cleanedStyle.dropShadow);
+
+      // In PIXI v8, stroke needs to be an object
+      if (cleanedStyle.stroke && typeof cleanedStyle.stroke === 'string') {
+        console.log('[Sizer] Converting stroke from string to object');
+        cleanedStyle.stroke = {
+          color: cleanedStyle.stroke,
+          width: cleanedStyle.strokeThickness || 1
+        } as any;
+      }
+
+      // Remove problematic properties for sizer
+      delete cleanedStyle.stroke;
+      delete cleanedStyle.strokeThickness;
+
+      console.log('[Sizer] About to set sizer.style');
       sizer.style = {
-        ...style,
+        ...cleanedStyle,
         align: alignClassic,
         // Override some styles for the purposes of sizing text.
         wordWrap: false,
-        dropShadowBlur: 0,
-        dropShadowDistance: 0,
-        dropShadowAngle: 0,
-        dropShadow: false,
-      };
+        dropShadow: undefined,
+      } as any;
+      console.log('[Sizer] Successfully set sizer.style');
 
       if (typeof token === "string") {
         // split into pieces and convert into tokens.
@@ -656,6 +689,7 @@ export const calculateTokens = (
         const textSegments = splitText(token, splitStyle);
 
         const textTokens = textSegments.map((str): SegmentToken => {
+
           switch (style.textTransform) {
             case "uppercase":
               sizer.text = str.toUpperCase();
@@ -674,7 +708,7 @@ export const calculateTokens = (
 
           // Incorporate the size of the stroke into the size of the text.
           if (isOnlyWhitespace(token) === false) {
-            const stroke = sizer.style.strokeThickness ?? 0;
+            const stroke = (sizer.style as any).stroke ?? 0;
             if (stroke > 0) {
               fontProperties.descent += stroke / 2;
               fontProperties.ascent += stroke / 2;
@@ -695,8 +729,83 @@ export const calculateTokens = (
           fontProperties.descent *= scaleHeight;
           fontProperties.fontSize *= scaleHeight;
 
-          const bounds = rectFromContainer(sizer);
+          // Use a fresh sizer instance for each measurement to avoid state corruption
+          // In Pixi v8, we need to pass style in constructor
+          console.log('[MeasureSizer] Creating new Text with text:', sizer.text);
+          const sizerStyleCopy = { ...sizer.style };
+          console.log('[MeasureSizer] Style keys:', Object.keys(sizerStyleCopy));
+
+          // Check for problematic properties
+          for (const key of Object.keys(sizerStyleCopy)) {
+            const value = (sizerStyleCopy as any)[key];
+            if (value === undefined || value === null) {
+              console.log(`[MeasureSizer] WARNING: Property ${key} is ${value}`);
+            }
+          }
+
+          const measureSizer = new PIXI.Text({
+            text: sizer.text,
+            style: sizerStyleCopy as any
+          });
+          console.log('[MeasureSizer] Successfully created');
+          measureSizer.scale.set(sizer.scale.x, sizer.scale.y);
+
+
+          let bounds = rectFromContainer(measureSizer);
           // bounds.height = fontProperties.fontSize;
+
+
+          // Fix for Pixi v8: handle NaN width for whitespace
+          if (isNaN(bounds.width)) {
+            // For whitespace, measure a space character width
+            if (isOnlyWhitespace(str)) {
+              // Try multiple measurement approaches using fresh measureSizer
+              let spaceWidth = 0;
+
+              // Approach 1: Non-breaking space
+              measureSizer.text = "\u00A0"; // Non-breaking space
+              let spaceBounds = rectFromContainer(measureSizer);
+              if (!isNaN(spaceBounds.width) && spaceBounds.width > 0) {
+                spaceWidth = spaceBounds.width;
+              } else {
+                // Approach 2: Regular space
+                measureSizer.text = " ";
+                spaceBounds = rectFromContainer(measureSizer);
+                if (!isNaN(spaceBounds.width) && spaceBounds.width > 0) {
+                  spaceWidth = spaceBounds.width;
+                } else {
+                  // Approach 3: Measure 'M' character and use fraction for space
+                  measureSizer.text = "M";
+                  spaceBounds = rectFromContainer(measureSizer);
+                  if (!isNaN(spaceBounds.width) && spaceBounds.width > 0) {
+                    spaceWidth = spaceBounds.width * 0.25; // Space is roughly 1/4 of M width
+                  } else {
+                    // Fallback: use font size as basis
+                    spaceWidth = fontProperties.fontSize * 0.25;
+                  }
+                }
+              }
+
+              bounds.width = spaceWidth * str.length;
+
+            } else {
+              // For non-whitespace with NaN width, try measuring again with fresh measureSizer
+              measureSizer.text = str;
+              const newBounds = rectFromContainer(measureSizer);
+              if (!isNaN(newBounds.width)) {
+                bounds.width = newBounds.width;
+              } else {
+                // Fallback to 0 width if measurement fails
+                bounds.width = 0;
+              }
+            }
+          }
+
+          // Ensure bounds is not corrupted
+          if (isNaN(bounds.width) || isNaN(bounds.height)) {
+            console.error(`ERROR: Token "${str}" has invalid bounds:`, bounds);
+            bounds = new PIXI.Rectangle(0, 0, 0, 0);
+          }
 
           const textDecorations = extractDecorations(
             style,
@@ -728,8 +837,10 @@ export const calculateTokens = (
           // Required to remove extra stroke width from whitespace.
           // to be totally honest, I'm not sure why this works / why it was being added.
           if (isOnlyWhitespace(str)) {
-            bounds.width -= style.strokeThickness ?? 0;
+            bounds.width -= (style as any).stroke ?? 0;
           }
+
+
           return convertedToken;
         });
 
@@ -816,6 +927,7 @@ export const calculateTokens = (
 
   const lineSpacing = defaultStyle.lineSpacing ?? 0;
   const align = defaultStyle.align ?? "left";
+
 
   const lines = layout(finalTokens, maxWidth, lineSpacing, align, splitStyle);
 

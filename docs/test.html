@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pixi v8 + Glyphs Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@8.5.2/dist/pixi.min.js"></script>
+    <script src="../dist/pixi-glyphs.umd.js"></script>
+    <style>
+        body { margin: 0; padding: 20px; background: #222; color: white; font-family: Arial; }
+        #container { border: 2px solid #444; display: inline-block; }
+    </style>
+</head>
+<body>
+    <h1>Pixi v8 + Glyphs Test</h1>
+    <div id="container"></div>
+    <pre id="output"></pre>
+
+    <script>
+        const output = document.getElementById('output');
+
+        async function test() {
+            try {
+                output.textContent = "Initializing PIXI Application...";
+
+                // Create PIXI Application with v8 API
+                const app = new PIXI.Application();
+                await app.init({
+                    width: 600,
+                    height: 400,
+                    background: 0x333333,
+                    antialias: true
+                });
+
+                document.getElementById('container').appendChild(app.canvas);
+                output.textContent += "\n✓ PIXI Application created";
+
+                // Test Glyphs
+                output.textContent += "\nChecking if Glyphs is loaded: " + (typeof window.Glyphs);
+
+                // Check if it's a constructor or an object with default
+                const GlyphsConstructor = window.Glyphs?.default || window.Glyphs;
+                output.textContent += "\nGlyphs constructor type: " + (typeof GlyphsConstructor);
+
+                const text = "Hello <b>Pixi v8</b> with <color>Glyphs!</color>";
+                const styles = {
+                    default: {
+                        fontFamily: "Arial",
+                        fontSize: 24,
+                        fill: 0xffffff
+                    },
+                    b: {
+                        fontWeight: "bold",
+                        fill: 0xffcc00
+                    },
+                    color: {
+                        fill: 0x00ff00
+                    }
+                };
+
+                const glyphs = new GlyphsConstructor(text, styles);
+                glyphs.x = 50;
+                glyphs.y = 50;
+                app.stage.addChild(glyphs);
+
+                output.textContent += "\n✓ Glyphs text created and added to stage";
+                output.textContent += "\n\nSuccess! Pixi v8 and Glyphs are working together.";
+
+            } catch (error) {
+                output.textContent += "\n\n❌ Error: " + error.message;
+                console.error(error);
+            }
+        }
+
+        // Run test when page loads
+        test();
+    </script>
+</body>
+</html>

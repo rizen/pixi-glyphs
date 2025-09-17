@@ -1,4 +1,5 @@
 // Demo configurations extracted from the original demo
+
 const demos = {
   basic: {
     title: "Basics",
@@ -30,7 +31,7 @@ const styles = {
   }
 };
 
-const glyphs = new Glyphs(text, styles);`,
+const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
     init: function() {
       const text = `Let's make some
 <ml>multiline</ml>
@@ -59,14 +60,17 @@ and <ms>multistyle</ms> text for
         }
       };
 
-      return new Glyphs(text, styles, {});
+      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles, {});
     }
   },
 
   img: {
     title: "Inline Images",
     description: "Embed images directly in your text with inline display options",
-    code: `const thinking = PIXI.Sprite.from("./icon.png");
+    code: `// Load textures first in Pixi v8
+await PIXI.Assets.load(['./icon.png', './doot.png', './100.png']);
+
+const thinking = new PIXI.Sprite(PIXI.Texture.from("./icon.png"));
 const doot = PIXI.Texture.from("./doot.png");
 const url = "100.png";
 
@@ -104,11 +108,14 @@ const styles = {
   url: { imgDisplay: "icon" }
 };
 
-const glyphs = new Glyphs(text, styles, {
+const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, {
   imgMap: { thinking, doot, url }
 });`,
-    init: function() {
-      const thinking = PIXI.Sprite.from("./icon.png");
+    init: async function() {
+      // Load textures asynchronously
+      await PIXI.Assets.load(['./icon.png', './doot.png', './100.png']);
+
+      const thinking = new PIXI.Sprite(PIXI.Texture.from("./icon.png"));
       const doot = PIXI.Texture.from("./doot.png");
       const url = "./100.png";
 
@@ -146,7 +153,7 @@ You can even load images from a URL <url /> (if you can figure out the CORS stuf
         url: { imgDisplay: "icon" }
       };
 
-      return new Glyphs(text, styles, {
+      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles, {
         imgMap: { thinking, doot, url }
       });
     }
@@ -193,7 +200,7 @@ const styles = {
   }
 };
 
-const glyphs = new Glyphs(text, styles, {
+const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, {
   wrapEmoji: true
 });`,
     init: function() {
@@ -235,7 +242,7 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
         }
       };
 
-      return new Glyphs(text, styles, { wrapEmoji: true });
+      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles, { wrapEmoji: true });
     }
   },
 
@@ -255,7 +262,7 @@ const baseStyle = {
 };
 
 // Create four text objects with different alignments
-let left = new Glyphs(
+const Glyphs = window.Glyphs?.default || window.Glyphs; let left = new Glyphs(
   text.replace("left", "<b>left</b>"),
   {
     ...baseStyle,
@@ -300,7 +307,7 @@ let justify = new Glyphs(
 
       const texts = [];
 
-      let left = new Glyphs(
+      const Glyphs = window.Glyphs?.default || window.Glyphs; let left = new Glyphs(
         alignText.replace("left", "<b>left</b>"),
         {
           ...alignStyle,
@@ -363,7 +370,10 @@ let justify = new Glyphs(
   valign: {
     title: "Vertical Alignment",
     description: "Control vertical alignment of text: top, middle, bottom, baseline",
-    code: `const valignImg = PIXI.Sprite.from("./icon.png");
+    code: `// Load texture first in Pixi v8
+await PIXI.Assets.load('./icon.png');
+
+const valignImg = new PIXI.Sprite(PIXI.Texture.from("./icon.png"));
 
 const text = \`<top><code>Top</code> <small>Vertical</small> <img/> Alignment.</top>
 
@@ -393,11 +403,14 @@ const styles = {
   img: { imgSrc: "valignImg", imgDisplay: "icon" }
 };
 
-const glyphs = new Glyphs(text, styles, {
+const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, {
   imgMap: { valignImg }
 });`,
-    init: function() {
-      const valignImg = PIXI.Sprite.from("./icon.png");
+    init: async function() {
+      // Load texture first in Pixi v8
+      await PIXI.Assets.load('./icon.png');
+
+      const valignImg = new PIXI.Sprite(PIXI.Texture.from("./icon.png"));
 
       const text = `<top><code>Top</code> <small>Vertical</small> <img/> Alignment.</top>
 
@@ -427,7 +440,7 @@ const glyphs = new Glyphs(text, styles, {
         img: { imgSrc: "valignImg", imgDisplay: "icon" }
       };
 
-      return new Glyphs(text, styles, {
+      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles, {
         imgMap: { valignImg }
       });
     }
@@ -461,7 +474,7 @@ const styles = {
   smallcaps: { fontVariant: "small-caps" }
 };
 
-const glyphs = new Glyphs(text, styles);`,
+const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
     init: function() {
       const text = `<h1>Text transformations:</h1>
 <code>textTransform: "lowercase"</code>
@@ -488,7 +501,7 @@ const glyphs = new Glyphs(text, styles);`,
         smallcaps: { fontVariant: "small-caps" }
       };
 
-      return new Glyphs(text, styles);
+      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles);
     }
   },
 
@@ -553,7 +566,7 @@ const styles = {
   }
 };
 
-const glyphs = new Glyphs(text, styles, {
+const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, {
   drawWhitespace: true,
   overdrawDecorations: 2
 });`,
@@ -616,7 +629,7 @@ const glyphs = new Glyphs(text, styles, {
         }
       };
 
-      return new Glyphs(text, styles, {
+      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles, {
         drawWhitespace: true,
         overdrawDecorations: 2
       });
@@ -641,7 +654,7 @@ const styles = {
   }
 };
 
-const glyphs = new Glyphs(text, styles);`,
+const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
     init: function() {
       const text = `You can add <em>attributes</em> to your tags!\nThey will <em fontStyle="italic">overwrite</em> the <em fill="#FF8822">values</em> for any existing <em fontFamily="Courier" fill="#FFFF00" fontWeight="400">tag styles</em>.`;
 
@@ -658,7 +671,7 @@ const glyphs = new Glyphs(text, styles);`,
         }
       };
 
-      return new Glyphs(text, styles, {});
+      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles, {});
     }
   },
 
@@ -686,7 +699,7 @@ const styles = {
   large: { fontSize: "36px" }
 };
 
-const glyphs = new Glyphs(text, styles);`,
+const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
     init: function() {
       const text = `You can <outline>nest <b>tags <red>as <i>deeply <thicker>as you'd <large>like, <blue>dude!</blue></large></thicker></i></red></b></outline>`;
 
@@ -709,7 +722,7 @@ const glyphs = new Glyphs(text, styles);`,
         large: { fontSize: "36px" }
       };
 
-      return new Glyphs(text, styles);
+      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles);
     }
   },
 
@@ -738,7 +751,7 @@ const styles = {
   }
 };
 
-const glyphs = new Glyphs(text, styles);`,
+const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
     init: function() {
       const text = "You can <narrow>set line and letter spacing</narrow> to <wide>give your text some drama.</wide>\nNote that lineSpacing can only be set on the default style.";
 
@@ -762,7 +775,7 @@ const glyphs = new Glyphs(text, styles);`,
         }
       };
 
-      return new Glyphs(text, styles);
+      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles);
     }
   },
 
@@ -783,7 +796,7 @@ const wrappingStyle = {
   }
 };
 
-const wrapping = new Glyphs(wrappingText, wrappingStyle);
+const wrapping = new (window.Glyphs?.default || window.Glyphs)(wrappingText, wrappingStyle);
 
 // Without word wrap
 const nonWrappingText = \`This one doesn't have \\\`wordWrap\\\` so it just keeps going and going and going off the edge!\`;
@@ -801,6 +814,7 @@ const nonWrappingStyle = {
 
 const nonWrapping = new Glyphs(nonWrappingText, nonWrappingStyle);`,
     init: function() {
+      const Glyphs = window.Glyphs?.default || window.Glyphs;
       const texts = [];
 
       const wrappingText = `Global word wrap and alignment properties are controlled by the "default" style, and can\'t be overridden by other styles.`;
@@ -893,7 +907,7 @@ const styles = {
   }
 };
 
-const glyphs = new Glyphs(text, styles);`,
+const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
     init: function() {
       const text = `You can change the scaling of the font:
 
@@ -951,7 +965,7 @@ const glyphs = new Glyphs(text, styles);`,
         }
       };
 
-      return new Glyphs(text, styles);
+      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles);
     }
   },
 
@@ -988,7 +1002,7 @@ const styles = {
   }
 };
 
-const glyphs = new Glyphs(text, styles);`,
+const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
     init: function() {
       const text = `Use <code>splitStyle: "characters"</code> and <code>breakWords: true</code> to allow line breaks between characters. Can be useful for languages such as chinese.
 
@@ -1020,7 +1034,7 @@ const glyphs = new Glyphs(text, styles);`,
         }
       };
 
-      return new Glyphs(text, styles, {});
+      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles, {});
     }
   },
 
@@ -1053,7 +1067,7 @@ const styles = {
   }
 };
 
-const glyphs = new Glyphs(text, styles, { debug: true });`,
+const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, { debug: true });`,
     init: function() {
       const text = `You can use <blue>debug mode</blue> to help you figure out what your text is doing. Include <code>{debug: true} </code> in the options when you create your text.
 You can also set <code>debugConsole: true</code> if you want to log information about the text field to the console.`;
@@ -1081,7 +1095,7 @@ You can also set <code>debugConsole: true</code> if you want to log information 
         }
       };
 
-      return new Glyphs(text, styles, { debug: true });
+      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles, { debug: true });
     }
   },
 
@@ -1114,7 +1128,7 @@ const styles = {
   red: { fill: 0xff8888, stroke: 0xcc4444 }
 };
 
-const glyphs = new Glyphs(text, styles, {
+const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, {
   splitStyle: "characters"
 });
 
@@ -1161,7 +1175,7 @@ app.ticker.add((delta) => {
         red: { fill: 0xff8888, stroke: 0xcc4444 }
       };
 
-      return new Glyphs(text, styles, {
+      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles, {
         splitStyle: "characters"
       });
     },
@@ -1185,3 +1199,9 @@ app.ticker.add((delta) => {
     }
   }
 };
+
+// Export for module usage
+export { demos };
+
+// Also make available globally for backward compatibility
+window.demos = demos;

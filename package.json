@@ -35,8 +35,14 @@
     "2d"
   ],
   "peerDependencies": {
-    "pixi.js": "^6"
+    "pixi.js": "^8.0.0"
   },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Firefox versions",
+    "last 2 Safari versions",
+    "last 2 Edge versions"
+  ],
   "dependencies": {
     "emoji-regex": "9.2.2"
   },
@@ -49,6 +55,7 @@
     "@typescript-eslint/parser": "^6.18.1",
     "ansi-regex": "^6.0.1",
     "commitizen": "^4.2.4",
+    "concurrently": "^9.2.1",
     "cz-conventional-changelog": "3.3.0",
     "electron": "^28.1.3",
     "eslint": "^8.36.0",
@@ -62,11 +69,13 @@
     "microbundle": "^0.15.0",
     "nth-check": "^2.0.1",
     "opener": "^1.5.1",
+    "pixi.js": "^8.13.2",
     "prettier": "^3.2.2",
     "set-value": "^4.0.1",
     "standard-version": "^9.3.2",
     "ts-jest": "^26",
-    "typescript": "^4"
+    "typescript": "^4",
+    "vite": "^7.1.5"
   },
   "scripts": {
     "prepare": "install-peers",
@@ -74,8 +83,10 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "docs": "npm run build && http-server . --port 8888 -o docs/index.html",
-    "build": "microbundle --name Glyphs --external 'pixi.js' --globals  'pixi.js'=PIXI",
+    "docs": "concurrently \"npm run dev\" \"vite\"",
+    "docs:build": "npm run build && vite build",
+    "docs:preview": "vite preview",
+    "build": "microbundle --name Glyphs --external 'pixi.js' --globals 'pixi.js'=PIXI --no-compress",
     "lint:eslint": "eslint ./src/**/*.ts",
     "lint:prettier": "prettier ./**/*.{ts,js,json,html,css,md} -l",
     "fix:prettier": "prettier ./**/*.{ts,js,json,html,css,md} -w",

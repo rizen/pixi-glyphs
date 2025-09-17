@@ -192,9 +192,9 @@ export const mapTagsToStyles = (
 
     // Use color as an alias for fill.
     if (currentTagColor !== undefined && currentTagFill === undefined) {
-      style.fill = style.color;
+      style.fill = style.color as any;
     }
-    style.color = style.fill;
+    style.color = style.fill as any;
 
     fontSizeStack.push(style.fontSize as FontSize);
 

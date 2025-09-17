@@ -1,22 +1,34 @@
+// Import demos
+import { demos } from './demos.js';
+
 // Main application logic
 let currentApp = null;
 let currentDemo = null;
 
-// Initialize PIXI settings
-PIXI.settings.RESOLUTION = 2;
+// Get demo ID from URL
+function getDemoFromURL() {
+  const hash = window.location.hash.slice(1);
+  return hash || 'basic';
+}
+
+// Update URL when demo changes
+function updateURL(demoId) {
+  window.location.hash = demoId;
+}
 
 // Helper function to create PIXI app
-function createPixiApp(container, width = 600, height = 600, backgroundColor = 0x333333) {
-  const app = new PIXI.Application({
+async function createPixiApp(container, width = 600, height = 600, backgroundColor = 0x333333) {
+  const app = new PIXI.Application();
+  await app.init({
     width,
     height,
-    backgroundColor,
+    background: backgroundColor,
     antialias: true,
     resolution: window.devicePixelRatio || 1,
     autoDensity: true
   });
 
-  container.appendChild(app.view);
+  container.appendChild(app.canvas);
   return app;
 }
 
@@ -30,9 +42,12 @@ function cleanupDemo() {
 }
 
 // Function to load and display a demo
-function loadDemo(demoId) {
+async function loadDemo(demoId) {
   const demoConfig = demos[demoId];
   if (!demoConfig) return;
+
+  // Update URL
+  updateURL(demoId);
 
   // Clean up previous demo
   cleanupDemo();
@@ -84,10 +99,13 @@ function loadDemo(demoId) {
 
   // Initialize PIXI demo
   const pixiContainer = document.getElementById('pixi-container');
-  currentApp = createPixiApp(pixiContainer);
+  currentApp = await createPixiApp(pixiContainer);
 
-  // Initialize the demo
-  const result = demoConfig.init();
+  // Initialize the demo (handle both sync and async)
+  let result = demoConfig.init();
+  if (result && typeof result.then === 'function') {
+    result = await result;
+  }
 
   // Handle single or multiple Glyphs objects
   if (Array.isArray(result)) {
@@ -202,13 +220,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Load first demo by default
-  loadDemo('basic');
+  // Handle browser back/forward navigation
+  window.addEventListener('hashchange', () => {
+    const demoId = getDemoFromURL();
+    loadDemo(demoId);
+  });
+
+  // Load the initial demo from URL or default to 'basic'
+  const initialDemo = getDemoFromURL();
+  loadDemo(initialDemo);
 });
 
 // Handle window resize
 window.addEventListener('resize', () => {
-  if (currentApp) {
+  if (currentApp && currentApp.renderer) {
     currentApp.renderer.resize(
       Math.min(600, window.innerWidth - 100),
       Math.min(600, window.innerHeight - 200)

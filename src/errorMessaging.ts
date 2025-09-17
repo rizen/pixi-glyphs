@@ -3,7 +3,7 @@ import { ErrorHandler, ErrorMessage, ErrorMessageType } from "./types";
 
 const log =
   (type: ErrorMessageType) =>
-  (handler?: ErrorHandler, supressConsole = false, target?: PIXI.Sprite) =>
+  (handler?: ErrorHandler, supressConsole = false, target?: PIXI.Container) =>
   (code: string, message: string): void => {
     if (supressConsole !== true) {
       const method = type === "warning" ? console.warn : console.error;

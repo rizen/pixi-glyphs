@@ -33,7 +33,7 @@ export type TextureSource =
   | HTMLImageElement
   | HTMLCanvasElement
   | HTMLVideoElement
-  | PIXI.BaseTexture;
+  | PIXI.Texture;
 
 export type ImageSource = PIXI.Sprite | SpriteSource | TextureSource;
 
@@ -42,8 +42,8 @@ export const isSpriteSource = (s: ImageSource): s is SpriteSource =>
   s instanceof PIXI.Texture ||
   s instanceof HTMLCanvasElement ||
   s instanceof HTMLVideoElement;
-export const isBaseTexture = (s: ImageSource): s is PIXI.BaseTexture =>
-  s instanceof PIXI.BaseTexture;
+export const isBaseTexture = (s: ImageSource): s is PIXI.Texture =>
+  s instanceof PIXI.Texture;
 export const isImageElement = (s: ImageSource): s is HTMLImageElement =>
   s instanceof HTMLImageElement;
 export const isTextureSource = (s: ImageSource): s is TextureSource =>
@@ -207,8 +207,7 @@ export interface LineBreakStyles {
 
 export interface TextStyleExtended
   extends Record<string, unknown>,
-    Partial<Omit<Omit<PIXI.IBitmapTextStyle, "align">, "fontSize">>,
-    Partial<Omit<PIXI.ITextStyle, "align">>,
+    Partial<Omit<PIXI.TextStyle, "align" | "fontSize">>,
     ImageStyles,
     TextDecorationStyles,
     VerticalAlignStyles,
@@ -221,7 +220,7 @@ export interface TextStyleExtended
   fontStyle?: FontStyle;
   fontSize?: FontSize;
   // alias for `fill`
-  color?: PIXI.TextStyleFill;
+  color?: any; // PIXI v8 has complex fill types
 }
 
 export interface TextDecorationMetrics {
@@ -314,7 +313,7 @@ export type ParagraphToken = LineToken[];
 
 export const createEmptySegmentToken = (): SegmentToken => ({
   content: "",
-  bounds: new PIXI.Rectangle(),
+  bounds: new PIXI.Rectangle(0, 0, 0, 0),
   fontProperties: { ascent: 0, descent: 0, fontSize: 0 },
   style: {},
   tags: "",

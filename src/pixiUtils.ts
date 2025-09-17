@@ -5,8 +5,20 @@ const PX_PER_EM = 16;
 const PX_PER_PERCENT = 16 / 100;
 const PX_PER_PT = 1.3281472327365;
 
-export const measureFont = (context: { font: string }): IFontMetrics =>
-  PIXI.TextMetrics.measureFont(context.font);
+export const measureFont = (font: string): IFontMetrics => {
+  // In Pixi v8, we need to create a canvas context to measure fonts
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  if (!context) throw new Error('Cannot get 2D context');
+  context.font = font;
+  const metrics = context.measureText('M');
+  const fontSize = parseInt(font.match(/\d+/)?.['0'] || '16');
+  return {
+    ascent: metrics.actualBoundingBoxAscent || fontSize * 0.8,
+    descent: metrics.actualBoundingBoxDescent || fontSize * 0.2,
+    fontSize: fontSize
+  };
+};
 
 export const INITIAL_FONT_PROPS: IFontMetrics = {
   ascent: 10,
@@ -19,27 +31,19 @@ export const getFontPropertiesOfText = (
   textField: PIXI.Text,
   forceUpdate = false
 ): IFontMetrics => {
-  if (forceUpdate) {
-    textField.updateText(false);
-    return measureFont(textField.context);
-  } else {
-    const props = measureFont(textField.context);
-    const fs = Number(textField.style.fontSize) ?? NaN;
-    if (
-      props.ascent === INITIAL_FONT_PROPS.ascent &&
-      props.descent === INITIAL_FONT_PROPS.descent &&
-      (isNaN(fs) || fs > INITIAL_FONT_PROPS.fontSize)
-    ) {
-      throw new Error(
-        "getFontPropertiesOfText() returned metrics associated with a Text field that has not been updated yet. Please try using the forceUpdate parameter when you call this function."
-      );
-    }
-    return measureFont(textField.context);
-  }
+  // In Pixi v8, we need to work with the text style directly
+  const style = textField.style;
+  const fontSize = typeof style.fontSize === 'number' ? style.fontSize : 16;
+  const fontFamily = style.fontFamily || 'Arial';
+  const fontWeight = (style as any).fontWeight || 'normal';
+  const fontStyle = style.fontStyle || 'normal';
+  const font = `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
+
+  return measureFont(font);
 };
 
 export const addChildrenToContainer = (
-  children: PIXI.DisplayObject[],
+  children: PIXI.Container[],
   container: PIXI.Container
 ): void => children.forEach((child) => container.addChild(child));
 
