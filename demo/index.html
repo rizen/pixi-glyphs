@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>pixi-tagged-text Demo</title>
+    <title>pixi-glyphs Demo</title>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="style.css" />
 
@@ -15,7 +15,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.2.2/browser/pixi.min.js"></script>
 
-    <!-- TaggedText -->
+    <!-- Glyphs -->
     <script src="../dist/pixi-tagged-text.umd.js"></script>
     <script>
       hljs.initHighlightingOnLoad();
@@ -39,13 +39,13 @@
           return app;
         }
 
-        function createDemo(id, TaggedTextExample) {
+        function createDemo(id, GlyphsExample) {
           const app = createPixiApp(id);
 
-          if (TaggedTextExample !== undefined) {
-            TaggedTextExample.x = 30;
-            TaggedTextExample.y = 30;
-            app.stage.addChild(TaggedTextExample);
+          if (GlyphsExample !== undefined) {
+            GlyphsExample.x = 30;
+            GlyphsExample.y = 30;
+            app.stage.addChild(GlyphsExample);
           }
 
           return app;
@@ -88,7 +88,7 @@ and <ms>multistyle</ms> text for
               },
             };
 
-            const basic = new TaggedText(basicText, basicStyle, {});
+            const basic = new Glyphs(basicText, basicStyle, {});
 
             createDemo("basic", basic);
           </script>
@@ -138,7 +138,7 @@ You can even load images from a URL <url /> (if you can figure out the CORS stuf
               url: { imgDisplay: "icon" },
             };
 
-            const imgTaggedText = new TaggedText(imgText, imgStyle, {
+            const imgGlyphs = new Glyphs(imgText, imgStyle, {
               // debug: true,
               // debugConsole: true,
               // splitStyle: "characters",
@@ -146,7 +146,7 @@ You can even load images from a URL <url /> (if you can figure out the CORS stuf
               imgMap: { thinking, doot, url },
             });
 
-            const imgApp = createDemo("img", imgTaggedText);
+            const imgApp = createDemo("img", imgGlyphs);
           </script>
         </div>
       </div>
@@ -196,11 +196,11 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
               },
             };
 
-            const emojiTaggedText = new TaggedText(emojiText, emojiStyle, {
+            const emojiGlyphs = new Glyphs(emojiText, emojiStyle, {
               wrapEmoji: true,
             });
 
-            const emojiApp = createDemo("emoji", emojiTaggedText);
+            const emojiApp = createDemo("emoji", emojiGlyphs);
           </script>
         </div>
       </div>
@@ -226,7 +226,7 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
             };
             const alignOptions = {};
 
-            let left = new TaggedText(
+            let left = new Glyphs(
               alignText.replace("left", "<b>left</b>"),
               {
                 ...alignStyle,
@@ -239,7 +239,7 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
               alignOptions
             );
 
-            let right = new TaggedText(
+            let right = new Glyphs(
               alignText.replace("right", "<b>right</b>"),
               {
                 ...alignStyle,
@@ -254,7 +254,7 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
             right.x = 330;
             right.y = 30;
 
-            let center = new TaggedText(
+            let center = new Glyphs(
               alignText.replace("center", "<b>center</b>"),
               {
                 ...alignStyle,
@@ -269,7 +269,7 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
             center.x = 30;
             center.y = 330;
 
-            let justify = new TaggedText(
+            let justify = new Glyphs(
               alignText.replace("justify", "<b>justify</b>"),
               {
                 ...alignStyle,
@@ -331,7 +331,7 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
 
             const valignImg = PIXI.Sprite.from("./icon.png");
 
-            let valign = new TaggedText(valignText, valignStyle, {
+            let valign = new Glyphs(valignText, valignStyle, {
               imgMap: { valignImg },
             });
             createDemo("valign", valign);
@@ -372,7 +372,7 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
               smallcaps: { fontVariant: "small-caps" },
             };
 
-            let textTransform = new TaggedText(
+            let textTransform = new Glyphs(
               textTransformText,
               textTransformStyle
             );
@@ -448,7 +448,7 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
               },
             };
 
-            let underline = new TaggedText(underlineText, underlineStyle, {
+            let underline = new Glyphs(underlineText, underlineStyle, {
               // When using text decoration, it's recommended you use drawWhitespace: true
               // so that spaces will have underlines.
               drawWhitespace: true,
@@ -484,7 +484,7 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
                 fontWeight: 700,
               },
             };
-            let attributes = new TaggedText(
+            let attributes = new Glyphs(
               attributesText,
               attributesStyle,
               {}
@@ -522,7 +522,7 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
               thicker: { stroke: "#002266", strokeThickness: 10 },
               large: { fontSize: "36px" },
             };
-            let nested = new TaggedText(nestedText, nestedStyle);
+            let nested = new Glyphs(nestedText, nestedStyle);
             createDemo("nested", nested);
           </script>
         </div>
@@ -557,7 +557,7 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
                 letterSpacing: 10,
               },
             };
-            let spacing = new TaggedText(spacingText, spacingStyle);
+            let spacing = new Glyphs(spacingText, spacingStyle);
 
             createDemo("spacing", spacing);
           </script>
@@ -582,7 +582,7 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
                 align: "right",
               },
             };
-            let wrapping = new TaggedText(wrappingText, wrappingStyle, {});
+            let wrapping = new Glyphs(wrappingText, wrappingStyle, {});
 
             const nonWrappingText = `This one doesn't have \`wordWrap\` so it just keeps going and going and going off the edge!`;
             const nonWrappingStyle = {
@@ -595,7 +595,7 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
                 align: "left",
               },
             };
-            let nonWrapping = new TaggedText(nonWrappingText, nonWrappingStyle);
+            let nonWrapping = new Glyphs(nonWrappingText, nonWrappingStyle);
             nonWrapping.x = 30;
             nonWrapping.y = 330;
 
@@ -665,7 +665,7 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
                 fontFamily: "georgia",
               },
             };
-            let fontScaling = new TaggedText(fontScalingText, fontScalingStyle);
+            let fontScaling = new Glyphs(fontScalingText, fontScalingStyle);
 
             createDemo("fontScaling", fontScaling);
           </script>
@@ -712,7 +712,7 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
             };
             createDemo(
               "breakWords",
-              new TaggedText(breakWordsText, breakWordsStyle, breakWordsOptions)
+              new Glyphs(breakWordsText, breakWordsStyle, breakWordsOptions)
             );
           </script>
         </div>
@@ -761,7 +761,7 @@ an explicit line break in the middle.</nobreak>
             },
           };
 
-          const breakLines = new TaggedText(breakLinesText, breakLinesStyle, {});
+          const breakLines = new Glyphs(breakLinesText, breakLinesStyle, {});
 
           createDemo("breakLines", breakLines);
         </script>
@@ -801,7 +801,7 @@ You can also set <code>debugConsole: true</code> if you want to log information 
               },
             };
 
-            let debug = new TaggedText(debugText, debugStyle, { debug: true });
+            let debug = new Glyphs(debugText, debugStyle, { debug: true });
 
             createDemo("debug", debug);
           </script>
@@ -848,7 +848,7 @@ This is designed to help with fonts which don't align correctly with the baselin
               },
             };
 
-            const adjustFontBaseline = new TaggedText(
+            const adjustFontBaseline = new Glyphs(
               adjustFontBaselineText,
               adjustFontBaselineStyle,
               {
@@ -873,7 +873,7 @@ This is designed to help with fonts which don't align correctly with the baselin
         <div class="pixi" id="interaction">
           <script>
             // Interaction Events
-            let interactionTagged = new TaggedText(
+            let interactionTagged = new Glyphs(
               `If you enable <link name="interaction">interaction</link>, you can get <link name="information">information</link> about which <link name="tag">tag</link> corresponded to the <link name="event">event</link>.`,
               {
                 default: {
@@ -938,7 +938,7 @@ This is designed to help with fonts which don't align correctly with the baselin
               red: { fill: 0xff8888, stroke: 0xcc4444 },
             };
 
-            let animated = new TaggedText(animatedText, animatedStyles, {
+            let animated = new Glyphs(animatedText, animatedStyles, {
               splitStyle: "characters",
             });
 

@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import TaggedText from "./TaggedText";
+import Glyphs from "./Glyphs";
 import { complement, flatEvery } from "./functionalUtils";
 import { logWarning } from "./errorMessaging";
 
@@ -62,7 +62,7 @@ export interface ErrorMessage {
   type: ErrorMessageType;
   code: string;
   message: string;
-  target?: TaggedText;
+  target?: Glyphs;
 }
 export type ErrorHandler = (e: ErrorMessage) => void;
 
@@ -72,7 +72,7 @@ export interface IFontMetrics {
   fontSize: number;
 }
 
-export interface TaggedTextOptions {
+export interface GlyphsOptions {
   debug?: boolean;
   debugConsole?: boolean;
   splitStyle?: SplitStyle;
@@ -87,6 +87,9 @@ export interface TaggedTextOptions {
   supressConsole?: boolean;
   overdrawDecorations?: number;
 }
+
+// Legacy alias for backwards compatibility
+export type TaggedTextOptions = GlyphsOptions;
 
 ///// STYLE PROPERTIES
 
@@ -286,7 +289,7 @@ export type StyledTokens = StyledToken;
 // - The SegmentToken is the only one that contains text content and metadata;
 //   the rest are all ordered containers used to organize the smaller pieces inside it.
 //   In other words, the type of a ParagraphToken is equal to SegmentToken[][][]
-// - The .tokens property of a TaggedText is a ParagraphToken.
+// - The .tokens property of a Glyphs is a ParagraphToken.
 // - ParagrahpTokens don't necessarily contain paragraphs in the grammatical sense.
 //   It is simply a collection of lines of text and could contain one literal paragraph,
 //   or more than one, or none at all. Same is true for Lines & Words

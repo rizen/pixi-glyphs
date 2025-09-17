@@ -1,20 +1,20 @@
-import TaggedText from "../src/TaggedText";
+import Glyphs from "../src/Glyphs";
 
-describe("TaggedText - performance", () => {
+describe("Glyphs - performance", () => {
   describe("skipUpdates & skipDraw", () => {
     const REPS = 50;
     describe(`performace of skipping draw and updates. Updating string ${REPS} times.`, () => {
       // Performance
-      const editText = (textField: TaggedText) => {
+      const editText = (textField: Glyphs) => {
         textField.text = "";
         for (let i = 0; i < REPS; i++) {
           textField.text += `${i} `;
         }
       };
 
-      const control = new TaggedText();
-      const skipDraw = new TaggedText("", {}, { skipDraw: true });
-      const skipUpdates = new TaggedText("", {}, { skipUpdates: true });
+      const control = new Glyphs();
+      const skipDraw = new Glyphs("", {}, { skipDraw: true });
+      const skipUpdates = new Glyphs("", {}, { skipUpdates: true });
 
       let startTime = new Date().getTime();
       editText(control);

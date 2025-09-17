@@ -67,7 +67,7 @@ const DEFAULT_DESTROY_OPTIONS: PIXI.IDestroyOptions = {
   texture: true,
 };
 
-export default class TaggedText<
+export default class Glyphs<
   TextType extends PixiTextTypes = PIXI.Text,
 > extends PIXI.Sprite {
   public static get defaultStyles(): TextStyleSet {
@@ -77,7 +77,7 @@ export default class TaggedText<
     return DEFAULT_OPTIONS;
   }
 
-  /** Settings for the TaggedText component. */
+  /** Settings for the Glyphs component. */
   private _options: TaggedTextOptions;
   public get options(): TaggedTextOptions {
     return this._options;

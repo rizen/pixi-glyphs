@@ -2,7 +2,7 @@
 const demos = {
   basic: {
     title: "Basics",
-    description: "Basic multiline and multistyle text with TaggedText",
+    description: "Basic multiline and multistyle text with Glyphs",
     code: `const text = \`Let's make some
 <ml>multiline</ml>
 and <ms>multistyle</ms> text for
@@ -30,7 +30,7 @@ const styles = {
   }
 };
 
-const taggedText = new TaggedText(text, styles);`,
+const glyphs = new Glyphs(text, styles);`,
     init: function() {
       const text = `Let's make some
 <ml>multiline</ml>
@@ -59,7 +59,7 @@ and <ms>multistyle</ms> text for
         }
       };
 
-      return new TaggedText(text, styles, {});
+      return new Glyphs(text, styles, {});
     }
   },
 
@@ -104,7 +104,7 @@ const styles = {
   url: { imgDisplay: "icon" }
 };
 
-const taggedText = new TaggedText(text, styles, {
+const glyphs = new Glyphs(text, styles, {
   imgMap: { thinking, doot, url }
 });`,
     init: function() {
@@ -146,7 +146,7 @@ You can even load images from a URL <url /> (if you can figure out the CORS stuf
         url: { imgDisplay: "icon" }
       };
 
-      return new TaggedText(text, styles, {
+      return new Glyphs(text, styles, {
         imgMap: { thinking, doot, url }
       });
     }
@@ -193,7 +193,7 @@ const styles = {
   }
 };
 
-const taggedText = new TaggedText(text, styles, {
+const glyphs = new Glyphs(text, styles, {
   wrapEmoji: true
 });`,
     init: function() {
@@ -235,7 +235,7 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
         }
       };
 
-      return new TaggedText(text, styles, { wrapEmoji: true });
+      return new Glyphs(text, styles, { wrapEmoji: true });
     }
   },
 
@@ -255,7 +255,7 @@ const baseStyle = {
 };
 
 // Create four text objects with different alignments
-let left = new TaggedText(
+let left = new Glyphs(
   text.replace("left", "<b>left</b>"),
   {
     ...baseStyle,
@@ -263,7 +263,7 @@ let left = new TaggedText(
   }
 );
 
-let right = new TaggedText(
+let right = new Glyphs(
   text.replace("right", "<b>right</b>"),
   {
     ...baseStyle,
@@ -271,7 +271,7 @@ let right = new TaggedText(
   }
 );
 
-let center = new TaggedText(
+let center = new Glyphs(
   text.replace("center", "<b>center</b>"),
   {
     ...baseStyle,
@@ -279,7 +279,7 @@ let center = new TaggedText(
   }
 );
 
-let justify = new TaggedText(
+let justify = new Glyphs(
   text.replace("justify", "<b>justify</b>"),
   {
     ...baseStyle,
@@ -300,7 +300,7 @@ let justify = new TaggedText(
 
       const texts = [];
 
-      let left = new TaggedText(
+      let left = new Glyphs(
         alignText.replace("left", "<b>left</b>"),
         {
           ...alignStyle,
@@ -313,7 +313,7 @@ let justify = new TaggedText(
       );
       texts.push(left);
 
-      let right = new TaggedText(
+      let right = new Glyphs(
         alignText.replace("right", "<b>right</b>"),
         {
           ...alignStyle,
@@ -327,7 +327,7 @@ let justify = new TaggedText(
       right.x = 300;
       texts.push(right);
 
-      let center = new TaggedText(
+      let center = new Glyphs(
         alignText.replace("center", "<b>center</b>"),
         {
           ...alignStyle,
@@ -341,7 +341,7 @@ let justify = new TaggedText(
       center.y = 300;
       texts.push(center);
 
-      let justify = new TaggedText(
+      let justify = new Glyphs(
         alignText.replace("justify", "<b>justify</b>"),
         {
           ...alignStyle,
@@ -393,7 +393,7 @@ const styles = {
   img: { imgSrc: "valignImg", imgDisplay: "icon" }
 };
 
-const taggedText = new TaggedText(text, styles, {
+const glyphs = new Glyphs(text, styles, {
   imgMap: { valignImg }
 });`,
     init: function() {
@@ -427,7 +427,7 @@ const taggedText = new TaggedText(text, styles, {
         img: { imgSrc: "valignImg", imgDisplay: "icon" }
       };
 
-      return new TaggedText(text, styles, {
+      return new Glyphs(text, styles, {
         imgMap: { valignImg }
       });
     }
@@ -461,7 +461,7 @@ const styles = {
   smallcaps: { fontVariant: "small-caps" }
 };
 
-const taggedText = new TaggedText(text, styles);`,
+const glyphs = new Glyphs(text, styles);`,
     init: function() {
       const text = `<h1>Text transformations:</h1>
 <code>textTransform: "lowercase"</code>
@@ -488,7 +488,7 @@ const taggedText = new TaggedText(text, styles);`,
         smallcaps: { fontVariant: "small-caps" }
       };
 
-      return new TaggedText(text, styles);
+      return new Glyphs(text, styles);
     }
   },
 
@@ -553,7 +553,7 @@ const styles = {
   }
 };
 
-const taggedText = new TaggedText(text, styles, {
+const glyphs = new Glyphs(text, styles, {
   drawWhitespace: true,
   overdrawDecorations: 2
 });`,
@@ -616,7 +616,7 @@ const taggedText = new TaggedText(text, styles, {
         }
       };
 
-      return new TaggedText(text, styles, {
+      return new Glyphs(text, styles, {
         drawWhitespace: true,
         overdrawDecorations: 2
       });
@@ -641,7 +641,7 @@ const styles = {
   }
 };
 
-const taggedText = new TaggedText(text, styles);`,
+const glyphs = new Glyphs(text, styles);`,
     init: function() {
       const text = `You can add <em>attributes</em> to your tags!\nThey will <em fontStyle="italic">overwrite</em> the <em fill="#FF8822">values</em> for any existing <em fontFamily="Courier" fill="#FFFF00" fontWeight="400">tag styles</em>.`;
 
@@ -658,7 +658,7 @@ const taggedText = new TaggedText(text, styles);`,
         }
       };
 
-      return new TaggedText(text, styles, {});
+      return new Glyphs(text, styles, {});
     }
   },
 
@@ -686,7 +686,7 @@ const styles = {
   large: { fontSize: "36px" }
 };
 
-const taggedText = new TaggedText(text, styles);`,
+const glyphs = new Glyphs(text, styles);`,
     init: function() {
       const text = `You can <outline>nest <b>tags <red>as <i>deeply <thicker>as you'd <large>like, <blue>dude!</blue></large></thicker></i></red></b></outline>`;
 
@@ -709,7 +709,7 @@ const taggedText = new TaggedText(text, styles);`,
         large: { fontSize: "36px" }
       };
 
-      return new TaggedText(text, styles);
+      return new Glyphs(text, styles);
     }
   },
 
@@ -738,7 +738,7 @@ const styles = {
   }
 };
 
-const taggedText = new TaggedText(text, styles);`,
+const glyphs = new Glyphs(text, styles);`,
     init: function() {
       const text = "You can <narrow>set line and letter spacing</narrow> to <wide>give your text some drama.</wide>\nNote that lineSpacing can only be set on the default style.";
 
@@ -762,7 +762,7 @@ const taggedText = new TaggedText(text, styles);`,
         }
       };
 
-      return new TaggedText(text, styles);
+      return new Glyphs(text, styles);
     }
   },
 
@@ -783,7 +783,7 @@ const wrappingStyle = {
   }
 };
 
-const wrapping = new TaggedText(wrappingText, wrappingStyle);
+const wrapping = new Glyphs(wrappingText, wrappingStyle);
 
 // Without word wrap
 const nonWrappingText = \`This one doesn't have \\\`wordWrap\\\` so it just keeps going and going and going off the edge!\`;
@@ -799,7 +799,7 @@ const nonWrappingStyle = {
   }
 };
 
-const nonWrapping = new TaggedText(nonWrappingText, nonWrappingStyle);`,
+const nonWrapping = new Glyphs(nonWrappingText, nonWrappingStyle);`,
     init: function() {
       const texts = [];
 
@@ -814,7 +814,7 @@ const nonWrapping = new TaggedText(nonWrappingText, nonWrappingStyle);`,
           align: "right"
         }
       };
-      texts.push(new TaggedText(wrappingText, wrappingStyle, {}));
+      texts.push(new Glyphs(wrappingText, wrappingStyle, {}));
 
       const nonWrappingText = `This one doesn't have \`wordWrap\` so it just keeps going and going and going off the edge!`;
       const nonWrappingStyle = {
@@ -827,7 +827,7 @@ const nonWrapping = new TaggedText(nonWrappingText, nonWrappingStyle);`,
           align: "left"
         }
       };
-      const nonWrapping = new TaggedText(nonWrappingText, nonWrappingStyle);
+      const nonWrapping = new Glyphs(nonWrappingText, nonWrappingStyle);
       nonWrapping.y = 300;
       texts.push(nonWrapping);
 
@@ -893,7 +893,7 @@ const styles = {
   }
 };
 
-const taggedText = new TaggedText(text, styles);`,
+const glyphs = new Glyphs(text, styles);`,
     init: function() {
       const text = `You can change the scaling of the font:
 
@@ -951,7 +951,7 @@ const taggedText = new TaggedText(text, styles);`,
         }
       };
 
-      return new TaggedText(text, styles);
+      return new Glyphs(text, styles);
     }
   },
 
@@ -988,7 +988,7 @@ const styles = {
   }
 };
 
-const taggedText = new TaggedText(text, styles);`,
+const glyphs = new Glyphs(text, styles);`,
     init: function() {
       const text = `Use <code>splitStyle: "characters"</code> and <code>breakWords: true</code> to allow line breaks between characters. Can be useful for languages such as chinese.
 
@@ -1020,7 +1020,7 @@ const taggedText = new TaggedText(text, styles);`,
         }
       };
 
-      return new TaggedText(text, styles, {});
+      return new Glyphs(text, styles, {});
     }
   },
 
@@ -1053,7 +1053,7 @@ const styles = {
   }
 };
 
-const taggedText = new TaggedText(text, styles, { debug: true });`,
+const glyphs = new Glyphs(text, styles, { debug: true });`,
     init: function() {
       const text = `You can use <blue>debug mode</blue> to help you figure out what your text is doing. Include <code>{debug: true} </code> in the options when you create your text.
 You can also set <code>debugConsole: true</code> if you want to log information about the text field to the console.`;
@@ -1081,7 +1081,7 @@ You can also set <code>debugConsole: true</code> if you want to log information 
         }
       };
 
-      return new TaggedText(text, styles, { debug: true });
+      return new Glyphs(text, styles, { debug: true });
     }
   },
 
@@ -1114,18 +1114,18 @@ const styles = {
   red: { fill: 0xff8888, stroke: 0xcc4444 }
 };
 
-const taggedText = new TaggedText(text, styles, {
+const glyphs = new Glyphs(text, styles, {
   splitStyle: "characters"
 });
 
 // Animate with sine wave
-const originalYPositions = taggedText.textFields.map((t) => t.y);
+const originalYPositions = glyphs.textFields.map((t) => t.y);
 let time = 0;
 
 app.ticker.add((delta) => {
   time += delta;
-  for (let i = 0; i < taggedText.textFields.length; i++) {
-    const text = taggedText.textFields[i];
+  for (let i = 0; i < glyphs.textFields.length; i++) {
+    const text = glyphs.textFields[i];
     const amplitude = 5;
     const frequency = 0.1;
     const phaseOffsetPerLetter = 1;
@@ -1161,18 +1161,18 @@ app.ticker.add((delta) => {
         red: { fill: 0xff8888, stroke: 0xcc4444 }
       };
 
-      return new TaggedText(text, styles, {
+      return new Glyphs(text, styles, {
         splitStyle: "characters"
       });
     },
-    animate: function(taggedText, app) {
-      const originalYPositions = taggedText.textFields.map((t) => t.y);
+    animate: function(glyphs, app) {
+      const originalYPositions = glyphs.textFields.map((t) => t.y);
       let time = 0;
 
       app.ticker.add((delta) => {
         time += delta;
-        for (let i = 0; i < taggedText.textFields.length; i++) {
-          const text = taggedText.textFields[i];
+        for (let i = 0; i < glyphs.textFields.length; i++) {
+          const text = glyphs.textFields[i];
           const amplitude = 5;
           const frequency = 0.1;
           const phaseOffsetPerLetter = 1;

@@ -89,7 +89,7 @@ function loadDemo(demoId) {
   // Initialize the demo
   const result = demoConfig.init();
 
-  // Handle single or multiple TaggedText objects
+  // Handle single or multiple Glyphs objects
   if (Array.isArray(result)) {
     result.forEach(text => {
       text.x = text.x !== undefined ? text.x : 30;
@@ -183,13 +183,13 @@ const app = new PIXI.Application({
 });
 document.body.appendChild(app.view);
 
-// Create TaggedText
+// Create Glyphs
 ${code}
 
 // Add to stage
-taggedText.x = 30;
-taggedText.y = 30;
-app.stage.addChild(taggedText);`;
+glyphs.x = 30;
+glyphs.y = 30;
+app.stage.addChild(glyphs);`;
 }
 
 // Setup navigation event listeners

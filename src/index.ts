@@ -1,3 +1,3 @@
-import TaggedText from "./TaggedText";
+import Glyphs from "./Glyphs";
 
-export default TaggedText;
+export default Glyphs;

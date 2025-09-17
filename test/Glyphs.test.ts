@@ -1,8 +1,8 @@
 import { expectToBeBetween } from "./support/testUtil";
-import { DEFAULT_KEY, TaggedTextOptions } from "./../src/types";
+import { DEFAULT_KEY, GlyphsOptions } from "./../src/types";
 import * as PIXI from "pixi.js";
 import { pluck } from "../src/functionalUtils";
-import TaggedText from "../src/TaggedText";
+import Glyphs from "../src/Glyphs";
 import iconSrc from "./support/icon.base64";
 import {
   iconImage,
@@ -22,7 +22,7 @@ import {
 import { Graphics } from "pixi.js";
 import DEFAULT_STYLE from "../src/defaultStyle";
 
-describe("TaggedText", () => {
+describe("Glyphs", () => {
   const style: TextStyleSet = {
     default: {
       fontSize: 10,
@@ -52,65 +52,65 @@ describe("TaggedText", () => {
 
   describe("constructor", () => {
     it("Takes a string for the text content. Strings can be multi-line. Strings don't need to contain any tags to work.", () => {
-      const t = new TaggedText("Hello,\nworld!");
+      const t = new Glyphs("Hello,\nworld!");
       expect(t.text).toBe("Hello,\nworld!");
     });
     it("Takes an optional list of styles.", () => {
-      const t = new TaggedText("Hello!", { b: { fontWeight: "700" } });
+      const t = new Glyphs("Hello!", { b: { fontWeight: "700" } });
       expect(t.tagStyles).toHaveProperty("b");
     });
 
     describe("defaultStyles", () => {
       it("Should define some styles by default like text color: black.", () => {
-        const text = new TaggedText("Hello");
+        const text = new Glyphs("Hello");
         expect(text.defaultStyle.fill).toEqual(0);
       });
 
-      it("Should provide the default styles for TaggedText as a static value.", () => {
-        const defaultStyles = TaggedText.defaultStyles;
+      it("Should provide the default styles for Glyphs as a static value.", () => {
+        const defaultStyles = Glyphs.defaultStyles;
         expect(defaultStyles).toHaveProperty(DEFAULT_KEY);
         expect(defaultStyles.default).toHaveProperty("valign", "baseline");
       });
 
       it("defaultStyles replaces color names like 'black' with numbers", () => {
-        expect(TaggedText.defaultStyles.default).toHaveProperty("fill", 0);
+        expect(Glyphs.defaultStyles.default).toHaveProperty("fill", 0);
       });
 
       it("defaultStyles uses 26px as a default for fontSize", () => {
-        expect(TaggedText.defaultStyles.default).toHaveProperty("fontSize", 26);
+        expect(Glyphs.defaultStyles.default).toHaveProperty("fontSize", 26);
       });
 
       it("defaultStyles should not be editable.", () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        expect(() => (TaggedText.defaultStyles = {})).toThrow();
-        expect(TaggedText.defaultStyles).toHaveProperty(DEFAULT_KEY);
+        expect(() => (Glyphs.defaultStyles = {})).toThrow();
+        expect(Glyphs.defaultStyles).toHaveProperty(DEFAULT_KEY);
       });
     });
     describe("defaultOptions", () => {
       it("Should define some options by default like text debug:false.", () => {
-        const text = new TaggedText("Hello");
+        const text = new Glyphs("Hello");
         expect(text.options.debug).toBeFalsy();
       });
       it("Should provide the default options as a static value.", () => {
-        const defaultOptions = TaggedText.defaultOptions;
+        const defaultOptions = Glyphs.defaultOptions;
         expect(defaultOptions).toHaveProperty("splitStyle", "words");
         expect(defaultOptions).toHaveProperty("debug", false);
       });
       it("defaultOptions should not be editable.", () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        expect(() => (TaggedText.defaultOptions = {})).toThrow();
-        expect(TaggedText.defaultOptions).toHaveProperty("splitStyle");
+        expect(() => (Glyphs.defaultOptions = {})).toThrow();
+        expect(Glyphs.defaultOptions).toHaveProperty("splitStyle");
       });
     });
     describe("constructor takes a list of options.", () => {
       describe("debug", () => {
-        const control = new TaggedText("Test <b><i>test</i></b>", style);
-        const debug = new TaggedText("Test <b><i>test</i></b> test", style, {
+        const control = new Glyphs("Test <b><i>test</i></b>", style);
+        const debug = new Glyphs("Test <b><i>test</i></b> test", style, {
           debug: true,
         });
-        const blank = new TaggedText("", style, { debug: true });
+        const blank = new Glyphs("", style, { debug: true });
 
         it("Draws all shapes into one graphics layer.", () => {
           expect(blank.debugContainer).not.toBeNull();
@@ -145,20 +145,20 @@ describe("TaggedText", () => {
       describe("debugConsole", () => {
         it("It should log debug info to console.", () => {
           const consoleSpy = jest.spyOn(console, "log");
-          new TaggedText("This <b>should appear</b> in console!", style, {
+          new Glyphs("This <b>should appear</b> in console!", style, {
             debugConsole: true,
           });
           expect(consoleSpy).toHaveBeenCalled();
         });
 
         it("Should have debugCosole set to false by default.", () => {
-          const control = new TaggedText("Test <b>test</b>", style);
+          const control = new Glyphs("Test <b>test</b>", style);
           expect(control.options.debugConsole).toBeFalsy();
         });
       });
 
       describe("imageMap", () => {
-        const t = new TaggedText(
+        const t = new Glyphs(
           "a b c <icon/>",
           { icon: { imgDisplay: "icon", fontSize: 48 } },
           { imgMap: { icon }, debug: true }
@@ -179,7 +179,7 @@ describe("TaggedText", () => {
 
         describe("Icon sizes", () => {
           it("All icons in the same style should have same size.", () => {
-            const iconTest = new TaggedText(
+            const iconTest = new Glyphs(
               "<icon />A<icon />",
               { icon: { imgDisplay: "icon", fontSize: 30 } },
               { imgMap: { icon } }
@@ -201,7 +201,7 @@ describe("TaggedText", () => {
 
         describe("imgSrc using non-Sprite references", () => {
           it("Should load images from a Texture object", () => {
-            const texTest = new TaggedText(
+            const texTest = new Glyphs(
               "<icon />",
               { icon: { imgDisplay: "icon" } },
               { imgMap: { icon: iconTexture } }
@@ -212,7 +212,7 @@ describe("TaggedText", () => {
             expect(texTest.spriteTemplates.icon).toBeInstanceOf(PIXI.Sprite);
           });
           it("Should load images from an HTMLImage object", () => {
-            const imgTest = new TaggedText(
+            const imgTest = new Glyphs(
               "<icon />",
               { icon: { imgDisplay: "icon" } },
               { imgMap: { icon: iconImage } }
@@ -223,7 +223,7 @@ describe("TaggedText", () => {
             expect(imgTest.spriteTemplates.icon).toBeInstanceOf(PIXI.Sprite);
           });
           it("Should load images from a URL", () => {
-            const urlTest = new TaggedText(
+            const urlTest = new Glyphs(
               "<img />",
               {},
               {
@@ -246,7 +246,7 @@ describe("TaggedText", () => {
 
         it("should throw if an imgSrc uses a bogus reference", () => {
           expect(() => {
-            new TaggedText(
+            new Glyphs(
               "<img />",
               {},
               { imgMap: { img: new Date() as unknown as string } }
@@ -257,13 +257,13 @@ describe("TaggedText", () => {
         it("should throw if the reference to the sprite was destroyed", () => {
           const texture = createTexture();
           expect(() => {
-            new TaggedText("<img />", {}, { imgMap: { img: texture } });
+            new Glyphs("<img />", {}, { imgMap: { img: texture } });
           }).not.toThrow();
 
           texture.destroy(true);
 
           expect(() => {
-            new TaggedText("<img />", {}, { imgMap: { img: texture } });
+            new Glyphs("<img />", {}, { imgMap: { img: texture } });
           }).toThrow(/destroyed/);
         });
       });
@@ -281,8 +281,8 @@ describe("TaggedText", () => {
         const options = {
           adjustFontBaseline: { Arial: `${aPercent * 100}%`, Georgia: bPixels },
         };
-        const control = new TaggedText(text, style, {});
-        const adjustFontBaseline = new TaggedText(text, style, options);
+        const control = new Glyphs(text, style, {});
+        const adjustFontBaseline = new Glyphs(text, style, options);
 
         const [aControl, bControl, cControl] = control.tokensFlat;
         const [a, b, c] = adjustFontBaseline.tokensFlat;
@@ -376,7 +376,7 @@ describe("TaggedText", () => {
             super: { fontSize: 8, adjustBaseline: 10 },
           };
 
-          const text = new TaggedText(str, styles);
+          const text = new Glyphs(str, styles);
           const tokens = text.tokensFlat;
           const small = tokens[0];
           const superscript = tokens[tokens.length - 1];
@@ -399,7 +399,7 @@ describe("TaggedText", () => {
             });
           });
           it("Should combine with adjustFontBaseline", () => {
-            const textWithFontAdjustment = new TaggedText(str, styles, {
+            const textWithFontAdjustment = new Glyphs(str, styles, {
               adjustFontBaseline: { arial: 10 },
             });
             const doubleSuper =
@@ -417,8 +417,8 @@ describe("TaggedText", () => {
       });
 
       describe("drawWhitespace", () => {
-        const noDrawWhitespace = new TaggedText("a b\nc", {});
-        const drawWhitespace = new TaggedText(
+        const noDrawWhitespace = new Glyphs("a b\nc", {});
+        const drawWhitespace = new Glyphs(
           "a b\nc",
           {},
           { drawWhitespace: true }
@@ -452,9 +452,9 @@ describe("TaggedText", () => {
         const charLength = text.length - " ".length;
         const style = {};
 
-        const control = new TaggedText(text, style);
-        const words = new TaggedText(text, style, { splitStyle: "words" });
-        const chars = new TaggedText(text, style, { splitStyle: "characters" });
+        const control = new Glyphs(text, style);
+        const words = new Glyphs(text, style, { splitStyle: "words" });
+        const chars = new Glyphs(text, style, { splitStyle: "characters" });
 
         it('Should be "words" by default.', () => {
           expect(control.options.splitStyle).toBe("words");
@@ -478,20 +478,20 @@ describe("TaggedText", () => {
 
         it("Should throw if the style is not supported. It will offer suggestions if you're close!", () => {
           expect(() => {
-            new TaggedText(text, style, { splitStyle: "chars" as SplitStyle });
+            new Glyphs(text, style, { splitStyle: "chars" as SplitStyle });
           }).toThrow(/.*(Did you mean "characters"?)/g);
         });
       });
 
       describe("skipUpdates & skipDraw", () => {
-        // See also TaggedText.perf.test.ts
+        // See also Glyphs.perf.test.ts
 
         const text = "Test <b>test</b>";
-        const control = new TaggedText(text, style);
-        const skipUpdates = new TaggedText(text, style, {
+        const control = new Glyphs(text, style);
+        const skipUpdates = new Glyphs(text, style, {
           skipUpdates: true,
         });
-        const skipDraw = new TaggedText(text, style, {
+        const skipDraw = new Glyphs(text, style, {
           skipDraw: true,
         });
 
@@ -559,7 +559,7 @@ describe("TaggedText", () => {
       });
       describe("needsUpdate and needsDraw", () => {
         it("When your code skips an update, the needsUpdate flag will be set to true.", () => {
-          const t = new TaggedText("test", style);
+          const t = new Glyphs("test", style);
           expect(t.needsUpdate).toBeFalsy();
           t.setText("new!", true);
           expect(t.needsUpdate).toBeTruthy();
@@ -567,13 +567,13 @@ describe("TaggedText", () => {
           expect(t.needsUpdate).toBeFalsy();
         });
         it("Setting text to the same value won't require an update.", () => {
-          const t = new TaggedText("test", style);
+          const t = new Glyphs("test", style);
           expect(t.needsUpdate).toBeFalsy();
           t.setText("test", true);
           expect(t.needsUpdate).toBeFalsy();
         });
         it("When your code skips a draw, the needsUpdate flag will be set to true.", () => {
-          const t = new TaggedText("test", style);
+          const t = new Glyphs("test", style);
           expect(t.needsDraw).toBeFalsy();
           t.update(true);
           expect(t.needsDraw).toBeTruthy();
@@ -583,12 +583,12 @@ describe("TaggedText", () => {
       });
 
       describe("wrapEmoji", () => {
-        const control = new TaggedText("test");
+        const control = new Glyphs("test");
         it("Should be true by default", () => {
           expect(control.options.wrapEmoji).toBeTruthy();
         });
         it("should wrap emoji in a span", () => {
-          const t = new TaggedText(
+          const t = new Glyphs(
             "test 🔥",
             { default: { fontFamily: "Georgia" } },
             { wrapEmoji: true }
@@ -600,7 +600,7 @@ describe("TaggedText", () => {
           ]);
         });
         it("should not wrap emoji when set to false", () => {
-          const t = new TaggedText(
+          const t = new Glyphs(
             "test 🔥",
             { default: { fontFamily: "Georgia" } },
             { wrapEmoji: false }
@@ -616,13 +616,13 @@ describe("TaggedText", () => {
   });
 
   describe("text", () => {
-    const singleLine = new TaggedText("Line 1", style);
-    const doubleLine = new TaggedText(
+    const singleLine = new Glyphs("Line 1", style);
+    const doubleLine = new Glyphs(
       `Line 1
 Line 2`,
       style
     );
-    const tripleSpacedLines = new TaggedText("", style);
+    const tripleSpacedLines = new Glyphs("", style);
 
     describe("setText(), get text, & set text", () => {
       it("Implicit setter should set the text. Does not allow you to override the skipUpdate", () => {
@@ -670,7 +670,7 @@ Line 2`,
 
     describe("untaggedText", () => {
       it("Returns the text with tags stripped out.", () => {
-        const t = new TaggedText(
+        const t = new Glyphs(
           "<b>Hello</b>... Is it <i>me</i> you're looking for?",
           { b: {}, i: {} }
         );
@@ -688,7 +688,7 @@ Line 4`);
     });
 
     describe("textTransform style", () => {
-      const t = new TaggedText(
+      const t = new Glyphs(
         `control CONTROL
 <upper>upperCASE</upper>
 <lower>lowerCASE</lower>
@@ -770,9 +770,9 @@ Line 4`);
         },
       } as TextStyleSet;
       const opt = { drawWhitespace: true };
-      const t = new TaggedText(str, style, opt);
+      const t = new Glyphs(str, style, opt);
 
-      it("Should not break the whole TaggedText object", () => {
+      it("Should not break the whole Glyphs object", () => {
         expect(t).toBeDefined();
         expect(t).toHaveProperty("textFields");
         expect(t).toHaveProperty("decorations");
@@ -818,7 +818,7 @@ Line 4`);
         it("Should add additional length to the text decorations on either side.", () => {
           const overValue = 3;
 
-          const overdraw = new TaggedText(str, style, {
+          const overdraw = new Glyphs(str, style, {
             ...opt,
             overdrawDecorations: overValue,
           });
@@ -834,7 +834,7 @@ Line 4`);
         });
         it("Should allow negative values.", () => {
           const underValue = -3;
-          const underdraw = new TaggedText(str, style, {
+          const underdraw = new Glyphs(str, style, {
             ...opt,
             overdrawDecorations: underValue,
           });
@@ -847,7 +847,7 @@ Line 4`);
 
         it("Should not allow the width of the decoration to be below 0", () => {
           const superUnderValue = -100;
-          const superUnderdraw = new TaggedText(str, style, {
+          const superUnderdraw = new Glyphs(str, style, {
             ...opt,
             overdrawDecorations: superUnderValue,
           });
@@ -865,8 +865,8 @@ Line 4`);
               wordWrapWidth: 100,
             },
           } as TextStyleSet;
-          const a = new TaggedText(str, style);
-          const b = new TaggedText(str, style, { overdrawDecorations: 30 });
+          const a = new Glyphs(str, style);
+          const b = new Glyphs(str, style, { overdrawDecorations: 30 });
 
           // without overdraw, text wraps to 4 lines
           expect(a.tokens).toHaveLength(4);
@@ -890,11 +890,11 @@ Line 4`);
           expect(code).toBe("invalid-color");
           expect(typeof message).toBe("string");
           expect(type).toBe("warning");
-          expect(target).toBeInstanceOf(TaggedText);
+          expect(target).toBeInstanceOf(Glyphs);
           expect(target?.text).toBe(text);
         };
 
-        new TaggedText(
+        new Glyphs(
           text,
           {
             b: { underlineColor: "red", textDecoration: "underline" },
@@ -904,7 +904,7 @@ Line 4`);
       });
 
       it("If the default style is empty, use the default text color (black)", () => {
-        const noDefault = new TaggedText(
+        const noDefault = new Glyphs(
           "<a>a</a>",
           {
             a: { textDecoration: "underline" },
@@ -923,7 +923,7 @@ Line 4`);
           override: { textDecoration: "none" },
         } as TextStyleSet;
         const text = "Underline <override>NoUnerline</override>";
-        const t = new TaggedText(text, style);
+        const t = new Glyphs(text, style);
         const { decorations, tokensFlat } = t;
         const underline = tokensFlat[0];
         const noUnderline = tokensFlat[2];
@@ -949,7 +949,7 @@ Line 4`);
     describe("stroke", () => {
       describe("Stroke and whitespace", () => {
         it("Shouldn't affeect whitespace (#303)", () => {
-          const t = new TaggedText("a b", {
+          const t = new Glyphs("a b", {
             default: { fontSize: 10, strokeThickness: 100 },
           });
           const [a, space, b] = t.tokensFlat;
@@ -968,7 +968,7 @@ Line 4`);
         };
         const text = `hello
 <wide>hello</wide>`;
-        const w = new TaggedText(text, wideStyle);
+        const w = new Glyphs(text, wideStyle);
         const [normal, wide] = w.textFields;
         expect(wide.width / normal.width).toBeCloseTo(2.0, 0);
         expect(wide.height / normal.height).toBeCloseTo(1, 1);
@@ -981,7 +981,7 @@ Line 4`);
         };
         const text = `hello
 <tall>hello</tall>`;
-        const h = new TaggedText(text, tallStyle);
+        const h = new Glyphs(text, tallStyle);
         const [normal, tall] = h.textFields;
         expect(tall.width / normal.width).toBeCloseTo(1, 0);
         expect(tall.height / normal.height).toBeCloseTo(1.5, 1);
@@ -995,14 +995,14 @@ Line 4`);
           icon: { imgDisplay: "icon" },
         };
         const options = { imgMap: { icon } };
-        const iconTest = new TaggedText(text, style, options);
+        const iconTest = new Glyphs(text, style, options);
 
         const [icon0, , icon1] = iconTest.tokensFlat;
 
         expect(icon0.bounds.width).toEqual(icon0.bounds.height);
         expect(icon1.bounds.width).toEqual(icon1.bounds.height * 2);
 
-        const iconTestNoScale = new TaggedText(text, style, {
+        const iconTestNoScale = new Glyphs(text, style, {
           ...options,
           scaleIcons: false,
         });
@@ -1021,7 +1021,7 @@ Line 4`);
         const text = `hello
 <neg>hello</neg>
 <nan>hello</nan>`;
-        const w = new TaggedText(text, wideStyle);
+        const w = new Glyphs(text, wideStyle);
         const [, neg, nan] = w.textFields;
         expect(neg.width).toBe(0);
         expect(nan.width).toBe(0);
@@ -1030,7 +1030,7 @@ Line 4`);
   });
 
   describe("styles", () => {
-    const t = new TaggedText(`<b>Test</b>`, style);
+    const t = new Glyphs(`<b>Test</b>`, style);
     describe("getStyleForTag()", () => {
       it("Should return a style object for the tag.", () => {
         expect(t.getStyleForTag("b")).toHaveProperty("fontWeight", "bold");
@@ -1051,21 +1051,21 @@ Line 4`);
   describe("parsing", () => {
     it("Should allow nested self-closing tags.", () => {
       expect(() => {
-        new TaggedText(`<b>Nested <i /> self-closing tag</b>`, style);
+        new Glyphs(`<b>Nested <i /> self-closing tag</b>`, style);
       }).not.toThrow();
     });
   });
 
   describe("attributes", () => {
     it("Should allow attributes on tags.", () => {
-      const t = new TaggedText(`<b fontWeight="normal">Test</b>`, style);
+      const t = new Glyphs(`<b fontWeight="normal">Test</b>`, style);
       expect(t.tokens[0][0][0].style.fontWeight).toEqual("normal");
     });
     it("Should allow spaces in attributes.", () => {
-      const control = new TaggedText(`<times>Test</times>`, {
+      const control = new Glyphs(`<times>Test</times>`, {
         times: { fontFamily: "Times New Roman" },
       });
-      const t = new TaggedText(
+      const t = new Glyphs(
         `<times fontFamily="Times New Roman">Test</times>`,
         {
           times: { fontFamily: "Arial" },
@@ -1079,7 +1079,7 @@ Line 4`);
   });
 
   describe("update()", () => {
-    const t = new TaggedText(`<b>Test</b>`, style);
+    const t = new Glyphs(`<b>Test</b>`, style);
     it("Should render the text as pixi text elements.", () => {
       const lines = t.update();
       const [line] = lines;
@@ -1102,7 +1102,7 @@ Line 4`);
   });
 
   describe("Child display-object containers and references to children", () => {
-    const t = new TaggedText(
+    const t = new Glyphs(
       "<u>a</u> b c <icon/>",
       { u: { textDecoration: "underline" } },
       { imgMap: { icon }, debug: true, drawWhitespace: true }
@@ -1158,7 +1158,7 @@ Line 4`);
 
   describe("breakLines", () => {
     it("There is a style called break lines which should default to true.", () => {
-      const t = new TaggedText("A");
+      const t = new Glyphs("A");
       expect(t.defaultStyle.breakLines).toBeTruthy();
     });
   });
@@ -1178,9 +1178,9 @@ Line 4`);
         red: { fill: 0xff8888, stroke: 0xcc4444 },
         big: { fill: 0x88ff88, stroke: 0x44cc44, fontSize: "36px" },
       };
-      const opts: TaggedTextOptions = { splitStyle: "characters" };
+      const opts: GlyphsOptions = { splitStyle: "characters" };
 
-      const control = new TaggedText(
+      const control = new Glyphs(
         charsText,
         {
           ...charsStyle,
@@ -1188,13 +1188,13 @@ Line 4`);
         },
         opts
       );
-      const chars = new TaggedText(charsText, charsStyle, opts);
-      const chars2 = new TaggedText(
+      const chars = new Glyphs(charsText, charsStyle, opts);
+      const chars2 = new Glyphs(
         "<big>Selbstständigkeitserklärung</big>",
         charsStyle,
         opts
       );
-      const chars3 = new TaggedText(
+      const chars3 = new Glyphs(
         `<big>Die Selbstständigkeitserklärung ist noch nicht fertig.</big>`,
         charsStyle,
         opts
@@ -1230,7 +1230,7 @@ Line 4`);
 
         const valignImg = PIXI.Sprite.from(iconSrc);
 
-        const valign = new TaggedText(valignText, valignStyle, {
+        const valign = new Glyphs(valignText, valignStyle, {
           imgMap: { valignImg },
         });
 
@@ -1258,9 +1258,9 @@ Line 4`);
     });
   });
 
-  describe("TaggedText should support percentage font sizes #107", () => {
+  describe("Glyphs should support percentage font sizes #107", () => {
     test("default size of text", () => {
-      expect(new TaggedText("a").textFields[0].style.fontSize).toBe(26);
+      expect(new Glyphs("a").textFields[0].style.fontSize).toBe(26);
     });
 
     const text = "<a>Hello</a> beautiful <b>World<c>!</c></b>";
@@ -1268,7 +1268,7 @@ Line 4`);
       default: { fontFamily: "arial", fontSize: 26 },
     };
 
-    const control = new TaggedText(text, styleControl);
+    const control = new Glyphs(text, styleControl);
     const controlField = control.textFields[0];
     const controlToken = control.tokensFlat[0];
 
@@ -1286,7 +1286,7 @@ Line 4`);
         default: { ...styleControl.default, fontSize: "100%" },
       };
 
-      const percentage = new TaggedText(text, stylePercentage);
+      const percentage = new Glyphs(text, stylePercentage);
       const percentageField = percentage.textFields[0];
       const percentageToken = percentage.tokensFlat[0];
 
@@ -1317,7 +1317,7 @@ Line 4`);
         },
       };
 
-      const nested = new TaggedText(text, style);
+      const nested = new Glyphs(text, style);
       const [a, b, bc, , , ac] = nested.tokensFlat;
       it("renders percentages correctly based on context.", () => {
         expect(a.style.fontSize).toBe(10);
@@ -1342,7 +1342,7 @@ Line 4`);
         },
       };
 
-      const nested = new TaggedText(text, style);
+      const nested = new Glyphs(text, style);
       const [control, big, medium, attr] = nested.tokensFlat;
       it("renders percentages correctly based on context and attributes work correctly.", () => {
         expect(control.style.fontSize).toBe(20); // 20px
@@ -1360,7 +1360,7 @@ Line 4`);
         small: { fontSize: "10%" },
       };
 
-      const test = new TaggedText(text, styleTest);
+      const test = new Glyphs(text, styleTest);
       const [bigField, defaultField, smallField] = test.textFields;
 
       it("default size is 26", () => {
@@ -1384,7 +1384,7 @@ Line 4`);
         c: { fontSize: "200%" },
       };
 
-      const test = new TaggedText(text, styleTest);
+      const test = new Glyphs(text, styleTest);
       const [testField, defaultField] = test.textFields;
       const [
         token100percent,
@@ -1415,7 +1415,7 @@ Line 4`);
     recreateSprite();
 
     const createTextToDestroy = () =>
-      new TaggedText(
+      new Glyphs(
         "Hello my baby, hello my honey, hello my ragtime gal! <icon />",
         { default: { fontSize: 25, textDecoration: "underline" } },
         { imgMap: { icon: sprite }, debug: true }
@@ -1501,7 +1501,7 @@ Line 4`);
       const testString = "This/should=not!be!modified=";
       const customPropertyName = "propertyTest";
 
-      const taggedTextInstance = new TaggedText(
+      const taggedTextInstance = new Glyphs(
         `<test ${customPropertyName}='${testString}'>Test</test>`,
         {
           test: {},

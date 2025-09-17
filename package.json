@@ -1,22 +1,22 @@
 {
-  "name": "pixi-tagged-text",
+  "name": "pixi-glyphs",
   "version": "3.15.2",
-  "description": "TaggedText for pixi.js",
+  "description": "Glyphs - Advanced text rendering for pixi.js",
   "author": "Mims Wright, JT Smith, tleunen",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/mimshwright/pixi-tagged-text.git"
+    "url": "git://github.com/mimshwright/pixi-glyphs.git"
   },
   "bugs": {
-    "url": "https://github.com/mimshwright/pixi-tagged-text/issues"
+    "url": "https://github.com/mimshwright/pixi-glyphs/issues"
   },
-  "homepage": "https://github.com/mimshwright/pixi-tagged-text",
+  "homepage": "https://github.com/mimshwright/pixi-glyphs",
   "source": "./src/index.ts",
-  "main": "./dist/pixi-tagged-text.js",
-  "umd:main": "./dist/pixi-tagged-text.umd.js",
-  "module": "./dist/pixi-tagged-text.m.js",
-  "exports": "./dist/pixi-tagged-text.modern.js",
+  "main": "./dist/pixi-glyphs.js",
+  "umd:main": "./dist/pixi-glyphs.umd.js",
+  "module": "./dist/pixi-glyphs.m.js",
+  "exports": "./dist/pixi-glyphs.modern.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist"
@@ -70,13 +70,13 @@
   },
   "scripts": {
     "prepare": "install-peers",
-    "dev": "microbundle watch -f umd --name TaggedText --external 'pixi.js' --globals 'pixi.js'=PIXI",
+    "dev": "microbundle watch -f umd --name Glyphs --external 'pixi.js' --globals 'pixi.js'=PIXI",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "demo": "npm run build && http-server . --port 8888 && opener http://localhost:8888/demo/index.html",
     "demo:new": "npm run build && http-server . --port 8888 -o docs/index.html",
-    "build": "microbundle --name TaggedText --external 'pixi.js' --globals  'pixi.js'=PIXI",
+    "build": "microbundle --name Glyphs --external 'pixi.js' --globals  'pixi.js'=PIXI",
     "lint:eslint": "eslint ./src/**/*.ts",
     "lint:prettier": "prettier ./**/*.{ts,js,json,html,css,md} -l",
     "fix:prettier": "prettier ./**/*.{ts,js,json,html,css,md} -w",
