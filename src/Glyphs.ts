@@ -656,6 +656,21 @@ export default class Glyphs<
 
       displayObject.x = bounds.x;
       displayObject.y = bounds.y;
+
+      // For icon sprites, push them down relative to their baseline
+      if (isSpriteToken(t)) {
+        const imgDisplay = t.style['imgDisplay'];
+        if (imgDisplay === 'icon') {
+          // Push icon down by 0.1em below its baseline position
+          let fontSize = t.style.fontSize || 20;
+          if (typeof fontSize === 'string') {
+            fontSize = parseInt(fontSize.replace('px', ''), 10);
+          }
+          const iconOffset = fontSize * 0.1;
+          displayObject.y = bounds.y + iconOffset;
+
+        }
+      }
     });
 
     if (drawWhitespace === false && drewDecorations) {

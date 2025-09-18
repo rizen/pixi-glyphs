@@ -527,6 +527,7 @@ export const verticalAlignInLines = (
     }
     if (isSpriteToken(tallestToken)) {
       tallestHeight += tallestToken.fontProperties.descent;
+      // For sprites, use their full height as the ascent for line spacing
       tallestAscent = tallestToken.bounds.height;
     }
 
@@ -546,8 +547,18 @@ export const verticalAlignInLines = (
         const valign = overrideValign ?? style.valign;
 
         let { ascent } = fontProperties;
+        // For sprites, use their height as ascent
         if (isSpriteToken(segment)) {
-          ascent = segment.bounds.height;
+          const imgDisplay = segment.style[IMG_DISPLAY_PROPERTY];
+          if (imgDisplay === 'icon') {
+            // For icons, reduce ascent by 4px to move baseline down to align with text
+            ascent = segment.bounds.height - 4;
+
+          } else {
+            // For non-icon images (regular inline images), use the full height as ascent
+            // This maintains v6 behavior
+            ascent = segment.bounds.height;
+          }
         }
 
         if (isNewlineToken(segment)) {
@@ -597,6 +608,8 @@ export const verticalAlignInLines = (
             // we get consistent ascent/descent values like PIXI v6 did
             newY = previousLineBottom + tallestAscent - ascent;
 
+            // Don't modify newY here - we'll handle icon offset separately
+
             // Adjust for stroke if present
             // PIXI positions stroked text from the outer edge of the stroke
             // So we compensate by subtracting half the stroke width
@@ -606,6 +619,7 @@ export const verticalAlignInLines = (
 
         }
         newBounds.y = newY;
+
 
         const newToken = {
           ...segment,
@@ -1027,7 +1041,24 @@ export const calculateTokens = (
         const imgDisplay = style[IMG_DISPLAY_PROPERTY];
         // const isBlockImage = imgDisplay === "block";
         const isIcon = imgDisplay === "icon";
+
+        // For icons, we need to measure text properties with actual text
+        // Empty text gives incorrect font metrics
+        if (localSizer.text === "") {
+          localSizer.text = "Mg"; // Use Mg to get proper ascent/descent
+        }
+
+        // Debug: Check what localSizer style has
+
         fontProperties = { ...getFontPropertiesOfText(localSizer, true) };
+
+        // Icons need to scale relative to text WITH stroke if present
+        // Since we removed stroke from localSizer, we need to add it back for proper scaling
+        if (strokeThickness && strokeThickness > 0) {
+          fontProperties.ascent += strokeThickness / 2;
+          fontProperties.descent += strokeThickness / 2;
+          fontProperties.fontSize = fontProperties.ascent + fontProperties.descent;
+        }
 
         if (isIcon) {
           // Set to minimum of 1 to avoid devide by zero.
@@ -1037,9 +1068,13 @@ export const calculateTokens = (
 
           if (h > 1 && sprite.scale.y === 1) {
             const { iconScale = 1.0 } = style;
+            // Use fontSize directly for more consistent scaling
+            // The ascent measurement is too small in PIXI v8 compared to v6
+            const effectiveFontSize = fontProperties.fontSize || 20;
             const ratio =
-              (fontProperties.ascent / h) * ICON_SCALE_BASE * iconScale;
+              (effectiveFontSize / h) * ICON_SCALE_BASE * iconScale;
             sprite.scale.set(ratio);
+
           }
 
           if (scaleIcons) {

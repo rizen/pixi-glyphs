@@ -81,8 +81,8 @@ async function loadDemo(demoId) {
   // Create demo container content
   const container = document.getElementById('demo-container');
 
-  // Add download button for debug demo
-  const downloadButton = demoId === 'debug' ?
+  // Add download button for debug and img demos
+  const downloadButton = (demoId === 'debug' || demoId === 'img') ?
     '<button id="download-measurements" style="margin-left: 10px; padding: 5px 10px; cursor: pointer;">Download Measurements</button>' : '';
 
   container.innerHTML = `
@@ -198,8 +198,8 @@ async function loadDemo(demoId) {
     });
   }
 
-  // Setup download measurements button for debug demo
-  if (demoId === 'debug') {
+  // Setup download measurements button for debug and img demos
+  if (demoId === 'debug' || demoId === 'img') {
     const downloadBtn = document.getElementById('download-measurements');
     if (downloadBtn) {
       downloadBtn.addEventListener('click', () => {
@@ -250,7 +250,7 @@ async function loadDemo(demoId) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'debug-measurements.json';
+        a.download = demoId === 'img' ? 'img-measurements.json' : 'debug-measurements.json';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
