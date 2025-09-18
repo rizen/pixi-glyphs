@@ -11,13 +11,16 @@ export const measureFont = (font: string): IFontMetrics => {
   const context = canvas.getContext('2d');
   if (!context) throw new Error('Cannot get 2D context');
   context.font = font;
-  const metrics = context.measureText('M');
-  const fontSize = parseInt(font.match(/\d+/)?.['0'] || '16');
-  return {
+  // Measure a string with descenders to get accurate descent
+  const metrics = context.measureText('Mgpjy');
+  // Match digits followed by 'px' to get the actual font size, not fontWeight
+  const fontSize = parseInt(font.match(/(\d+)px/)?.['1'] || '16');
+  const result = {
     ascent: metrics.actualBoundingBoxAscent || fontSize * 0.8,
     descent: metrics.actualBoundingBoxDescent || fontSize * 0.2,
     fontSize: fontSize
   };
+  return result;
 };
 
 export const INITIAL_FONT_PROPS: IFontMetrics = {

@@ -530,9 +530,6 @@ export default class Glyphs<
    * is provided in this.options.
    */
   public update(skipDraw?: boolean): ParagraphToken {
-    console.log('[Update] Starting update process');
-    console.log('[Update] Text:', this.text);
-
     // Determine default style properties
     const tagStyles = this.tagStyles;
     const { splitStyle, scaleIcons } = this.options;
@@ -620,23 +617,6 @@ export default class Glyphs<
     const { drawWhitespace } = this.options;
     const tokensFlat = this.tokensFlat;
 
-    // Debug: Check if this is the nested tags demo
-    const isNestedDemo = this.text.includes("<outline>nest");
-
-    if (isNestedDemo) {
-      console.log("=== DRAW DEBUG START ===");
-      console.log("Text:", this.text);
-      console.log("Tokens structure (_tokens):", this._tokens);
-      console.log("Flattened tokens count:", tokensFlat.length);
-      console.log("Flattened tokens:", tokensFlat);
-
-      // Check each token's content and bounds
-      tokensFlat.forEach((t, i) => {
-        if (typeof t.content === 'string') {
-          console.log(`Token ${i}: "${t.content}", x: ${t.bounds?.x}, y: ${t.bounds?.y}, width: ${t.bounds?.width}`);
-        }
-      });
-    }
 
     const tokens = drawWhitespace
       ? tokensFlat
@@ -650,13 +630,6 @@ export default class Glyphs<
     tokens.forEach((t, index) => {
       if (isTextToken(t)) {
         displayObject = this.createTextFieldForToken(t as TextSegmentToken);
-
-        if (isNestedDemo) {
-          const pixiText = displayObject as any;
-          console.log(`Creating text field ${index}: "${t.content}" at x:${t.bounds?.x}, y:${t.bounds?.y}`);
-          console.log(`  PIXI.Text position: x:${pixiText.x}, y:${pixiText.y}`);
-          console.log(`  PIXI.Text visible:`, pixiText.visible);
-        }
 
         textContainer.addChild(displayObject);
         this.textFields.push(displayObject as TextType);
@@ -681,18 +654,7 @@ export default class Glyphs<
       const { bounds } = t;
       displayObject.x = bounds.x;
       displayObject.y = bounds.y;
-
-      if (isNestedDemo && isTextToken(t)) {
-        console.log(`  Final position for "${t.content}": x=${displayObject.x}, y=${displayObject.y}`);
-      }
     });
-
-    if (isNestedDemo) {
-      console.log(`=== DRAW DEBUG END ===`);
-      console.log(`Rendered ${renderedCount} text fields out of ${tokens.length} tokens`);
-      console.log(`TextContainer children:`, textContainer.children.length);
-      console.log("======================");
-    }
 
     if (drawWhitespace === false && drewDecorations) {
       this.logWarning(
@@ -751,51 +713,31 @@ export default class Glyphs<
 
     // In PIXI v8, use the new Graphics API
     // According to PIXI v8 docs, we should use setFillStyle then rect then fill
-    try {
-      console.log(`[TextDecoration] About to set fill style with color: ${finalColor} (type: ${typeof finalColor})`);
-      drawing.setFillStyle({ color: finalColor });
-      drawing.rect(x, y, width, height);
-      drawing.fill();
-    } catch (err) {
-      console.error('[TextDecoration] Error drawing decoration:', err);
-      console.error('Color was:', finalColor);
-      console.error('Bounds were:', { x, y, width, height });
-      throw err;
-    }
+    drawing.setFillStyle({ color: finalColor });
+    drawing.rect(x, y, width, height);
+    drawing.fill();
 
     return drawing;
   }
 
   protected createTextField(text: string, style: TextStyleExtended): TextType {
     // In Pixi v8, Text constructor takes an options object
-    try {
-      console.log(`[TextField] Creating text field with text: "${text.substring(0, 20)}..."`);
-      console.log(`[TextField] Style stroke: ${(style as any).stroke} (type: ${typeof (style as any).stroke})`);
-      console.log(`[TextField] Style strokeThickness: ${(style as any).strokeThickness}`);
+    // Clean up the style for PIXI v8
+    const cleanedStyle = { ...style };
 
-      // Clean up the style for PIXI v8
-      const cleanedStyle = { ...style };
-
-      // In PIXI v8, stroke needs to be an object if it exists
-      if (cleanedStyle.stroke && typeof cleanedStyle.stroke === 'string') {
-        console.log(`[TextField] Converting stroke from string to object`);
-        cleanedStyle.stroke = {
-          color: cleanedStyle.stroke,
-          width: cleanedStyle.strokeThickness || 0
-        } as any;
-      }
-
-      const textField = new PIXI.Text({
-        text: text,
-        style: cleanedStyle as Partial<PIXI.TextStyle>
-      });
-      return textField as TextType;
-    } catch (err) {
-      console.error('[TextField] Error creating text field:', err);
-      console.error('Text was:', text);
-      console.error('Style was:', style);
-      throw err;
+    // In PIXI v8, stroke needs to be an object if it exists
+    if (cleanedStyle.stroke && typeof cleanedStyle.stroke === 'string') {
+      cleanedStyle.stroke = {
+        color: cleanedStyle.stroke,
+        width: cleanedStyle.strokeThickness || 0
+      } as any;
     }
+
+    const textField = new PIXI.Text({
+      text: text,
+      style: cleanedStyle as Partial<PIXI.TextStyle>
+    });
+    return textField as TextType;
   }
 
   protected createTextFieldForToken(token: TextSegmentToken): TextType {
@@ -945,10 +887,9 @@ export default class Glyphs<
 
       if (this.defaultStyle.wordWrap) {
         const w = (this.defaultStyle.wordWrapWidth ?? this.width) as number;
-        g.clear();
-        g.setStrokeStyle({ width: 0.5, color: DEBUG.LINE_COLOR, alpha: 0.2 });
-        g.rect(0, lineBounds.y, w, lineBounds.height);
-        g.stroke();
+        // In PIXI v8, use lineStyle and drawRect
+        g.lineStyle(0.5, DEBUG.LINE_COLOR, 0.2);
+        g.drawRect(0, lineBounds.y, w, lineBounds.height);
       }
 
       for (let wordNumber = 0; wordNumber < line.length; wordNumber++) {
@@ -979,24 +920,16 @@ export default class Glyphs<
               createInfoText("↩︎", { x, y: y + 10 })
             );
           } else {
-            try {
-              console.log(`[Debug] Setting stroke style with color: ${DEBUG.LINE_COLOR}`);
-              g.setStrokeStyle({ width: 0.5, color: DEBUG.LINE_COLOR, alpha: 0.2 });
-              console.log(`[Debug] Setting fill style with color: ${fillColor}`);
-              g.setFillStyle({ color: fillColor, alpha: 0.2 });
-              g.rect(x, y, width, height);
-              g.fill();
-              g.stroke();
+            // In PIXI v8, use beginFill/endFill and lineStyle
+            g.beginFill(fillColor, 0.2);
+            g.lineStyle(0.5, strokeColor, 0.5);
+            g.drawRect(x, y, width, height);
+            g.endFill();
 
-              console.log(`[Debug] Setting baseline fill with color: ${DEBUG.BASELINE_COLOR}`);
-              g.setFillStyle({ color: DEBUG.BASELINE_COLOR, alpha: 1 });
-              g.rect(x, baseline, width, 1);
-              g.fill();
-            } catch (err) {
-              console.error('[Debug] Error in debug drawing:', err);
-              console.error('Colors were:', { fillColor, lineColor: DEBUG.LINE_COLOR, baselineColor: DEBUG.BASELINE_COLOR });
-              throw err;
-            }
+            // Draw baseline
+            g.lineStyle(1, DEBUG.BASELINE_COLOR, 1);
+            g.moveTo(x, baseline);
+            g.lineTo(x + width, baseline);
           }
 
           let info;
