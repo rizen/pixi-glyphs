@@ -622,7 +622,7 @@ export default class Glyphs<
     const tokens = drawWhitespace
       ? tokensFlat
       : // remove any tokens that are purely whitespace unless drawWhitespace is specified
-        tokensFlat.filter(isNotWhitespaceToken);
+      tokensFlat.filter(isNotWhitespaceToken);
 
     let drewDecorations = false;
     let displayObject: PIXI.Container;
@@ -824,22 +824,19 @@ export default class Glyphs<
                 text = `[Image]`;
               }
               let s = `\n${text}: (${lineNumber}/${wordNumber}/${tokenNumber})`;
-              s += `${nl}tags: ${
-                token.tags.length === 0
-                  ? "<none>"
-                  : token.tags
-                      .split(",")
-                      .map((tag) => `<${tag}>`)
-                      .join(", ")
-              }`;
+              s += `${nl}tags: ${token.tags.length === 0
+                ? "<none>"
+                : token.tags
+                  .split(",")
+                  .map((tag) => `<${tag}>`)
+                  .join(", ")
+                }`;
               s += `${nl}style: ${Object.entries(token.style)
                 .map((e) => e.join(":"))
                 .join("; ")}`;
-              s += `${nl}size: x:${token.bounds.x} y:${token.bounds.y} width:${
-                token.bounds.width
-              } height:${token.bounds.height} bottom:${
-                token.bounds.height + token.bounds.y
-              } right:${token.bounds.x + token.bounds.width}`;
+              s += `${nl}size: x:${token.bounds.x} y:${token.bounds.y} width:${token.bounds.width
+                } height:${token.bounds.height} bottom:${token.bounds.height + token.bounds.y
+                } right:${token.bounds.x + token.bounds.width}`;
               s += `${nl}font: fontSize:${token.fontProperties.fontSize} ascent:${token.fontProperties.ascent} descent:${token.fontProperties.descent}`;
               return s;
             })
@@ -859,24 +856,34 @@ export default class Glyphs<
       );
     }
     const debugContainer = this.debugContainer;
-    debugContainer.addChild(this._debugGraphics);
 
+    // Remove and re-add graphics in the correct order to ensure proper layering
+    debugContainer.removeChildren();
+
+    // Add main graphics first (bottom layer)
+    debugContainer.addChild(this._debugGraphics);
     const g = this._debugGraphics;
     g.clear();
+    console.log('Main graphics object g:', g);
 
-    // Create a separate graphics object for baselines to render on top
-    let baselineGraphics = debugContainer.getChildByName('baselineGraphics') as PIXI.Graphics;
-    if (!baselineGraphics) {
-      baselineGraphics = new PIXI.Graphics();
-      baselineGraphics.name = 'baselineGraphics';
-      baselineGraphics.visible = true;
-      baselineGraphics.alpha = 1;
-      debugContainer.addChild(baselineGraphics);
-    }
+    // Create and add line-height graphics second (on top)
+    let lineHeightGraphics = new PIXI.Graphics();
+    lineHeightGraphics.name = 'lineHeightGraphics';
+    debugContainer.addChild(lineHeightGraphics);
+    lineHeightGraphics.clear();
+    console.log('Line height graphics object:', lineHeightGraphics);
+    console.log('Are they the same object?', g === lineHeightGraphics);
+
+    // Create and add baseline graphics third (topmost layer)
+    let baselineGraphics = new PIXI.Graphics();
+    baselineGraphics.name = 'baselineGraphics';
+    baselineGraphics.visible = true;
+    baselineGraphics.alpha = 1;
+    debugContainer.addChild(baselineGraphics);
     baselineGraphics.clear();
 
     // Store baseline data to draw after everything else
-    const baselines: Array<{x: number, baseline: number, width: number}> = [];
+    const baselines: Array<{ x: number, baseline: number, width: number }> = [];
 
     // const { width, height } = this.getBounds();
     // // frame shadow
@@ -897,6 +904,9 @@ export default class Glyphs<
       info.y = position.y + 1;
       return info;
     }
+
+    // Pass lineHeightGraphics to inner scope
+    const lineHeightGfx = lineHeightGraphics;
 
     // for (const line of tokens) {
     for (let lineNumber = 0; lineNumber < paragraph.length; lineNumber++) {
@@ -954,13 +964,13 @@ export default class Glyphs<
 
             // Check for red code text first (36px with stroke)
             if (fontSize === 36) {
-              // Red code text: fine-tuning baseline position
-              baseline += 17;  // Was 18, now 17 (moved up 1px more)
+              // Red code text: adjusting up by 1-2px to align with white text
+              baseline += 15;  // Was 17, now 15 (moved up 2px)
             } else if (hasStroke && fontSize <= 28) {
               // Blue text with stroke (but not the red code text)
               baseline += 6;
             } else if (fontSize <= 24) {
-              // Regular white text: was 5px, now 4px (moved up 1px)
+              // Regular white text: keep at 4px
               baseline += 4;
             } else {
               // Default adjustment
@@ -999,11 +1009,14 @@ export default class Glyphs<
               createInfoText("↩︎", { x, y: boxY + 10 })
             );
           } else {
-            // In PIXI v8, use beginFill/endFill and lineStyle
-            g.beginFill(fillColor, 0.2);
-            g.lineStyle(0.5, strokeColor, 0.5);
-            g.drawRect(x, boxY, width, boxHeight);
-            g.endFill();
+            // Draw line-height box with no fill, only semi-transparent stroke
+            g.rect(x, boxY, width, boxHeight)
+              .stroke({ width: 0.5, color: DEBUG.LINE_COLOR, alpha: 0.2 });
+
+            // Draw word box with semi-transparent debug color fill
+            g.rect(x, y, width, segmentToken.bounds.height)
+              .fill({ color: fillColor, alpha: 0.2 })
+              .stroke({ width: 0.5, color: strokeColor, alpha: 0.5 });
 
             // Store baseline data to draw later on top of everything
             baselines.push({ x, baseline, width });
