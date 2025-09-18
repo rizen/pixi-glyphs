@@ -31,7 +31,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
+const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);`,
     init: function() {
       const text = `Let's make some
 <ml>multiline</ml>
@@ -60,7 +60,7 @@ and <ms>multistyle</ms> text for
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles, {});
+      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles, {});
     }
   },
 
@@ -108,7 +108,7 @@ const styles = {
   url: { imgDisplay: "icon" }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, {
+const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles, {
   imgMap: { thinking, doot, url }
 });`,
     init: async function() {
@@ -153,7 +153,7 @@ You can even load images from a URL <url /> (if you can figure out the CORS stuf
         url: { imgDisplay: "icon" }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles, {
+      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles, {
         imgMap: { thinking, doot, url }
       });
     }
@@ -200,7 +200,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, {
+const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles, {
   wrapEmoji: true
 });`,
     init: function() {
@@ -242,7 +242,7 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles, { wrapEmoji: true });
+      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles, { wrapEmoji: true });
     }
   },
 
@@ -403,7 +403,7 @@ const styles = {
   img: { imgSrc: "valignImg", imgDisplay: "icon" }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, {
+const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles, {
   imgMap: { valignImg }
 });`,
     init: async function() {
@@ -440,7 +440,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, {
         img: { imgSrc: "valignImg", imgDisplay: "icon" }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles, {
+      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles, {
         imgMap: { valignImg }
       });
     }
@@ -474,7 +474,7 @@ const styles = {
   smallcaps: { fontVariant: "small-caps" }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
+const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);`,
     init: function() {
       const text = `<h1>Text transformations:</h1>
 <code>textTransform: "lowercase"</code>
@@ -501,7 +501,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
         smallcaps: { fontVariant: "small-caps" }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles);
+      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles);
     }
   },
 
@@ -566,7 +566,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, {
+const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles, {
   drawWhitespace: true,
   overdrawDecorations: 2
 });`,
@@ -629,7 +629,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, {
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles, {
+      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles, {
         drawWhitespace: true,
         overdrawDecorations: 2
       });
@@ -654,7 +654,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
+const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);`,
     init: function() {
       const text = `You can add <em>attributes</em> to your tags!\nThey will <em fontStyle="italic">overwrite</em> the <em fill="#FF8822">values</em> for any existing <em fontFamily="Courier" fill="#FFFF00" fontWeight="400">tag styles</em>.`;
 
@@ -671,7 +671,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles, {});
+      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles, {});
     }
   },
 
@@ -699,7 +699,7 @@ const styles = {
   large: { fontSize: "36px" }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
+const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);`,
     init: function() {
       const text = `You can <outline>nest <b>tags <red>as <i>deeply <thicker>as you'd <large>like, <blue>dude!</blue></large></thicker></i></red></b></outline>`;
 
@@ -722,7 +722,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
         large: { fontSize: "36px" }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles);
+      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles);
     }
   },
 
@@ -751,7 +751,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
+const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);`,
     init: function() {
       const text = "You can <narrow>set line and letter spacing</narrow> to <wide>give your text some drama.</wide>\nNote that lineSpacing can only be set on the default style.";
 
@@ -775,7 +775,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles);
+      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles);
     }
   },
 
@@ -907,7 +907,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
+const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);`,
     init: function() {
       const text = `You can change the scaling of the font:
 
@@ -965,7 +965,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles);
+      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles);
     }
   },
 
@@ -1002,7 +1002,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
+const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);`,
     init: function() {
       const text = `Use <code>splitStyle: "characters"</code> and <code>breakWords: true</code> to allow line breaks between characters. Can be useful for languages such as chinese.
 
@@ -1034,7 +1034,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles, {});
+      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles, {});
     }
   },
 
@@ -1067,7 +1067,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, { debug: true });`,
+const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles, { debug: true });`,
     init: function() {
       const text = `You can use <blue>debug mode</blue> to help you figure out what your text is doing. Include <code>{debug: true} </code> in the options when you create your text.
 You can also set <code>debugConsole: true</code> if you want to log information about the text field to the console.`;
@@ -1095,7 +1095,7 @@ You can also set <code>debugConsole: true</code> if you want to log information 
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles, { debug: true });
+      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles, { debug: true });
     }
   },
 
@@ -1128,7 +1128,7 @@ const styles = {
   red: { fill: 0xff8888, stroke: 0xcc4444 }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, {
+const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles, {
   splitStyle: "characters"
 });
 

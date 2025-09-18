@@ -80,10 +80,15 @@ async function loadDemo(demoId) {
 
   // Create demo container content
   const container = document.getElementById('demo-container');
+
+  // Add download button for debug demo
+  const downloadButton = demoId === 'debug' ?
+    '<button id="download-measurements" style="margin-left: 10px; padding: 5px 10px; cursor: pointer;">Download Measurements</button>' : '';
+
   container.innerHTML = `
     <div class="demo-header">
       <h2 class="demo-title">${demoConfig.title}</h2>
-      <p class="demo-description">${demoConfig.description}</p>
+      <p class="demo-description">${demoConfig.description}${downloadButton}</p>
     </div>
     <div class="demo-content">
       <div class="canvas-section">
@@ -191,6 +196,67 @@ async function loadDemo(demoId) {
         console.error('Failed to copy:', err);
       }
     });
+  }
+
+  // Setup download measurements button for debug demo
+  if (demoId === 'debug') {
+    const downloadBtn = document.getElementById('download-measurements');
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', () => {
+        // Collect measurements from the Glyphs instance
+        const measurements = {};
+
+        if (currentDemo && currentDemo.textFields) {
+          // Process each text field in the Glyphs instance
+          currentDemo.textFields.forEach((field, index) => {
+            // Determine key based on text content
+            let key = 'field_' + index;
+            const textContent = field.text || '';
+
+            if (textContent.includes('blue mode') || textContent.includes('debug mode')) {
+              key = 'blueText';
+            } else if (textContent.includes('{debug: true}') || textContent.includes('debugConsole:')) {
+              key = 'codeText';
+            } else if (textContent && !textContent.includes('<') && !textContent.includes('>')) {
+              key = 'regularText_' + index;
+            }
+
+            // Extract only primitive values, no objects with circular references
+            measurements[key] = {
+              x: field.x,
+              y: field.y,
+              width: field.width,
+              height: field.height,
+              text: textContent,
+              fontSize: field.style?.fontSize || null,
+              fontFamily: field.style?.fontFamily || null,
+              fill: typeof field.style?.fill === 'number' ? field.style.fill : (field.style?.fill || null)
+            };
+          });
+
+          // Also add overall Glyphs measurements
+          measurements.overall = {
+            x: currentDemo.x,
+            y: currentDemo.y,
+            width: currentDemo.width,
+            height: currentDemo.height,
+            textFieldsCount: currentDemo.textFields.length
+          };
+        }
+
+        // Create and download JSON file
+        const jsonStr = JSON.stringify(measurements, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'debug-measurements.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    }
   }
 }
 

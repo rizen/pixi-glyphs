@@ -864,15 +864,12 @@ export default class Glyphs<
     debugContainer.addChild(this._debugGraphics);
     const g = this._debugGraphics;
     g.clear();
-    console.log('Main graphics object g:', g);
 
     // Create and add line-height graphics second (on top)
     let lineHeightGraphics = new PIXI.Graphics();
     lineHeightGraphics.name = 'lineHeightGraphics';
     debugContainer.addChild(lineHeightGraphics);
     lineHeightGraphics.clear();
-    console.log('Line height graphics object:', lineHeightGraphics);
-    console.log('Are they the same object?', g === lineHeightGraphics);
 
     // Create and add baseline graphics third (topmost layer)
     let baselineGraphics = new PIXI.Graphics();

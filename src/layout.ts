@@ -233,8 +233,8 @@ export const getBoundsNested: Unary<Nested<SegmentToken>, Bounds> = flatReduce<
 type AlignFunction = (line: Bounds[]) => Bounds[];
 type AlignFunctionMaxWidth = (maxWidth: number) => AlignFunction;
 
-export const alignLeft: AlignFunction = (line) =>
-  line.reduce(
+export const alignLeft: AlignFunction = (line) => {
+  return line.reduce(
     (newLine: Bounds[], bounds: Bounds, i: number): Bounds[] => {
       // is first word?
       if (i === 0) {
@@ -259,6 +259,7 @@ export const alignLeft: AlignFunction = (line) =>
     },
     []
   );
+};
 
 export const alignRight: AlignFunctionMaxWidth = (maxWidth) => (line) => {
   // First align left to normalize positions
@@ -866,11 +867,6 @@ export const calculateTokens = (
       // Clean up the style for PIXI v8 compatibility
       const cleanedStyle = { ...style };
 
-      // Remove stroke properties from sizer - we don't need them for measuring
-      // and they can cause issues with PIXI v8
-      delete cleanedStyle.stroke;
-      delete cleanedStyle.strokeThickness;
-
       // Create a fresh sizer for this context to avoid state corruption in nested tags
       // Make sure we have all required style properties for PIXI v8
       const sizerStyle = {
@@ -884,6 +880,12 @@ export const calculateTokens = (
         fontSize: cleanedStyle.fontSize || 24,
         fill: cleanedStyle.fill || 0x000000,
       };
+
+      // Remove stroke from sizer style to avoid PIXI v8 errors
+      // but keep track of it for manual adjustments
+      const strokeThickness = (sizerStyle as any).strokeThickness;
+      delete (sizerStyle as any).stroke;
+      delete (sizerStyle as any).strokeThickness;
 
       const localSizer = new PIXI.Text({
         text: "",
@@ -960,6 +962,13 @@ export const calculateTokens = (
             });
             measureSizer.scale.set(localSizer.scale.x, localSizer.scale.y);
             bounds = rectFromContainer(measureSizer);
+
+            // Add stroke width to measurements since we removed it from the sizer
+            // PIXI measures text including stroke, so we need to add it back
+            if (strokeThickness && strokeThickness > 0) {
+              bounds.width += strokeThickness;
+              bounds.height += strokeThickness;
+            }
           }
 
 
@@ -1003,25 +1012,10 @@ export const calculateTokens = (
             textDecorations,
           };
 
-          // Required to remove extra stroke width from whitespace.
-          // to be totally honest, I'm not sure why this works / why it was being added.
-          if (isOnlyWhitespace(str)) {
-            const strokeThickness = (style as any).strokeThickness;
-            let strokeWidth = 0;
-
-            // Only use strokeThickness if it's a positive number
-            if (typeof strokeThickness === 'number' && strokeThickness > 0) {
-              strokeWidth = strokeThickness;
-            }
-            // Don't check stroke value - it can be a color string like "#aaaaaa"
-            // which would be misinterpreted as a number
-
-            // Only adjust width if we have a valid stroke width
-            if (strokeWidth > 0 && !isNaN(strokeWidth)) {
-              const newWidth = bounds.width - strokeWidth;
-              bounds.width = Math.max(0, newWidth); // Never go negative!
-            }
-          }
+          // For whitespace with stroke, we should NOT reduce the width
+          // The whitespace needs to maintain proper spacing between stroked words
+          // Previously we were subtracting stroke width from whitespace which caused
+          // stroked words like "debug" and "mode" to overlap
 
 
           return convertedToken;
