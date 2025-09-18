@@ -74,11 +74,24 @@ const rectFromContainer = (
  */
 export const translatePoint =
   <P extends Point>(offset: Point) =>
-  (point: P): P => ({
-    ...point,
-    x: point.x + offset.x,
-    y: point.y + offset.y,
-  });
+  (point: P): P => {
+    const newX = point.x + offset.x;
+
+    // Debug extreme translations
+    if (Math.abs(newX) > 10000 && Math.abs(point.x) < 10000) {
+      console.error('EXTREME TRANSLATION IN translatePoint:', {
+        oldX: point.x,
+        offsetX: offset.x,
+        newX: newX
+      });
+    }
+
+    return {
+      ...point,
+      x: newX,
+      y: point.y + offset.y,
+    };
+  };
 
 /**
  * Same as translatePoint but for all the points in an array.
@@ -110,10 +123,38 @@ export const lineWidth = (wordsInLine: Bounds[]): number => {
   if (lastWord === firstWord) {
     return firstWord.width;
   }
-  return lastWord.x + lastWord.width - firstWord.x;
+
+  const width = lastWord.x + lastWord.width - firstWord.x;
+
+  // Debug extreme values that can cause center alignment issues
+  if (width < -1000 || width > 100000 || isNaN(width)) {
+    console.warn('Extreme lineWidth detected in animation demo:', {
+      width,
+      firstWord: { x: firstWord.x, width: firstWord.width },
+      lastWord: { x: lastWord.x, width: lastWord.width },
+      numWords: wordsInLine.length,
+      calculation: `${lastWord.x} + ${lastWord.width} - ${firstWord.x} = ${width}`
+    });
+  }
+
+  return width;
 };
 
-export const center = (x: number, context: number): number => (context - x) / 2;
+export const center = (x: number, context: number): number => {
+  const result = (context - x) / 2;
+
+  // Debug extreme center calculations
+  if (Math.abs(result) > 10000) {
+    console.error('EXTREME CENTER CALCULATION:', {
+      x: x,
+      context: context,
+      result: result,
+      calculation: `(${context} - ${x}) / 2 = ${result}`
+    });
+  }
+
+  return result;
+};
 
 const setBoundsX = assoc<Bounds, number>("x");
 
@@ -175,7 +216,14 @@ const getCombinedBounds = (bounds: Bounds[]): Bounds =>
 export const getBoundsNested: Unary<Nested<SegmentToken>, Bounds> = flatReduce<
   SegmentToken,
   Bounds
->((acc: Bounds, t: SegmentToken) => concatBounds(acc, t.bounds), {
+>((acc: Bounds, t: SegmentToken) => {
+  // When a token is a single character with splitStyle, just return its bounds directly
+  // instead of trying to concatenate with potentially incorrect accumulated bounds
+  if (isNaN(acc.x)) {
+    return { ...t.bounds };
+  }
+  return concatBounds(acc, t.bounds);
+}, {
   x: NaN,
   y: NaN,
   width: NaN,
@@ -187,26 +235,65 @@ type AlignFunctionMaxWidth = (maxWidth: number) => AlignFunction;
 
 export const alignLeft: AlignFunction = (line) =>
   line.reduce(
-    (newLine: Bounds[], bounds: Bounds, i: number): Bounds[] =>
+    (newLine: Bounds[], bounds: Bounds, i: number): Bounds[] => {
       // is first word?
-      i === 0
-        ? [setBoundsX(0)(bounds)]
-        : newLine.concat([
-            setBoundsX(newLine[i - 1].x + newLine[i - 1].width)(bounds),
-          ]),
+      if (i === 0) {
+        return [setBoundsX(0)(bounds)];
+      } else {
+        const prevBounds = newLine[i - 1];
+        const newX = prevBounds.x + prevBounds.width;
+
+        // Debug extreme spacing between words
+        if (Math.abs(newX) > 10000 || prevBounds.width > 10000) {
+          console.error('EXTREME SPACING IN alignLeft:', {
+            wordIndex: i,
+            prevX: prevBounds.x,
+            prevWidth: prevBounds.width,
+            calculatedX: newX,
+            currentBounds: bounds
+          });
+        }
+
+        return newLine.concat([setBoundsX(newX)(bounds)]);
+      }
+    },
     []
   );
 
-export const alignRight: AlignFunctionMaxWidth = (maxWidth) => (line) =>
-  translateLine({
-    x: maxWidth - lineWidth(line),
-    y: 0,
-  })(alignLeft(line));
+export const alignRight: AlignFunctionMaxWidth = (maxWidth) => (line) => {
+  // First align left to normalize positions
+  const leftAligned = alignLeft(line);
 
-export const alignCenter: AlignFunctionMaxWidth = (maxWidth) => (line) =>
-  translateLine({ x: center(lineWidth(line), maxWidth), y: 0 })(
-    alignLeft(line)
-  );
+  // Calculate the offset based on the properly aligned line
+  return translateLine({
+    x: maxWidth - lineWidth(leftAligned),
+    y: 0,
+  })(leftAligned);
+};
+
+export const alignCenter: AlignFunctionMaxWidth = (maxWidth) => (line) => {
+  // IMPORTANT: First align left to normalize all positions starting from 0
+  // This is critical for splitStyle: "characters" where words come with existing positions
+  const leftAligned = alignLeft(line);
+
+  // Now calculate the width from the properly aligned line
+  const width = lineWidth(leftAligned);
+  const centerOffset = center(width, maxWidth);
+
+  // Debug problematic centering with splitStyle characters
+  if (Math.abs(centerOffset) > 10000 || isNaN(centerOffset)) {
+    console.warn('Bad center offset detected:', {
+      lineWidth: width,
+      maxWidth: maxWidth,
+      centerOffset: centerOffset,
+      lineLength: line.length,
+      leftAlignedFirst: leftAligned[0],
+      leftAlignedLast: leftAligned[leftAligned.length - 1]
+    });
+  }
+
+  return translateLine({ x: centerOffset, y: 0 })(leftAligned);
+};
 
 export const alignJustify: AlignFunctionMaxWidth = (maxLineWidth) => (line) => {
   const count = line.length;
@@ -307,8 +394,42 @@ export const alignLines = (
 
     const wordBoundsForLine: Bounds[] = [];
     let alignedLine;
+    // Build array of bounds for alignment, normalizing x positions
+    let isFirstWord = true;
+    let expectedX = 0;
+
     for (const word of line) {
       const wordBounds = getBoundsNested(word);
+
+      // Debug extreme bounds before normalization
+      if (Math.abs(wordBounds.x) > 10000) {
+        console.error('EXTREME BOUNDS DETECTED in alignLines:', {
+          wordBounds,
+          wordLength: word.length,
+          firstToken: word[0],
+          lineIndex: lines.indexOf(line),
+          wordIndex: line.indexOf(word)
+        });
+      }
+
+      // CRITICAL FIX: Normalize x position for ALL words in the line
+      // to start from 0 for proper alignment calculation
+      // This is essential when splitStyle: "characters" creates individual word bounds
+      if (isFirstWord) {
+        expectedX = wordBounds.x; // Remember the offset of the first word
+        wordBounds.x = 0;
+        isFirstWord = false;
+      } else {
+        // Adjust subsequent words relative to the first
+        wordBounds.x = wordBounds.x - expectedX;
+      }
+
+      // Extra safety: if x is still extreme, force to 0
+      if (Math.abs(wordBounds.x) > 10000) {
+        console.warn('Forcing extreme x to 0 for word:', word[0]?.content);
+        wordBounds.x = 0;
+      }
+
       wordBoundsForLine.push(wordBounds);
     }
     if (isLastLine) {
@@ -320,7 +441,31 @@ export const alignLines = (
       const word = line[i];
       if (i < alignedLine.length) {
         const bounds = alignedLine[i];
-        line[i] = positionWordX(bounds.x)(word);
+
+        // Debug extreme positions after alignment
+        if (Math.abs(bounds.x) > 10000) {
+          console.error('EXTREME X AFTER ALIGNMENT:', {
+            boundsX: bounds.x,
+            wordIndex: i,
+            lineIndex: lines.indexOf(line),
+            wordContent: word[0]?.content || 'unknown',
+            wordLength: word.length,
+            isCharacterSplit: word.length === 1
+          });
+        }
+
+        const updatedWord = positionWordX(bounds.x)(word);
+
+        // Check if positionWordX is creating extreme values
+        if (updatedWord[0] && Math.abs(updatedWord[0].bounds.x) > 10000) {
+          console.error('EXTREME X AFTER positionWordX:', {
+            inputBoundsX: bounds.x,
+            outputBoundsX: updatedWord[0].bounds.x,
+            wordContent: updatedWord[0].content
+          });
+        }
+
+        line[i] = updatedWord;
       }
     }
   }
@@ -416,38 +561,47 @@ export const verticalAlignInLines = (
         // Every valignment starts at the previous line bottom.
         let newY = previousLineBottom;
 
+        // Check if text has stroke for adjustment
+        const hasStroke = style?.stroke && (style as any).strokeThickness > 0;
+        const strokeThickness = hasStroke ? (style as any).strokeThickness : 0;
+
         switch (valign) {
           case "bottom":
             newY += tallestHeight - height;
+            // Adjust for stroke (positions from outer edge)
+            if (hasStroke) {
+              newY -= strokeThickness / 2;
+            }
             break;
           case "middle":
             // Need to account for how paragraph spacing affects the middle positioning.
             newY += (tallestHeight + valignParagraphModifier - height) / 2;
+            // Adjust for stroke (positions from outer edge)
+            if (hasStroke) {
+              newY -= strokeThickness / 2;
+            }
             break;
           case "top":
             // Normally the change would be 0px but we need to account for paragraph spacing.
             newY += valignParagraphModifier;
+            // Adjust for stroke (positions from outer edge)
+            if (hasStroke) {
+              newY -= strokeThickness / 2;
+            }
             break;
           case "baseline":
           default:
-            // For baseline alignment, we need to compensate for PIXI's internal text rendering
-            // PIXI.Text seems to position text differently based on various factors
-            // Through empirical testing, larger fonts need to be moved up to align with smaller ones
-
-            // Start with the theoretical baseline position
+            // Baseline alignment with correct font metrics from comprehensive measurement
+            // The comprehensive measurement string in pixiUtils.ts ensures
+            // we get consistent ascent/descent values like PIXI v6 did
             newY = previousLineBottom + tallestAscent - ascent;
 
-            // Apply PIXI-specific adjustments based on visual testing
-            // Simple approach: only adjust the 36px font size
-            let adjustment = 0;
-            if (fontProperties.fontSize === 36) {
-              adjustment = 9; // Move 36px text up to align with 24px baseline
-            } else if (fontProperties.fontSize > 36) {
-              // Scale for fonts larger than 36px
-              adjustment = (fontProperties.fontSize / 36) * 9;
+            // Adjust for stroke if present
+            // PIXI positions stroked text from the outer edge of the stroke
+            // So we compensate by subtracting half the stroke width
+            if (hasStroke) {
+              newY -= strokeThickness / 2;
             }
-
-            newY -= adjustment;
 
         }
         newBounds.y = newY;
@@ -461,6 +615,7 @@ export const verticalAlignInLines = (
       newLine.push(newWord);
     }
 
+    // Update the position for the next line
     previousLineBottom += tallestHeight + lineSpacing;
     newLines.push(newLine);
   }
@@ -605,10 +760,32 @@ const layout = (
   function positionTokenAtCursorAndAdvanceCursor(token: SegmentToken): void {
     // position token at cursor
     setTallestHeight(token);
+
+    // Debug extreme cursor positions BEFORE assignment
+    if (Math.abs(cursor.x) > 10000) {
+      console.error('EXTREME CURSOR.X BEFORE ASSIGNMENT:', {
+        cursorX: cursor.x,
+        cursorY: cursor.y,
+        tokenContent: token.content,
+        tokenWidth: token.bounds.width,
+        tokenBounds: { ...token.bounds }
+      });
+    }
+
     token.bounds.x = cursor.x;
     token.bounds.y = cursor.y;
+
     // advance cursor
     cursor.x += token.bounds.width;
+
+    // Debug if cursor becomes extreme AFTER advancing
+    if (Math.abs(cursor.x) > 10000) {
+      console.error('EXTREME CURSOR.X AFTER ADVANCING:', {
+        cursorX: cursor.x,
+        tokenContent: token.content,
+        tokenWidth: token.bounds.width
+      });
+    }
   }
 
   function positionWordBufferAtCursorAndAdvanceCursor(): void {
@@ -829,18 +1006,20 @@ export const calculateTokens = (
           // Required to remove extra stroke width from whitespace.
           // to be totally honest, I'm not sure why this works / why it was being added.
           if (isOnlyWhitespace(str)) {
-            const strokeValue = (style as any).stroke;
+            const strokeThickness = (style as any).strokeThickness;
             let strokeWidth = 0;
 
-            if (typeof strokeValue === 'number') {
-              strokeWidth = strokeValue;
-            } else if (typeof strokeValue === 'object' && strokeValue?.width) {
-              strokeWidth = strokeValue.width;
+            // Only use strokeThickness if it's a positive number
+            if (typeof strokeThickness === 'number' && strokeThickness > 0) {
+              strokeWidth = strokeThickness;
             }
+            // Don't check stroke value - it can be a color string like "#aaaaaa"
+            // which would be misinterpreted as a number
 
-            // Only subtract if we have a valid number
-            if (!isNaN(strokeWidth) && strokeWidth > 0) {
-              bounds.width -= strokeWidth;
+            // Only adjust width if we have a valid stroke width
+            if (strokeWidth > 0 && !isNaN(strokeWidth)) {
+              const newWidth = bounds.width - strokeWidth;
+              bounds.width = Math.max(0, newWidth); // Never go negative!
             }
           }
 

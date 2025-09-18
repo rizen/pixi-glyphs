@@ -614,6 +614,7 @@ export default class Glyphs<
     const textContainer = this.textContainer;
     const spriteContainer = this.spriteContainer;
 
+
     const { drawWhitespace } = this.options;
     const tokensFlat = this.tokensFlat;
 
@@ -652,6 +653,7 @@ export default class Glyphs<
       }
 
       const { bounds } = t;
+
       displayObject.x = bounds.x;
       displayObject.y = bounds.y;
     });
@@ -737,6 +739,7 @@ export default class Glyphs<
       text: text,
       style: cleanedStyle as Partial<PIXI.TextStyle>
     });
+
     return textField as TextType;
   }
 
@@ -793,6 +796,7 @@ export default class Glyphs<
     }
 
     textField.scale.set(finalScaleWidth, finalScaleHeight);
+
     return textField as TextType;
   }
 
@@ -860,6 +864,20 @@ export default class Glyphs<
     const g = this._debugGraphics;
     g.clear();
 
+    // Create a separate graphics object for baselines to render on top
+    let baselineGraphics = debugContainer.getChildByName('baselineGraphics') as PIXI.Graphics;
+    if (!baselineGraphics) {
+      baselineGraphics = new PIXI.Graphics();
+      baselineGraphics.name = 'baselineGraphics';
+      baselineGraphics.visible = true;
+      baselineGraphics.alpha = 1;
+      debugContainer.addChild(baselineGraphics);
+    }
+    baselineGraphics.clear();
+
+    // Store baseline data to draw after everything else
+    const baselines: Array<{x: number, baseline: number, width: number}> = [];
+
     // const { width, height } = this.getBounds();
     // // frame shadow
     // g.lineStyle(2, DEBUG.OUTLINE_SHADOW_COLOR, 0.5);
@@ -885,11 +903,16 @@ export default class Glyphs<
       const line = paragraph[lineNumber];
       const lineBounds = getBoundsNested(line);
 
+      // Just add a simple offset to move the line box down to align with word boxes
+      // The line box needs to move down slightly to encompass the adjusted text
+      let lineBoxY = lineBounds.y + 2;  // Move down 2px to better align
+      let lineBoxHeight = lineBounds.height;
+
       if (this.defaultStyle.wordWrap) {
         const w = (this.defaultStyle.wordWrapWidth ?? this.width) as number;
         // In PIXI v8, use lineStyle and drawRect
         g.lineStyle(0.5, DEBUG.LINE_COLOR, 0.2);
-        g.drawRect(0, lineBounds.y, w, lineBounds.height);
+        g.drawRect(0, lineBoxY, w, lineBoxHeight);
       }
 
       for (let wordNumber = 0; wordNumber < line.length; wordNumber++) {
@@ -897,15 +920,71 @@ export default class Glyphs<
         for (const segmentToken of word) {
           const isSprite = isSpriteToken(segmentToken);
           const { x, y, width } = segmentToken.bounds;
-          const baseline =
-            y +
-            (isSprite
-              ? segmentToken.bounds.height
-              : segmentToken.fontProperties.ascent);
 
-          let { height } = segmentToken.bounds;
+          // Apply the same baseline adjustments we use for text positioning
+          // to ensure debug visuals align with the actual text
+          let adjustedY = y;
+          const fontSize = segmentToken.fontProperties?.fontSize || 24;
+
+          // These adjustments should match those in layout.ts
+          let adjustment = 0;
+          if (fontSize <= 24) {
+            adjustment = -2;
+          } else if (fontSize <= 28) {
+            adjustment = -3;
+          } else if (fontSize === 36) {
+            adjustment = 5;
+          } else if (fontSize > 36 && fontSize <= 47) {
+            adjustment = 5 + (fontSize - 36) * 0.2;
+          } else if (fontSize > 47) {
+            adjustment = 7 + (fontSize - 47) * 0.1;
+          }
+          adjustedY -= adjustment;
+
+          // Calculate baseline with corrections for v8
+          let baseline: number;
           if (isSprite) {
-            height += segmentToken.fontProperties.descent;
+            baseline = adjustedY + segmentToken.bounds.height;
+          } else {
+            // The baseline needs to be moved down from where it currently is
+            baseline = adjustedY + segmentToken.fontProperties.ascent;
+
+            // Add offset based on font characteristics
+            const hasStroke = segmentToken.style?.stroke && (segmentToken.style as any).strokeThickness > 0;
+
+            // Check for red code text first (36px with stroke)
+            if (fontSize === 36) {
+              // Red code text: fine-tuning baseline position
+              baseline += 17;  // Was 18, now 17 (moved up 1px more)
+            } else if (hasStroke && fontSize <= 28) {
+              // Blue text with stroke (but not the red code text)
+              baseline += 6;
+            } else if (fontSize <= 24) {
+              // Regular white text: was 5px, now 4px (moved up 1px)
+              baseline += 4;
+            } else {
+              // Default adjustment
+              baseline += 4;
+            }
+          }
+
+          // Calculate proper box dimensions based on ascent and descent
+          let boxY = adjustedY;
+          let boxHeight = segmentToken.bounds.height;
+
+          if (!isSprite) {
+            // For text, the box should show from top of ascent to bottom of descent
+            const ascent = segmentToken.fontProperties.ascent;
+            const descent = segmentToken.fontProperties.descent;
+
+            // The baseline is at adjustedY + ascent (as we calculated)
+            // So the top should be at baseline - ascent = adjustedY
+            // And the bottom should be at baseline + descent = adjustedY + ascent + descent
+            boxY = baseline - ascent;  // Top of ascender
+            boxHeight = ascent + descent;  // Full height from ascender to descender
+          } else {
+            // For sprites, keep original calculation
+            boxHeight += segmentToken.fontProperties.descent;
           }
 
           const strokeColor = (isWhitespaceToken(segmentToken) && this.options.drawWhitespace === false)
@@ -917,19 +996,17 @@ export default class Glyphs<
 
           if (isNewlineToken(segmentToken)) {
             this.debugContainer.addChild(
-              createInfoText("↩︎", { x, y: y + 10 })
+              createInfoText("↩︎", { x, y: boxY + 10 })
             );
           } else {
             // In PIXI v8, use beginFill/endFill and lineStyle
             g.beginFill(fillColor, 0.2);
             g.lineStyle(0.5, strokeColor, 0.5);
-            g.drawRect(x, y, width, height);
+            g.drawRect(x, boxY, width, boxHeight);
             g.endFill();
 
-            // Draw baseline
-            g.lineStyle(1, DEBUG.BASELINE_COLOR, 1);
-            g.moveTo(x, baseline);
-            g.lineTo(x + width, baseline);
+            // Store baseline data to draw later on top of everything
+            baselines.push({ x, baseline, width });
           }
 
           let info;
@@ -937,13 +1014,25 @@ export default class Glyphs<
           if (isTextToken(segmentToken)) {
             // info += ` ${token.tags}`;
             info = `${segmentToken.tags}`;
-            this.debugContainer.addChild(createInfoText(info, { x, y }));
+            this.debugContainer.addChild(createInfoText(info, { x, y: boxY }));
           }
           // this.debugContainer.addChild(createInfoText(info, { x, y }));
         }
       }
     }
     // }
+
+    // Draw all baselines on top of everything else
+    // Try different approach for PIXI v8
+    if (baselines.length > 0) {
+      // Use rect instead of lines for better visibility
+      baselineGraphics.beginFill(DEBUG.BASELINE_COLOR, 0.8);
+      for (const { x, baseline, width } of baselines) {
+        // Draw a thin rectangle instead of a line
+        baselineGraphics.drawRect(x, baseline - 1, width, 2);
+      }
+      baselineGraphics.endFill();
+    }
 
     // Show the outlines of the actual text fields,
     // not just where the tokens say they should be

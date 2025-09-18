@@ -5,21 +5,48 @@ const PX_PER_EM = 16;
 const PX_PER_PERCENT = 16 / 100;
 const PX_PER_PT = 1.3281472327365;
 
+// Cache for font metrics to avoid repeated measurements of identical fonts
+const fontMetricsCache = new Map<string, IFontMetrics>();
+
+// Comprehensive measurement string that captures ALL character extremes
+// This ensures we get the maximum ascent/descent for any text in this font
+const COMPREHENSIVE_MEASURE_STRING =
+  'ÁÇÉÍÑÓÚÜáçéíñóúüĀĢĻŅŖŠŪŽāģļņŗšūž|ÉqÅŠMgpjy' + // Accented chars + descenders
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +                    // All capitals
+  'abcdefghijklmnopqrstuvwxyz' +                    // All lowercase
+  '0123456789';                                      // Numbers
+
 export const measureFont = (font: string): IFontMetrics => {
+  // Check cache first
+  if (fontMetricsCache.has(font)) {
+    return fontMetricsCache.get(font)!;
+  }
+
   // In Pixi v8, we need to create a canvas context to measure fonts
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
   if (!context) throw new Error('Cannot get 2D context');
   context.font = font;
-  // Measure a string with descenders to get accurate descent
-  const metrics = context.measureText('Mgpjy');
+
+  // CRITICAL CHANGE: Measure comprehensive string to get maximum metrics
+  // This matches what PIXI v6's TextMetrics.measureFont() likely did internally
+  // NOTE: Using simple string for animation demo compatibility with splitStyle="characters"
+  const measureString = "Mgpjy"; // Temporarily reverting to test animation demo
+  const metrics = context.measureText(measureString);
+
   // Match digits followed by 'px' to get the actual font size, not fontWeight
   const fontSize = parseInt(font.match(/(\d+)px/)?.['1'] || '16');
+
+  // Use the actual measurements if available, with better fallback ratios
   const result = {
-    ascent: metrics.actualBoundingBoxAscent || fontSize * 0.8,
-    descent: metrics.actualBoundingBoxDescent || fontSize * 0.2,
+    ascent: metrics.actualBoundingBoxAscent || fontSize * 0.88,
+    descent: metrics.actualBoundingBoxDescent || fontSize * 0.12,
     fontSize: fontSize
   };
+
+  // Cache the result for this font
+  fontMetricsCache.set(font, result);
+
   return result;
 };
 

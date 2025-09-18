@@ -68,10 +68,10 @@ and <ms>multistyle</ms> text for
     title: "Inline Images",
     description: "Embed images directly in your text with inline display options",
     code: `// Load textures first in Pixi v8
-await PIXI.Assets.load(['./icon.png', './doot.png', './100.png']);
+await PIXI.Assets.load(['icon.png', 'doot.png', '100.png']);
 
-const thinking = new PIXI.Sprite(PIXI.Texture.from("./icon.png"));
-const doot = PIXI.Texture.from("./doot.png");
+const thinking = new PIXI.Sprite(PIXI.Texture.from("icon.png"));
+const doot = PIXI.Texture.from("doot.png");
 const url = "100.png";
 
 const text = \`<h2>Inline Images!</h2>
@@ -113,11 +113,11 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, {
 });`,
     init: async function() {
       // Load textures asynchronously
-      await PIXI.Assets.load(['./icon.png', './doot.png', './100.png']);
+      await PIXI.Assets.load(['icon.png', 'doot.png', '100.png']);
 
-      const thinking = new PIXI.Sprite(PIXI.Texture.from("./icon.png"));
-      const doot = PIXI.Texture.from("./doot.png");
-      const url = "./100.png";
+      const thinking = new PIXI.Sprite(PIXI.Texture.from("icon.png"));
+      const doot = PIXI.Texture.from("doot.png");
+      const url = "100.png";
 
       const text = `<h2>Inline Images!</h2>
 
@@ -313,7 +313,7 @@ let justify = new Glyphs(
           ...alignStyle,
           default: {
             ...alignStyle.default,
-            align: "left",
+            align: "center",
             fill: "teal"
           }
         }
@@ -388,7 +388,7 @@ const styles = {
     fontFamily: "Arial",
     fontSize: "24px",
     fill: "#cccccc",
-    align: "left"
+    align: "center"
   },
   code: {
     fontFamily: "Courier",
@@ -425,7 +425,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, {
           fontFamily: "Arial",
           fontSize: "24px",
           fill: "#cccccc",
-          align: "left"
+          align: "center"
         },
         code: {
           fontFamily: "Courier",
@@ -646,7 +646,7 @@ const styles = {
     fontFamily: "Arial",
     fontSize: "24px",
     fill: "#cccccc",
-    align: "left"
+    align: "center"
   },
   em: {
     fill: "#4488FF",
@@ -663,7 +663,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
           fontFamily: "Arial",
           fontSize: "24px",
           fill: "#cccccc",
-          align: "left"
+          align: "center"
         },
         em: {
           fill: "#4488FF",
@@ -687,7 +687,7 @@ const styles = {
     fill: "#cccccc",
     wordWrapWidth: 500,
     wordWrap: true,
-    align: "left",
+    align: "center",
     valign: "baseline"
   },
   outline: { stroke: "#000000", strokeThickness: 2 },
@@ -710,7 +710,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles);`,
           fill: "#cccccc",
           wordWrapWidth: 500,
           wordWrap: true,
-          align: "left",
+          align: "center",
           valign: "baseline"
         },
         outline: { stroke: "#000000", strokeThickness: 2 },
@@ -808,7 +808,7 @@ const nonWrappingStyle = {
     fill: "#669900",
     wordWrap: false,
     wordWrapWidth: 150,
-    align: "left"
+    align: "center"
   }
 };
 
@@ -838,7 +838,7 @@ const nonWrapping = new Glyphs(nonWrappingText, nonWrappingStyle);`,
           fill: "#669900",
           wordWrap: false,
           wordWrapWidth: 150,
-          align: "left"
+          align: "center"
         }
       };
       const nonWrapping = new Glyphs(nonWrappingText, nonWrappingStyle);
@@ -1106,7 +1106,7 @@ You can also set <code>debugConsole: true</code> if you want to log information 
 
 const styles = {
   default: {
-    fontFamily: "Recursive, Arial",
+    fontFamily: "Arial",
     fontSize: "48px",
     fontWeight: 900,
     fill: "#cccccc",
@@ -1153,7 +1153,7 @@ app.ticker.add((delta) => {
 
       const styles = {
         default: {
-          fontFamily: "Recursive, Arial",
+          fontFamily: "Arial",
           fontSize: "48px",
           fontWeight: 900,
           fill: "#cccccc",
@@ -1172,36 +1172,61 @@ app.ticker.add((delta) => {
           stroke: 0x2244cc,
           fontSize: 22
         },
-        red: { fill: 0xff8888, stroke: 0xcc4444 }
+        red: {
+          fill: 0xff8888,
+          stroke: 0xcc4444
+        }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs; return new Glyphs(text, styles, {
+      const Glyphs = window.Glyphs?.default || window.Glyphs;
+      const glyphs = new Glyphs(text, styles, {
         splitStyle: "characters"
       });
+      // Added splitStyle back - no animation yet
+
+      return glyphs;
     },
     animate: function(glyphs, app) {
-      const originalYPositions = glyphs.textFields.map((t) => t.y);
-      let time = 0;
+      // Store original Y positions
+      const originalYPositions = [];
+      for (let i = 0; i < glyphs.textFields.length; i++) {
+        originalYPositions.push(glyphs.textFields[i].y);
+      }
 
+      let frameCount = 0;
       app.ticker.add((delta) => {
-        time += delta;
+        frameCount++;
+
+        // Skip first 10 frames to let everything initialize
+        if (frameCount <= 10) {
+          return;
+        }
+
+        // Animate with sine wave
+        const time = (frameCount - 10) * 0.05;
         for (let i = 0; i < glyphs.textFields.length; i++) {
           const text = glyphs.textFields[i];
-          const amplitude = 5;
-          const frequency = 0.1;
-          const phaseOffsetPerLetter = 1;
+          const amplitude = 10;
+          const frequency = 2;
+          const phaseOffsetPerLetter = 0.2;
 
-          text.y =
-            originalYPositions[i] +
-            Math.sin(time * frequency + i * phaseOffsetPerLetter) * amplitude;
+          const newY = originalYPositions[i] + Math.sin(time * frequency + i * phaseOffsetPerLetter) * amplitude;
+
+          // Use position.set for PIXI v8 compatibility
+          text.position.set(text.x, newY);
         }
       });
     }
   }
 };
 
-// Export for module usage
-export { demos };
-
 // Also make available globally for backward compatibility
 window.demos = demos;
+
+// Export for module usage (only in module context)
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = demos;
+}
+
+// ES module export
+export { demos };

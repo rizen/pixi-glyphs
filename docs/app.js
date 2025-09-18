@@ -35,8 +35,29 @@ async function createPixiApp(container, width = 600, height = 600, backgroundCol
 // Function to clean up previous demo
 function cleanupDemo() {
   if (currentApp) {
-    currentApp.destroy(true);
-    currentApp = null;
+    try {
+      // Remove canvas from DOM first
+      if (currentApp.canvas && currentApp.canvas.parentNode) {
+        currentApp.canvas.parentNode.removeChild(currentApp.canvas);
+      }
+
+      // Destroy all children from stage if it exists
+      if (currentApp.stage) {
+        currentApp.stage.removeChildren();
+      }
+
+      // Destroy the entire application
+      // The destroy method should handle renderer cleanup
+      currentApp.destroy(true, {
+        children: true,
+        texture: true,
+        baseTexture: true
+      });
+    } catch (error) {
+      console.warn('Error during cleanup:', error);
+    } finally {
+      currentApp = null;
+    }
   }
   currentDemo = null;
 }
