@@ -109,7 +109,7 @@ async function loadDemo(demoId) {
             <pre><code class="language-javascript">${escapeHtml(getStylesCode(demoConfig.code))}</code></pre>
           </div>
           <div class="code-panel" data-panel="full">
-            <pre><code class="language-javascript">${escapeHtml(getFullCode(demoConfig.code))}</code></pre>
+            <pre><code class="language-javascript">${escapeHtml(getFullCode(demoConfig.code, demoId))}</code></pre>
           </div>
         </div>
       </div>
@@ -276,28 +276,104 @@ function getStylesCode(fullCode) {
 }
 
 // Helper function to create full runnable example
-function getFullCode(code) {
-  return `// Full working example
-// First, include PIXI.js v8 and pixi-glyphs in your HTML:
-// <script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"></script>
-// <script src="path/to/pixi-glyphs.umd.js"></script>
+function getFullCode(code, demoId) {
+  // Get actual PIXI version if available
+  const pixiVersion = window.PIXI?.VERSION || '8.x';
 
-// Create PIXI Application (v8 syntax)
-const app = new PIXI.Application();
-await app.init({
-  width: 600,
-  height: 600,
-  background: 0x333333
+  // Get actual canvas dimensions from current app
+  const width = currentApp?.screen?.width || 600;
+  const height = currentApp?.screen?.height || 600;
+
+  // Determine background color based on demo
+  const backgroundColor = demoId === 'webFonts' ? '0xFFFFFF' : '0x333333';
+
+  // Check if the demo uses async/await (for texture loading)
+  const needsAsync = code.includes('await') || code.includes('PIXI.Assets.load') || demoId === 'webFonts';
+
+  // Add demo-specific setup code
+  let setupCode = '';
+  let animationCode = '';
+
+  if (demoId === 'webFonts') {
+    setupCode = `
+// Load custom web fonts
+const aclonica = new FontFace('Aclonica', 'url(Aclonica.ttf)');
+const arimoBold = new FontFace('Arimo Bold', 'url(Arimo_Bold.ttf)');
+
+await Promise.all([
+  aclonica.load(),
+  arimoBold.load()
+]);
+
+document.fonts.add(aclonica);
+document.fonts.add(arimoBold);
+
+`;
+  }
+
+  if (demoId === 'animated') {
+    animationCode = `
+
+// Animation setup
+const originalYPositions = [];
+glyphs.textFields.forEach((field, i) => {
+  originalYPositions[i] = field.y;
 });
-document.body.appendChild(app.canvas);
 
-// Create Glyphs
-${code}
+app.ticker.add((ticker) => {
+  const time = ticker.lastTime / 1000;
 
-// Add to stage
+  glyphs.textFields.forEach((field, i) => {
+    const amplitude = 10;
+    const frequency = 2;
+    const phaseOffsetPerLetter = 0.2;
+
+    const newY = originalYPositions[i] + Math.sin(time * frequency + i * phaseOffsetPerLetter) * amplitude;
+    field.position.set(field.x, newY);
+  });
+});`;
+  }
+
+  // Handle multiple Glyphs objects (for wrapping demo)
+  const isMultiple = demoId === 'wrapping';
+  const glyphsVar = isMultiple ? 'texts' : 'glyphs';
+  const addToStage = isMultiple ?
+    `// Add all text objects to stage
+texts.forEach(text => {
+  app.stage.addChild(text);
+});` :
+    `// Add to stage
 glyphs.x = 30;
 glyphs.y = 30;
 app.stage.addChild(glyphs);`;
+
+  const functionWrapper = needsAsync ? 'async function init() {' : 'function init() {';
+  const functionClose = '}\n\ninit();';
+
+  return `// Full working example
+// Using PIXI.js v${pixiVersion} and pixi-glyphs
+// First, include these in your HTML:
+// <script src="https://cdn.jsdelivr.net/npm/pixi.js@${pixiVersion.split('.')[0]}/dist/pixi.min.js"></script>
+// <script src="path/to/pixi-glyphs.umd.js"></script>
+
+${functionWrapper}
+  // Create PIXI Application (v8 syntax)
+  const app = new PIXI.Application();
+  await app.init({
+    width: ${width},
+    height: ${height},
+    background: ${backgroundColor},
+    antialias: true,
+    resolution: window.devicePixelRatio || 1,
+    autoDensity: true
+  });
+  document.body.appendChild(app.canvas);
+${setupCode}
+  // Create Glyphs
+  ${code.replace(/^/gm, '  ')}
+
+  ${addToStage}${animationCode}
+${functionClose}`;
 }
 
 // Setup navigation event listeners

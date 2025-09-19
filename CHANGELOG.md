@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file. See [standa
 - Fixed: Link to github in demos
 - Feature: Added a web fonts demo with an svg icon.
 - Fixed: Updated the demos to say pixi 8 rather than 6.
+- Fixed: Demos now show more accurate code examples.
 
 ## 4.0.0 (2025-09-19)
 
