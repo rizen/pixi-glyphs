@@ -467,9 +467,9 @@ export default class Glyphs<
 
       if (
         (isSpriteSource(spriteSource) &&
-          (spriteSource as PIXI.Texture).baseTexture === null) ||
+          (spriteSource as PIXI.Texture).source === null) ||
         (sprite !== undefined &&
-          (sprite.destroyed || sprite.texture?.baseTexture === null))
+          (sprite.destroyed || sprite.texture?.source === null))
       ) {
         error = destroyedError;
         console.log(error);
@@ -482,12 +482,15 @@ export default class Glyphs<
       // Listen for changes to sprites (e.g. when they load.)
       const texture = sprite.texture;
 
-      const onTextureUpdate = (baseTexture: PIXI.Texture) => {
-        this.onImageTextureUpdate(baseTexture);
-        baseTexture.removeListener("update", onTextureUpdate);
+      const onTextureUpdate = () => {
+        this.onImageTextureUpdate(texture);
+        texture.source.removeListener("update", onTextureUpdate);
       };
 
-      texture.baseTexture.addListener("update", onTextureUpdate);
+      // In PIXI v8, listen on the source instead of baseTexture
+      if (texture.source) {
+        texture.source.addListener("update", onTextureUpdate);
+      }
 
       this.spriteTemplates[key] = sprite;
 
@@ -498,7 +501,7 @@ export default class Glyphs<
     });
   }
 
-  private onImageTextureUpdate(_baseTexture: PIXI.Texture): void {
+  private onImageTextureUpdate(_texture: PIXI.Texture): void {
     this._needsUpdate = true;
     this._needsDraw = true;
     this.updateIfShould();
