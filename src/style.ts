@@ -305,13 +305,17 @@ export const extractDecorations = (
 
     let y = offset;
     if (key === "underline") {
-      // position underline below baseline
-      y += baseline + descent / 2;
+      // position underline below baseline (add 4px for better separation)
+      y += baseline + descent / 2 + 4;
     } else if (key === "lineThrough") {
-      // position lineThrough in center of ascent
-      y += ascender + xHeight / 2;
+      // position lineThrough exactly halfway between overline and underline
+      const overlineY = 1;  // overline position
+      const underlineY = baseline + descent / 2 + 4;  // underline position
+      y += (overlineY + underlineY) / 2;
+    } else if (key === "overline") {
+      // position overline at top of text, moved down 1px
+      y += 1;
     }
-    // else, position overline at top of text
 
     return {
       color,
