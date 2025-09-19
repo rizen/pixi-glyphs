@@ -6,12 +6,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/mimshwright/pixi-glyphs.git"
+    "url": "git://github.com/rizen/pixi-glyphs.git"
   },
   "bugs": {
-    "url": "https://github.com/mimshwright/pixi-glyphs/issues"
+    "url": "https://github.com/rizen/pixi-glyphs/issues"
   },
-  "homepage": "https://github.com/mimshwright/pixi-glyphs",
+  "homepage": "https://github.com/rizne/pixi-glyphs",
   "source": "./src/index.ts",
   "main": "./dist/pixi-glyphs.js",
   "umd:main": "./dist/pixi-glyphs.umd.js",
