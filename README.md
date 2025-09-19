@@ -4,7 +4,7 @@
 
 `Glyphs` is a multi-style text component for [pixi.js](https://github.com/GoodBoyDigital/pixi.js) that supports multiple `TextStyle`s using HTML-like tags. Includes many additional features not found in `PIXI.Text` such as embedded images (sprites), underlines, justified layout, and more.
 
-Inspired by the original [pixi-multistyle-text](https://github.com/tleunen/pixi-multistyle-text)
+Inspired by the original [pixi-multistyle-text](https://github.com/tleunen/pixi-multistyle-text) and is the spiritual successor to [pixi-tagged-text](https://github.com/mimshwright/pixi-tagged-text).
 
 ## Usage
 
@@ -255,4 +255,4 @@ The build process is slightly complex and some of the build dependencies are at 
 
 ## License
 
-MIT, see [LICENSE.md](http://github.com/mimshwright/pixi-glyphs/blob/main/LICENSE.md) for details.
+MIT, see [LICENSE.md](http://github.com/rizen/pixi-glyphs/blob/main/LICENSE.md) for details.
