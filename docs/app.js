@@ -125,7 +125,9 @@ async function loadDemo(demoId) {
 
   // Initialize PIXI demo
   const pixiContainer = document.getElementById('pixi-container');
-  currentApp = await createPixiApp(pixiContainer);
+  // Use white background for webFonts demo
+  const backgroundColor = demoId === 'webFonts' ? 0xFFFFFF : 0x333333;
+  currentApp = await createPixiApp(pixiContainer, 600, 600, backgroundColor);
 
   // Initialize the demo (handle both sync and async)
   let result = demoConfig.init();
@@ -276,17 +278,18 @@ function getStylesCode(fullCode) {
 // Helper function to create full runnable example
 function getFullCode(code) {
   return `// Full working example
-// First, include PIXI.js and pixi-tagged-text in your HTML:
-// <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.2.2/browser/pixi.min.js"></script>
-// <script src="path/to/pixi-tagged-text.umd.js"></script>
+// First, include PIXI.js v8 and pixi-glyphs in your HTML:
+// <script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"></script>
+// <script src="path/to/pixi-glyphs.umd.js"></script>
 
-// Create PIXI Application
-const app = new PIXI.Application({
+// Create PIXI Application (v8 syntax)
+const app = new PIXI.Application();
+await app.init({
   width: 600,
   height: 600,
-  backgroundColor: 0x333333
+  background: 0x333333
 });
-document.body.appendChild(app.view);
+document.body.appendChild(app.canvas);
 
 // Create Glyphs
 ${code}
