@@ -77,15 +77,6 @@ export const translatePoint =
   (point: P): P => {
     const newX = point.x + offset.x;
 
-    // Debug extreme translations
-    if (Math.abs(newX) > 10000 && Math.abs(point.x) < 10000) {
-      console.error('EXTREME TRANSLATION IN translatePoint:', {
-        oldX: point.x,
-        offsetX: offset.x,
-        newX: newX
-      });
-    }
-
     return {
       ...point,
       x: newX,
@@ -141,19 +132,11 @@ export const lineWidth = (wordsInLine: Bounds[]): number => {
 };
 
 export const center = (x: number, context: number): number => {
-  const result = (context - x) / 2;
-
-  // Debug extreme center calculations
-  if (Math.abs(result) > 10000) {
-    console.error('EXTREME CENTER CALCULATION:', {
-      x: x,
-      context: context,
-      result: result,
-      calculation: `(${context} - ${x}) / 2 = ${result}`
-    });
+  // If context is infinite (no word wrap), don't center
+  if (!isFinite(context)) {
+    return 0;
   }
-
-  return result;
+  return (context - x) / 2;
 };
 
 const setBoundsX = assoc<Bounds, number>("x");
@@ -281,17 +264,6 @@ export const alignCenter: AlignFunctionMaxWidth = (maxWidth) => (line) => {
   const width = lineWidth(leftAligned);
   const centerOffset = center(width, maxWidth);
 
-  // Debug problematic centering with splitStyle characters
-  if (Math.abs(centerOffset) > 10000 || isNaN(centerOffset)) {
-    console.warn('Bad center offset detected:', {
-      lineWidth: width,
-      maxWidth: maxWidth,
-      centerOffset: centerOffset,
-      lineLength: line.length,
-      leftAlignedFirst: leftAligned[0],
-      leftAlignedLast: leftAligned[leftAligned.length - 1]
-    });
-  }
 
   return translateLine({ x: centerOffset, y: 0 })(leftAligned);
 };
@@ -315,7 +287,10 @@ export const alignJustify: AlignFunctionMaxWidth = (maxLineWidth) => (line) => {
   const combinedBounds = getCombinedBounds(nonZeroWidthWords);
   const w = combinedBounds.width;
   const totalSpace = maxLineWidth - w;
-  const spacerWidth = totalSpace / (countNonZeroWidthWords - 1);
+
+  // Prevent Infinity when line is too long or only one word
+  // If totalSpace is negative (line too long), use 0 spacing
+  const spacerWidth = totalSpace > 0 ? totalSpace / (countNonZeroWidthWords - 1) : 0;
 
   let previousWord;
   for (let i = 0; i < line.length; i++) {
@@ -402,16 +377,6 @@ export const alignLines = (
     for (const word of line) {
       const wordBounds = getBoundsNested(word);
 
-      // Debug extreme bounds before normalization
-      if (Math.abs(wordBounds.x) > 10000) {
-        console.error('EXTREME BOUNDS DETECTED in alignLines:', {
-          wordBounds,
-          wordLength: word.length,
-          firstToken: word[0],
-          lineIndex: lines.indexOf(line),
-          wordIndex: line.indexOf(word)
-        });
-      }
 
       // CRITICAL FIX: Normalize x position for ALL words in the line
       // to start from 0 for proper alignment calculation
@@ -425,11 +390,6 @@ export const alignLines = (
         wordBounds.x = wordBounds.x - expectedX;
       }
 
-      // Extra safety: if x is still extreme, force to 0
-      if (Math.abs(wordBounds.x) > 10000) {
-        console.warn('Forcing extreme x to 0 for word:', word[0]?.content);
-        wordBounds.x = 0;
-      }
 
       wordBoundsForLine.push(wordBounds);
     }
@@ -443,28 +403,7 @@ export const alignLines = (
       if (i < alignedLine.length) {
         const bounds = alignedLine[i];
 
-        // Debug extreme positions after alignment
-        if (Math.abs(bounds.x) > 10000) {
-          console.error('EXTREME X AFTER ALIGNMENT:', {
-            boundsX: bounds.x,
-            wordIndex: i,
-            lineIndex: lines.indexOf(line),
-            wordContent: word[0]?.content || 'unknown',
-            wordLength: word.length,
-            isCharacterSplit: word.length === 1
-          });
-        }
-
         const updatedWord = positionWordX(bounds.x)(word);
-
-        // Check if positionWordX is creating extreme values
-        if (updatedWord[0] && Math.abs(updatedWord[0].bounds.x) > 10000) {
-          console.error('EXTREME X AFTER positionWordX:', {
-            inputBoundsX: bounds.x,
-            outputBoundsX: updatedWord[0].bounds.x,
-            wordContent: updatedWord[0].content
-          });
-        }
 
         line[i] = updatedWord;
       }
