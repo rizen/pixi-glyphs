@@ -26,6 +26,9 @@
     "pixi.js",
     "text",
     "multistyle",
+    "pixi-tagged-text",
+    "rich text",
+    "html text",
     "multi style",
     "style",
     "canvas",
@@ -90,20 +93,8 @@
     "lint:eslint": "eslint ./src/**/*.ts",
     "lint:prettier": "prettier ./**/*.{ts,js,json,html,css,md} -l",
     "fix:prettier": "prettier ./**/*.{ts,js,json,html,css,md} -w",
-    "fix:changelog": "prettier CHANGELOG.md -w && git add CHANGELOG.md",
     "lint": "npm run lint:prettier && npm run lint:eslint",
-    "pre-commit": "npm run fix:changelog && npm run lint && npm run test",
-    "commit": "cz",
-    "commit-retry": "cz --retry",
-    "ci": "cz",
-    "cinv": "cz --no-verify",
-    "cirr": "cz --retry",
     "prepublishOnly": "npm run build",
     "release": "standard-version"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
   }
 }
