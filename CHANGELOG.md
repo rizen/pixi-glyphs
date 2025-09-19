@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 - Fixed: PixiJS Deprecation Warning: Texture.baseTexture is now Texture.source
 - Fixed: Link to github in demos
+- Feature: Added a web fonts demo with an svg icon.
 
 ## 4.0.0 (2025-09-19)
 

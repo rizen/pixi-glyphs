@@ -1217,6 +1217,91 @@ app.ticker.add((delta) => {
         }
       });
     }
+  },
+
+  webFonts: {
+    title: "Web Fonts",
+    description: "Using custom web fonts and SVG icons",
+    code: `// First, ensure your fonts are loaded (in CSS or using FontFace API)
+// Then load the SVG as a texture
+await PIXI.Assets.load('dole.svg');
+const dole = new PIXI.Sprite(PIXI.Texture.from('dole.svg'));
+
+const text = \`Take <b>some</b> more <dole/> damage.\`;
+
+const styles = {
+  default: {
+    align: "left",
+    breakWords: false,
+    fill: "#000000",
+    fontFamily: "Aclonica",
+    fontSize: 58,
+    fontStyle: "normal",
+    fontWeight: "400",
+    leading: 1.2,
+    letterSpacing: 0,
+    wordWrap: true,
+    wordWrapWidth: 675
+  },
+  b: {
+    fontFamily: "Arimo Bold"
+  },
+  dole: {
+    imgSrc: "dole",
+    imgDisplay: "icon"
+  }
+};
+
+const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, {
+  imgMap: { dole }
+});`,
+    init: async function() {
+      // Load fonts using FontFace API
+      const aclonica = new FontFace('Aclonica', 'url(Aclonica.ttf)');
+      const arimoBold = new FontFace('Arimo Bold', 'url(Arimo_Bold.ttf)');
+
+      await Promise.all([
+        aclonica.load(),
+        arimoBold.load()
+      ]);
+
+      document.fonts.add(aclonica);
+      document.fonts.add(arimoBold);
+
+      // Load SVG as texture
+      await PIXI.Assets.load('dole.svg');
+      const dole = new PIXI.Sprite(PIXI.Texture.from('dole.svg'));
+
+      const text = `Take <b>some</b> more <dole/> damage.`;
+
+      const styles = {
+        default: {
+          align: "left",
+          breakWords: false,
+          fill: "#000000",
+          fontFamily: "Aclonica",
+          fontSize: 58,
+          fontStyle: "normal",
+          fontWeight: "400",
+          leading: 1.2,
+          letterSpacing: 0,
+          wordWrap: true,
+          wordWrapWidth: 675
+        },
+        b: {
+          fontFamily: "Arimo Bold"
+        },
+        dole: {
+          imgSrc: "dole",
+          imgDisplay: "icon"
+        }
+      };
+
+      const Glyphs = window.Glyphs?.default || window.Glyphs;
+      return new Glyphs(text, styles, {
+        imgMap: { dole }
+      });
+    }
   }
 };
 
