@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/rizen/pixi-glyphs/issues"
   },
-  "homepage": "https://github.com/rizne/pixi-glyphs",
+  "homepage": "https://github.com/rizen/pixi-glyphs",
   "source": "./src/index.ts",
   "main": "./dist/pixi-glyphs.js",
   "umd:main": "./dist/pixi-glyphs.umd.js",
