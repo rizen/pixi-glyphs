@@ -1,6 +1,6 @@
 {
   "name": "pixi-glyphs",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Glyphs - Advanced text rendering for pixi.js",
   "author": "Mims Wright, JT Smith, tleunen",
   "license": "MIT",
