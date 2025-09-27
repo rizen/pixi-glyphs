@@ -721,8 +721,20 @@ export default class Glyphs<
 
         if (t.textDecorations && t.textDecorations.length > 0) {
           for (const d of t.textDecorations) {
-            const drawing = this.createDrawingForTextDecoration(d);
-            (displayObject as TextType).addChild(drawing);
+            // Create a copy of the decoration metrics with adjusted bounds for absolute positioning
+            // Use t.bounds which contains the actual text position
+            const absoluteDecoration = {
+              color: d.color,
+              bounds: {
+                x: d.bounds.x + t.bounds.x,
+                y: d.bounds.y + t.bounds.y,
+                width: d.bounds.width,
+                height: d.bounds.height
+              }
+            };
+            const drawing = this.createDrawingForTextDecoration(absoluteDecoration);
+            // In PIXI v8, Text objects cannot have children, so add decorations to the decoration container
+            this._decorationContainer.addChild(drawing);
             this._decorations.push(drawing);
           }
           drewDecorations = true;

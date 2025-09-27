@@ -292,7 +292,7 @@ export const extractDecorations = (
   const ascender = descent;
   const xHeight = baseline - ascender;
   const { width } = textBounds;
-  const x = 0;
+  const x = 0;  // Relative to text position
 
   function styleToMetrics(key: string): TextDecorationMetrics | undefined {
     const color = style[`${key}Color`] as Color;

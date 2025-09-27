@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file. See [standa
   4. Word Wrapping: Moved wordWrap, wordWrapWidth, and added breakWords to the standard properties section
   5. Fill: Added explicit documentation for the fill property
   6. fontVariant.
+- Fixed: PixiJS Deprecation Warning: addChild: Only Containers will be allowed to add children in v8.0
 
 ## [4.1.0](https://github.com/rizen/pixi-glyphs/compare/v4.0.3...v4.1.0) (2025-09-27)
 
