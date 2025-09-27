@@ -51,14 +51,28 @@ The style objects are modified versions (supersets) of `PIXI.TextStyle` (referre
 - Everything in [`PIXI.TextStyle`](https://pixijs.download/dev/docs/PIXI.TextStyle.html) including:
   - `fontFamily` - The font family. e.g. `"Arial"` or `"Arial, Helvetica, sans-serif"`
   - `fontStyle` - Font style. Options are `"normal"`, `"italic"`, `"oblique"`. Default is `"normal"`.
+  - `fontVariant` - Font variant. Options are `"normal"`, `"small-caps"`. Default is `"normal"`. Small-caps renders lowercase letters as smaller versions of capital letters.
   - `fontWeight` - Font weight. Options include `"normal"`, `"bold"`, `"bolder"`, `"lighter"`, `"100"` through `"900"`. Default is `"normal"`.
   - `stroke` - Stroke color for the text. Default is `0x000000` (black).
   - `strokeThickness` - Thickness of the stroke. Default is `0` (no stroke).
   - `dropShadow` - Enable drop shadow. Default is `false`.
   - `dropShadowColor` - Drop shadow color. Default is `0x000000`.
-  - `dropShadowBlur`, `dropShadowAngle`, `dropShadowDistance` - Drop shadow properties.
+  - `dropShadowBlur` - Drop shadow blur radius. Default is `0`.
+  - `dropShadowAngle` - Drop shadow angle in radians. Default is `Math.PI / 6`.
+  - `dropShadowDistance` - Drop shadow distance. Default is `5`.
+  - `dropShadowAlpha` - Drop shadow alpha/opacity. Default is `1`.
+  - `lineHeight` - The height of each line of text. Can be a number or a percentage string. Default is `0` (auto).
+  - `leading` - The space between lines of text. Default is `0`.
+  - `lineJoin` - Type of corner when drawing strokes. Options are `"miter"`, `"round"`, `"bevel"`. Default is `"miter"`.
+  - `miterLimit` - Miter limit ratio when using `"miter"` lineJoin. Default is `10`.
   - `padding` - Padding around the text. Default is `0`.
   - `trim` - Trim transparent borders. Default is `false`.
+  - `textBaseline` - The baseline of the text. Options are `"alphabetic"`, `"top"`, `"hanging"`, `"middle"`, `"ideographic"`, `"bottom"`. Default is `"alphabetic"`.
+  - `whiteSpace` - How whitespace and newlines are handled. Options are `"normal"`, `"pre"`, `"pre-line"`. Default is `"pre"` (preserve whitespace and newlines).
+  - `wordWrap` - Enable word wrapping. Default is `true` (changed from PIXI default of `false`).
+  - `wordWrapWidth` - The width at which text wraps. Default is `500` (changed from PIXI default of `100`).
+  - `breakWords` - Break words if they're too long for the wordWrapWidth. Default is `false`.
+  - `fill` - The fill color. Can be a string, number, or gradient. Default is `0x000000` (black).
 - `align` - Has all the options from `PIXI.TextStyle` plus additional options for justified alignment:
   - `"justify-left"`, `"justify-right"`, and `"justify-center"` are all types of jutified alignment and they only differ in how they treat the last line of text.
   - `"justify-all"` justifies all lines of text even the last line.
@@ -96,10 +110,10 @@ The style objects are modified versions (supersets) of `PIXI.TextStyle` (referre
 - `highlightColor` - Adds a background highlight color behind the text. Can be a hex number like `0xFFEB3B` or a hex string like `"#FFEB3B"`. The highlight appears as a continuous solid color box behind the text with no borders, spanning across spaces between words for a seamless highlight effect. When the same highlight color is applied to consecutive text segments, they will be rendered as a single continuous highlight box. Perfect for emphasizing important text, creating visual hierarchy, inline code blocks, or implementing syntax highlighting. Example: `<highlight>This entire phrase is highlighted</highlight>` will create one continuous highlight box.
 - `color` - An alias for `fill`. It's recommended you just use either `fill` or `color`, but if both are set, `fill` will be used. If tags are nested, `color` on an inner tag can override `fill` in an outer tag.
 
-Additionally, the following changes have been made to the default style values:
+Note that pixi-glyphs changes some default values from PIXI.TextStyle:
 
 - `wordWrap`: `false` -> `true`
-- `wordWrapWidth`: `100` -> `500`,
+- `wordWrapWidth`: `100` -> `500`
 - `fill`, `stroke`, & `dropShadowColor` - `"black"` -> `0x000000`
 
 ##### 'Default' `default` styles

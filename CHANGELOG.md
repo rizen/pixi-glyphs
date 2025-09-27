@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file. See [standa
 
 - Fixed: Memory leaks when destroying Glyphs object.
 - Fixed: Text color in the highlights demo.
+- Added: Documentation for the standard Pixi.TextStyle properties that are inherited by Glyphs in our Readme:
+  1. Drop Shadow Details: dropShadowBlur, dropShadowAngle, dropShadowDistance, dropShadowAlpha
+  2. Line & Text Layout: lineHeight, leading, textBaseline, whiteSpace
+  3. Stroke Details: lineJoin, miterLimit
+  4. Word Wrapping: Moved wordWrap, wordWrapWidth, and added breakWords to the standard properties section
+  5. Fill: Added explicit documentation for the fill property
+  6. fontVariant.
 
 ## [4.1.0](https://github.com/rizen/pixi-glyphs/compare/v4.0.3...v4.1.0) (2025-09-27)
 
