@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [4.0.3](https://github.com/rizen/pixi-glyphs/compare/v4.0.2...v4.0.3) (2025-09-27)
 
+- Fixed: lineSpacing and paragraphSpacing as options.
+- Added: Dynamic demonstration on the spacing demo.
+
 ### [4.0.2](https://github.com/rizen/pixi-glyphs/compare/v4.0.1...v4.0.2) (2025-09-22)
 
 - Fixed: Typos in package.json. 

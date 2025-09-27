@@ -86,6 +86,8 @@ export interface GlyphsOptions {
   errorHandler?: ErrorHandler;
   supressConsole?: boolean;
   overdrawDecorations?: number;
+  lineSpacing?: number;
+  paragraphSpacing?: number;
 }
 
 // Legacy alias for backwards compatibility

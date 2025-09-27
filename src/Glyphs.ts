@@ -337,7 +337,16 @@ export default class Glyphs<
         ...userStyles,
       };
     }
-    const mergedDefaultStyles = { ...DEFAULT_STYLE, ...tagStyles.default };
+    // Merge lineSpacing and paragraphSpacing from options into default style
+    const styleOverrides: any = { ...tagStyles.default };
+    if (options.lineSpacing !== undefined) {
+      styleOverrides.lineSpacing = options.lineSpacing;
+    }
+    if (options.paragraphSpacing !== undefined) {
+      styleOverrides.paragraphSpacing = options.paragraphSpacing;
+    }
+
+    const mergedDefaultStyles = { ...DEFAULT_STYLE, ...styleOverrides };
     tagStyles.default = mergedDefaultStyles;
     this.tagStyles = tagStyles;
 

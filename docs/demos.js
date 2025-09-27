@@ -728,15 +728,14 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
 
   spacing: {
     title: "Spacing",
-    description: "Control line and letter spacing for visual effects",
-    code: `const text = "You can <narrow>set line and letter spacing</narrow> to <wide>give your text some drama.</wide>\\nNote that lineSpacing can only be set on the default style.";
+    description: "Interactive demo for line, letter, and paragraph spacing. Adjust the sliders to see changes.",
+    code: `const text = "You can <narrow>set line and letter spacing</narrow> to <wide>give your text some drama.</wide>\\nThis line demonstrates lineSpacing between lines in the same paragraph.\\n\\nNotice the extra spacing between paragraphs from paragraphSpacing.\\nParagraph spacing only applies between different paragraphs.";
 
 const styles = {
   default: {
     fontFamily: "Arial",
     fontSize: "24px",
     fill: "#cccccc",
-    lineSpacing: 30,
     letterSpacing: 0,
     wordWrap: true,
     wordWrapWidth: 500
@@ -751,16 +750,20 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);`,
+const options = {
+  lineSpacing: 15,
+  paragraphSpacing: 40
+};
+
+const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles, options);`,
     init: function() {
-      const text = "You can <narrow>set line and letter spacing</narrow> to <wide>give your text some drama.</wide>\nNote that lineSpacing can only be set on the default style.";
+      const text = "You can <narrow>set line and letter spacing</narrow> to <wide>give your text some drama.</wide>\nThis line demonstrates lineSpacing between lines in the same paragraph.\n\nNotice the extra spacing between paragraphs from paragraphSpacing.\nParagraph spacing only applies between different paragraphs.";
 
       const styles = {
         default: {
           fontFamily: "Arial",
           fontSize: "24px",
           fill: "#cccccc",
-          lineSpacing: 30,
           letterSpacing: 0,
           wordWrap: true,
           wordWrapWidth: 500
@@ -775,7 +778,82 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles);
+      const options = {
+        lineSpacing: 15,
+        paragraphSpacing: 40
+      };
+
+      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs;
+      const glyphs = new Glyphs(text, styles, options);
+
+      // Create interactive controls
+      setTimeout(() => {
+        const controlsDiv = document.createElement('div');
+        controlsDiv.style.cssText = 'margin-top: 20px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 5px; color: white; font-family: Arial; font-size: 14px;';
+        controlsDiv.innerHTML = `
+          <div style="margin-bottom: 10px;">
+            <label>Letter Spacing: <span id="letter-value">0</span>px</label><br>
+            <input type="range" id="letter-spacing" min="-5" max="20" value="0" style="width: 300px;">
+          </div>
+          <div style="margin-bottom: 10px;">
+            <label>Line Spacing: <span id="line-value">15</span>px</label><br>
+            <input type="range" id="line-spacing" min="0" max="50" value="15" style="width: 300px;">
+          </div>
+          <div style="margin-bottom: 10px;">
+            <label>Paragraph Spacing: <span id="paragraph-value">40</span>px</label><br>
+            <input type="range" id="paragraph-spacing" min="0" max="100" value="40" style="width: 300px;">
+          </div>
+        `;
+
+        const canvasSection = document.querySelector('.canvas-section');
+        if (canvasSection) {
+          canvasSection.appendChild(controlsDiv);
+
+          // Letter spacing slider
+          const letterSlider = document.getElementById('letter-spacing');
+          const letterValue = document.getElementById('letter-value');
+          letterSlider.addEventListener('input', (e) => {
+            const letterSpacing = parseInt(e.target.value);
+            letterValue.textContent = letterSpacing;
+
+            // Update letterSpacing in default style
+            glyphs.setStyleForTag('default', {
+              ...glyphs.tagStyles.default,
+              letterSpacing: letterSpacing
+            });
+          });
+
+          // Line spacing slider
+          const lineSlider = document.getElementById('line-spacing');
+          const lineValue = document.getElementById('line-value');
+          lineSlider.addEventListener('input', (e) => {
+            const lineSpacing = parseInt(e.target.value);
+            lineValue.textContent = lineSpacing;
+
+            // Update lineSpacing in default style
+            glyphs.setDefaultStyle({
+              ...glyphs.defaultStyle,
+              lineSpacing: lineSpacing
+            });
+          });
+
+          // Paragraph spacing slider
+          const paragraphSlider = document.getElementById('paragraph-spacing');
+          const paragraphValue = document.getElementById('paragraph-value');
+          paragraphSlider.addEventListener('input', (e) => {
+            const paragraphSpacing = parseInt(e.target.value);
+            paragraphValue.textContent = paragraphSpacing;
+
+            // Update paragraphSpacing in default style
+            glyphs.setDefaultStyle({
+              ...glyphs.defaultStyle,
+              paragraphSpacing: paragraphSpacing
+            });
+          });
+        }
+      }, 100);
+
+      return glyphs;
     }
   },
 
