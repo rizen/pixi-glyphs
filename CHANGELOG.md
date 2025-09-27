@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [4.1.1](https://github.com/rizen/pixi-glyphs/compare/v4.1.0...v4.1.1) (2025-09-27)
 
+- Fixed: Memory leaks when destroying Glyphs object.
+
 ## [4.1.0](https://github.com/rizen/pixi-glyphs/compare/v4.0.3...v4.1.0) (2025-09-27)
 
 - Added: `highlightColor` option for highlight text.

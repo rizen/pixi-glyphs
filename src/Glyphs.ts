@@ -411,36 +411,46 @@ export default class Glyphs<
   protected resetChildren() {
     // Add highlight container first so it appears behind everything
     if (this._highlightContainer) {
-      this._highlightContainer.removeChildren();
-      this.removeChild(this._highlightContainer);
+      // Properly destroy all children to prevent memory leaks
+      this._highlightContainer.removeChildren().forEach((child) => child.destroy());
+      const removed = this.removeChild(this._highlightContainer);
+      if (removed) removed.destroy();
     }
     this._highlightContainer = new PIXI.Container();
     this.addChild(this._highlightContainer);
 
     if (this._textContainer) {
-      this._textContainer.removeChildren();
-      this.removeChild(this._textContainer);
+      // Properly destroy all children to prevent memory leaks
+      this._textContainer.removeChildren().forEach((child) => child.destroy());
+      const removed = this.removeChild(this._textContainer);
+      if (removed) removed.destroy();
     }
     this._textContainer = new PIXI.Container();
     this.addChild(this._textContainer);
 
     if (this._spriteContainer) {
+      // Don't destroy sprites as they may be reused from imgMap
       this._spriteContainer.removeChildren();
-      this.removeChild(this._spriteContainer);
+      const removed = this.removeChild(this._spriteContainer);
+      if (removed) removed.destroy();
     }
     this._spriteContainer = new PIXI.Container();
     this.addChild(this._spriteContainer);
 
     if (this._decorationContainer) {
-      this._decorationContainer.removeChildren();
-      this.removeChild(this._decorationContainer);
+      // Properly destroy all children to prevent memory leaks
+      this._decorationContainer.removeChildren().forEach((child) => child.destroy());
+      const removed = this.removeChild(this._decorationContainer);
+      if (removed) removed.destroy();
     }
     this._decorationContainer = new PIXI.Container();
     this.addChild(this._decorationContainer);
 
     if (this._debugContainer) {
-      this._debugContainer.removeChildren();
-      this.removeChild(this._debugContainer);
+      // Properly destroy all children to prevent memory leaks
+      this._debugContainer.removeChildren().forEach((child) => child.destroy());
+      const removed = this.removeChild(this._debugContainer);
+      if (removed) removed.destroy();
     }
     this._debugContainer = new PIXI.Container();
     this.addChild(this._debugContainer);
