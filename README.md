@@ -262,13 +262,13 @@ If you'd like to contribute, a great place to start is to log an issue. If you a
 ## Build instructions
 
 ```bash
-yarn install
-yarn build
+npm install
+npm run build
 ```
 
 The [node-canvas](https://www.npmjs.com/package/canvas) package, used for testing, has some additional dependencies. For Mac users, there's a homebrew Brewfile that you can install using `brew bundle`. For other users, see [the instructions for the package](https://www.npmjs.com/package/canvas). On Apple Silicon, [this issue](https://github.com/Automattic/node-canvas/issues/2433) was helpful with troubleshooting.
 
-Yarn should automatically install peer dependencies (including the very important pixi.js) but in my experience, you may have to run `yarn install` again after adding any additional packages.
+npm should automatically install peer dependencies (including the very important pixi.js) but in my experience, you may have to run `npm install` again after adding any additional packages.
 
 ### VSCode Users
 
@@ -279,7 +279,7 @@ If you're using the [vscode-jest extension](https://marketplace.visualstudio.com
 You can view examples using the command:
 
 ```bash
-yarn demo
+npm run docs
 ```
 
 This will start a simple HTTP server running locally on port 8080. Navigate to [http://localhost:8080/demo](http://localhost:8080/demo)
