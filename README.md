@@ -48,7 +48,17 @@ The style objects are modified versions (supersets) of `PIXI.TextStyle` (referre
 
 (By the way, there is an excellent [TextStyle visual editor](https://pixijs.io/pixi-text-style/) that you can use to preview how your style will appear. The style objects generated can be used in this component.)
 
-- Everything in [`PIXI.TextStyle`](https://pixijs.download/dev/docs/PIXI.TextStyle.html)
+- Everything in [`PIXI.TextStyle`](https://pixijs.download/dev/docs/PIXI.TextStyle.html) including:
+  - `fontFamily` - The font family. e.g. `"Arial"` or `"Arial, Helvetica, sans-serif"`
+  - `fontStyle` - Font style. Options are `"normal"`, `"italic"`, `"oblique"`. Default is `"normal"`.
+  - `fontWeight` - Font weight. Options include `"normal"`, `"bold"`, `"bolder"`, `"lighter"`, `"100"` through `"900"`. Default is `"normal"`.
+  - `stroke` - Stroke color for the text. Default is `0x000000` (black).
+  - `strokeThickness` - Thickness of the stroke. Default is `0` (no stroke).
+  - `dropShadow` - Enable drop shadow. Default is `false`.
+  - `dropShadowColor` - Drop shadow color. Default is `0x000000`.
+  - `dropShadowBlur`, `dropShadowAngle`, `dropShadowDistance` - Drop shadow properties.
+  - `padding` - Padding around the text. Default is `0`.
+  - `trim` - Trim transparent borders. Default is `false`.
 - `align` - Has all the options from `PIXI.TextStyle` plus additional options for justified alignment:
   - `"justify-left"`, `"justify-right"`, and `"justify-center"` are all types of jutified alignment and they only differ in how they treat the last line of text.
   - `"justify-all"` justifies all lines of text even the last line.
@@ -63,8 +73,13 @@ The style objects are modified versions (supersets) of `PIXI.TextStyle` (referre
 - `paragraphSpacing` - Additional spacing between paragraphs that is added when you use an explicit carriage return rather than letting the text wrap at the end of a line. Default is `0`. Can also be negative.
 - `breakLines` - When `breakLines` is `false`, the text in the tag will ignore the `wordWrapWidth` property and never wrap to the next line unless you explicitly include a newline character. It essentially treats the whole tag as a single word. If a nested tag overrides this, only the text inside the nested tag will wrap. Default is `true`.
 - `imgSrc` - ID of image to include in this tag (see `imgMap` under Options section)
-- `imgDisplay` - How should the image be displayed. `"block"` is no scaling, `"icon"` scales the image to match the text-size and appear inline.
+- `imgDisplay` - How should the image be displayed. `"block"` is no scaling, `"icon"` scales the image to match the text-size and appear inline, `"inline"` displays at original size inline. Default is `"inline"`.
 - `iconScale` - If you use `imgDisplay="icon"`, this value will scale the size of the icon relative to the text size. Default is `1.0` (or 100%)
+- `imgScale` - Scales both width and height of an image by a percentage. e.g. `"50%"` makes the image half size.
+- `imgScaleX` - Scales only the width of an image by a percentage. e.g. `"200%"` makes the image twice as wide.
+- `imgScaleY` - Scales only the height of an image by a percentage. e.g. `"75%"` makes the image 3/4 of its original height.
+- `imgWidth` - Sets the width of an image in pixels or as a percentage. e.g. `100` or `"50%"`.
+- `imgHeight` - Sets the height of an image in pixels or as a percentage. e.g. `50` or `"150%"`.
 - `textDecoration` - (i.e. underlines) Adds lines under, over, or through your text. Possible values are either `"normal"` or one or more of `"underline"`, `"overline"`, `"line-through"` (as a space separated string). Can also be set using the more fine-grained properties below. By default, decorations have `color` that matches the `fill` color of the text, `thickness` of `1` and `offset` `0`. **Note: You may need to enabled the `drawWhitespace` option in `options` to avoid seeing gaps in your text decorations between words.**
 - `decorationColor` - overrides the default color (`fill`) for all decorations.
 - `decorationThickness` - overrides the default thickness (`1`) for all decorations.
@@ -88,7 +103,7 @@ Additionally, the following changes have been made to the default style values:
 
 ##### 'Default' `default` styles
 
-Some styles (`fontSize`, `color`, etc.) are set by default when you call `new Glyphs()` but they can all be overridden. The most important default styles are:
+Some styles (`fontSize`, `color`, etc.) are set by default when you call `new Glyphs()` but they can all be overridden. The complete default styles are:
 
 ```javascript
 {
@@ -97,6 +112,12 @@ Some styles (`fontSize`, `color`, etc.) are set by default when you call `new Gl
   wordWrap: true,
   wordWrapWidth: 500,
   fill: 0x000000,
+  fontSize: 26,
+  stroke: 0x000000,
+  dropShadowColor: 0x000000,
+  imgDisplay: "inline",
+  iconScale: 1.0,
+  breakLines: true
 }
 ```
 

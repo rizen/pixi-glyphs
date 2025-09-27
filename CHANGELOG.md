@@ -6,6 +6,26 @@ All notable changes to this project will be documented in this file. See [standa
 
 - Fixed: lineSpacing and paragraphSpacing as options.
 - Added: Dynamic demonstration on the spacing demo.
+- Added: Style Properties Documentation:
+  1. Image properties - Added complete documentation for:
+    - imgScale, imgScaleX, imgScaleY - For scaling images by percentage
+    - imgWidth, imgHeight - For setting image dimensions
+    - Updated imgDisplay to include all three options: "inline", "icon", "block" with default value
+  2. Common PIXI.TextStyle properties - Added explicit documentation for commonly used properties that were inherited but not mentioned:
+    - fontFamily, fontStyle, fontWeight
+    - stroke, strokeThickness
+    - dropShadow and related properties
+    - padding, trim
+  3. Updated Default Styles section - Now shows the complete list of default values:
+    - Added fontSize: 26
+    - Added stroke: 0x000000
+    - Added dropShadowColor: 0x000000
+    - Added imgDisplay: "inline"
+    - Added iconScale: 1.0
+    - Added breakLines: true
+  4. Options:
+    - Added lineSpacing: 15
+    - Added letterSpacing: 3
 
 ### [4.0.2](https://github.com/rizen/pixi-glyphs/compare/v4.0.1...v4.0.2) (2025-09-22)
 
