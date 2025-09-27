@@ -1396,7 +1396,7 @@ const styles = {
   default: {
     fontFamily: "Arial",
     fontSize: 20,
-    fill: "#333333",
+    fill: "#cccccc",
     wordWrap: true,
     wordWrapWidth: 550
   },
@@ -1452,7 +1452,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
         default: {
           fontFamily: "Arial",
           fontSize: 20,
-          fill: "#333333",
+          fill: "#cccccc",
           wordWrap: true,
           wordWrapWidth: 550
         },
