@@ -207,6 +207,10 @@ export interface LineBreakStyles {
   breakLines?: boolean;
 }
 
+export interface HighlightStyles {
+  highlightColor?: Color;
+}
+
 export interface TextStyleExtended
   extends Record<string, unknown>,
     Partial<Omit<PIXI.TextStyle, "align" | "fontSize">>,
@@ -216,7 +220,8 @@ export interface TextStyleExtended
     VerticalSpacingStyles,
     FontScaleStyles,
     TextTransformStyles,
-    LineBreakStyles {
+    LineBreakStyles,
+    HighlightStyles {
   // Overridden properties
   align?: Align;
   fontStyle?: FontStyle;

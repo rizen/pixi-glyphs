@@ -1380,6 +1380,124 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, {
         imgMap: { dole }
       });
     }
+  },
+
+  highlights: {
+    title: "Highlights",
+    description: "Add background highlights to your text for emphasis and visual impact",
+    code: `const text = "You can <yellow>highlight text</yellow> to make it stand out!\\n\\n" +
+  "Use <blue>different colors</blue> for <green>different meanings</green>.\\n" +
+  "Combine highlights with <bold>other styles</bold> like <italic>italic text</italic>.\\n\\n" +
+  "Perfect for <important>important messages</important>, <warning>warnings</warning>,\\n" +
+  "or creating <code>inline code blocks</code> with syntax highlighting.\\n\\n" +
+  "Test: <code>const x = 42;</code> should have a gray background.";
+
+const styles = {
+  default: {
+    fontFamily: "Arial",
+    fontSize: 20,
+    fill: "#333333",
+    wordWrap: true,
+    wordWrapWidth: 550
+  },
+  yellow: {
+    highlightColor: "#FFEB3B",
+    fill: "#333333",
+    padding: 2
+  },
+  blue: {
+    highlightColor: "#2196F3",
+    fill: "#FFFFFF"
+  },
+  green: {
+    highlightColor: "#4CAF50",
+    fill: "#FFFFFF"
+  },
+  bold: {
+    fontWeight: "bold"
+  },
+  italic: {
+    fontStyle: "italic",
+    highlightColor: "#E1BEE7",
+    fill: "#4A148C"
+  },
+  important: {
+    highlightColor: "#FF5722",
+    fill: "#FFFFFF",
+    fontWeight: "bold"
+  },
+  warning: {
+    highlightColor: "#FFC107",
+    fill: "#333333",
+    fontWeight: "bold"
+  },
+  code: {
+    fontFamily: "monospace",
+    highlightColor: "#546E7A",
+    fill: "#E0F2F1",
+    fontSize: 18
+  }
+};
+
+const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);`,
+    init: function() {
+      const text = "You can <yellow>highlight text</yellow> to make it stand out!\n\n" +
+        "Use <blue>different colors</blue> for <green>different meanings</green>.\n" +
+        "Combine highlights with <bold>other styles</bold> like <italic>italic text</italic>.\n\n" +
+        "Perfect for <important>important messages</important>, <warning>warnings</warning>,\n" +
+        "or creating <code>inline code blocks</code> with syntax highlighting.\n\n" +
+        "Test: <code>const x = 42;</code> should have a gray background.";
+
+      const styles = {
+        default: {
+          fontFamily: "Arial",
+          fontSize: 20,
+          fill: "#333333",
+          wordWrap: true,
+          wordWrapWidth: 550
+        },
+        yellow: {
+          highlightColor: "#FFEB3B",
+          fill: "#333333",
+          padding: 2
+        },
+        blue: {
+          highlightColor: "#2196F3",
+          fill: "#FFFFFF"
+        },
+        green: {
+          highlightColor: "#4CAF50",
+          fill: "#FFFFFF"
+        },
+        bold: {
+          fontWeight: "bold"
+        },
+        italic: {
+          fontStyle: "italic",
+          highlightColor: "#E1BEE7",
+          fill: "#4A148C"
+        },
+        important: {
+          highlightColor: "#FF5722",
+          fill: "#FFFFFF",
+          fontWeight: "bold"
+        },
+        warning: {
+          highlightColor: "#FFC107",
+          fill: "#333333",
+          fontWeight: "bold"
+        },
+        code: {
+          fontFamily: "monospace",
+          highlightColor: "#546E7A",
+          fill: "#E0F2F1",
+          fontSize: 18
+        }
+      };
+
+      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs;
+      return new Glyphs(text, styles);
+    }
   }
 };
 

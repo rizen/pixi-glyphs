@@ -93,6 +93,7 @@ The style objects are modified versions (supersets) of `PIXI.TextStyle` (referre
 - `lineThroughThickness` - Sets the thickness of the line-through. Default is `1`.
 - `lineThroughOffset` - Positions the line-through above or below the default location. Default is `0`.
 - `adjustBaseline` - Adjusts the position of the text above or below the baseline. Default is `0`. Also see the `adjustFontBaseline` property in the options.
+- `highlightColor` - Adds a background highlight color behind the text. Can be a hex number like `0xFFEB3B` or a hex string like `"#FFEB3B"`. The highlight appears as a continuous solid color box behind the text with no borders, spanning across spaces between words for a seamless highlight effect. When the same highlight color is applied to consecutive text segments, they will be rendered as a single continuous highlight box. Perfect for emphasizing important text, creating visual hierarchy, inline code blocks, or implementing syntax highlighting. Example: `<highlight>This entire phrase is highlighted</highlight>` will create one continuous highlight box.
 - `color` - An alias for `fill`. It's recommended you just use either `fill` or `color`, but if both are set, `fill` will be used. If tags are nested, `color` on an inner tag can override `fill` in an outer tag.
 
 Additionally, the following changes have been made to the default style values:

@@ -289,6 +289,11 @@ export default class Glyphs<
     return this._textContainer;
   }
 
+  private _highlightContainer: PIXI.Container;
+  public get highlightContainer(): PIXI.Container {
+    return this._highlightContainer;
+  }
+
   private _decorationContainer: PIXI.Container;
   public get decorationContainer(): PIXI.Container {
     return this._decorationContainer;
@@ -319,6 +324,7 @@ export default class Glyphs<
 
     this._textContainer = new PIXI.Container();
     this._spriteContainer = new PIXI.Container();
+    this._highlightContainer = new PIXI.Container();
     this._decorationContainer = new PIXI.Container();
     this._debugContainer = new PIXI.Container();
     this._debugGraphics = new PIXI.Graphics();
@@ -403,6 +409,14 @@ export default class Glyphs<
    * Deletes references to sprites and text fields.
    */
   protected resetChildren() {
+    // Add highlight container first so it appears behind everything
+    if (this._highlightContainer) {
+      this._highlightContainer.removeChildren();
+      this.removeChild(this._highlightContainer);
+    }
+    this._highlightContainer = new PIXI.Container();
+    this.addChild(this._highlightContainer);
+
     if (this._textContainer) {
       this._textContainer.removeChildren();
       this.removeChild(this._textContainer);
@@ -618,14 +632,14 @@ export default class Glyphs<
    */
   public draw(): void {
     this.resetChildren();
-    if (this.textContainer === null || this.spriteContainer === null) {
+    if (this.textContainer === null || this.spriteContainer === null || this.highlightContainer === null) {
       throw new Error(
-        "Somehow the textContainer or spriteContainer is null. This shouldn't be possible. Perhaps you've destroyed this object?"
+        "Somehow the textContainer, spriteContainer, or highlightContainer is null. This shouldn't be possible. Perhaps you've destroyed this object?"
       );
     }
     const textContainer = this.textContainer;
     const spriteContainer = this.spriteContainer;
-
+    const highlightContainer = this.highlightContainer;
 
     const { drawWhitespace } = this.options;
     const tokensFlat = this.tokensFlat;
@@ -635,6 +649,53 @@ export default class Glyphs<
       ? tokensFlat
       : // remove any tokens that are purely whitespace unless drawWhitespace is specified
       tokensFlat.filter(isNotWhitespaceToken);
+
+    // Draw highlights first so they appear behind text
+    // Group consecutive tokens with the same highlight color
+    let i = 0;
+    while (i < tokensFlat.length) {
+      const token = tokensFlat[i];
+      if (isTextToken(token) && token.style.highlightColor !== undefined) {
+        // Find all consecutive tokens with the same highlight color
+        const highlightColor = token.style.highlightColor;
+        let startX = token.bounds.x;
+        let minY = token.bounds.y;
+        let maxY = token.bounds.y + token.bounds.height;
+        let endX = token.bounds.x + token.bounds.width;
+
+        let j = i + 1;
+        while (j < tokensFlat.length) {
+          const nextToken = tokensFlat[j];
+          // Check if next token has the same highlight color and is on the same line
+          if (isTextToken(nextToken) &&
+              nextToken.style.highlightColor === highlightColor &&
+              Math.abs(nextToken.bounds.y - token.bounds.y) < 5) { // Same line check
+            endX = nextToken.bounds.x + nextToken.bounds.width;
+            minY = Math.min(minY, nextToken.bounds.y);
+            maxY = Math.max(maxY, nextToken.bounds.y + nextToken.bounds.height);
+            j++;
+          } else {
+            break;
+          }
+        }
+
+        // Create a single highlight box for the group
+        const highlight = this.createHighlightBox(
+          highlightColor,
+          startX,
+          minY,
+          endX - startX,
+          maxY - minY
+        );
+        if (highlight) {
+          highlightContainer.addChild(highlight);
+        }
+
+        i = j;
+      } else {
+        i++;
+      }
+    }
 
     let drewDecorations = false;
     let displayObject: PIXI.Container;
@@ -768,6 +829,45 @@ export default class Glyphs<
     });
 
     return textField as TextType;
+  }
+
+  protected createHighlightBox(
+    highlightColor: any,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): PIXI.Graphics | null {
+    if (!highlightColor || width <= 0 || height <= 0) {
+      return null;
+    }
+
+    const highlight = new PIXI.Graphics();
+    let color = highlightColor;
+
+    // Convert color to a number if it's a string
+    if (typeof color === "string") {
+      if (color.indexOf("#") === 0) {
+        color = "0x" + color.substring(1);
+        color = parseInt(color, 16) as number;
+      } else {
+        this.logWarning(
+          "invalid-highlight-color",
+          "Sorry, at this point, only hex colors are supported for highlightColor. Please use either a hex number like 0x66FF33 or a string like '#66FF33'"
+        );
+        color = 0xFFFF00; // Default to yellow if invalid
+      }
+    }
+
+    // Draw the highlight box
+    highlight.rect(0, 0, width, height)
+      .fill({ color: color as number });
+
+    // Position the highlight
+    highlight.x = x;
+    highlight.y = y;
+
+    return highlight;
   }
 
   protected createTextFieldForToken(token: TextSegmentToken): TextType {

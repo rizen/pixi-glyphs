@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [4.1.0](https://github.com/rizen/pixi-glyphs/compare/v4.0.3...v4.1.0) (2025-09-27)
 
+- Added: `highlightColor` option for highlight text.
+
 ### [4.0.3](https://github.com/rizen/pixi-glyphs/compare/v4.0.2...v4.0.3) (2025-09-27)
 
 - Fixed: lineSpacing and paragraphSpacing as options.
