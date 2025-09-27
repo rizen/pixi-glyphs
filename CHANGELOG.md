@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.0](https://github.com/rizen/pixi-glyphs/compare/v4.0.3...v4.1.0) (2025-09-27)
+
 ### [4.0.3](https://github.com/rizen/pixi-glyphs/compare/v4.0.2...v4.0.3) (2025-09-27)
 
 - Fixed: lineSpacing and paragraphSpacing as options.
