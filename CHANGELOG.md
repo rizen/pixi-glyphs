@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.1.2](https://github.com/rizen/pixi-glyphs/compare/v4.1.1...v4.1.2) (2025-09-27)
+
 ### [4.1.1](https://github.com/rizen/pixi-glyphs/compare/v4.1.0...v4.1.1) (2025-09-27)
 
 - Fixed: Memory leaks when destroying Glyphs object.
