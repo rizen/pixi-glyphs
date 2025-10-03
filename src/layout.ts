@@ -412,8 +412,27 @@ export const alignLines = (
   return lines;
 };
 
-const getTallestToken = (line: LineToken): SegmentToken =>
-  flatReduce<SegmentToken, SegmentToken>((tallest, current) => {
+const getTallestToken = (line: LineToken): SegmentToken => {
+  // Find the last non-whitespace token to determine where actual content ends
+  let lastNonWhitespaceIndex = -1;
+  for (let i = line.length - 1; i >= 0; i--) {
+    if (isNotWhitespaceToken(line[i])) {
+      lastNonWhitespaceIndex = i;
+      break;
+    }
+  }
+
+  // Only consider tokens up to the last non-whitespace token for line height
+  const relevantWords = lastNonWhitespaceIndex >= 0
+    ? line.slice(0, lastNonWhitespaceIndex + 1)
+    : line;
+
+  return flatReduce<SegmentToken, SegmentToken>((tallest, current) => {
+    // Skip whitespace and newline tokens when determining tallest
+    if (isWhitespaceToken(current) || isNewlineToken(current)) {
+      return tallest;
+    }
+
     let h = current.bounds.height ?? 0;
     if (isSpriteToken(current)) {
       h += current.fontProperties.descent;
@@ -423,7 +442,8 @@ const getTallestToken = (line: LineToken): SegmentToken =>
       return current;
     }
     return tallest;
-  }, createEmptySegmentToken())(line);
+  }, createEmptySegmentToken())(relevantWords);
+};
 
 export const verticalAlignInLines = (
   lines: ParagraphToken,
@@ -445,9 +465,14 @@ export const verticalAlignInLines = (
 
     // For baseline alignment, we need the tallest ascent in the line
     // We should find the actual tallest ascent, not just from the tallest height token
+    // Skip whitespace/newline tokens to avoid using default style's font metrics
     let tallestAscent = 0;
     for (const word of line) {
       for (const segment of word) {
+        // Skip whitespace and newline tokens
+        if (isWhitespaceToken(segment) || isNewlineToken(segment)) {
+          continue;
+        }
         const segAscent = segment.fontProperties?.ascent ?? 0;
         if (segAscent > tallestAscent) {
           tallestAscent = segAscent;
@@ -455,6 +480,13 @@ export const verticalAlignInLines = (
       }
     }
     tallestAscent += paragraphModifier;
+
+    // If the line is empty (only whitespace), use the previous line's tallest token for spacing
+    // This ensures blank lines maintain proper vertical spacing
+    if (tallestHeight === 0 && tallestAscent === 0) {
+      tallestHeight = previousTallestToken.bounds?.height ?? 0;
+      tallestAscent = previousTallestToken.fontProperties?.ascent ?? 0;
+    }
 
     const valignParagraphModifier = paragraphModifier;
     paragraphModifier = 0;
@@ -699,16 +731,18 @@ const layout = (
   }
 
   function setTallestHeight(token?: SegmentToken): void {
+    // Don't use whitespace or newline tokens to determine line height
+    // This prevents default style's font size from affecting line height at wrap boundaries
+    if (!token || isWhitespaceToken(token) || isNewlineToken(token)) {
+      return;
+    }
+
     const fontSize = token?.fontProperties?.fontSize ?? 0;
     const height = token?.bounds?.height ?? 0;
 
     // Don't include lineSpacing in the max - it should be added separately when moving to next line
     tallestHeightInLine = Math.max(tallestHeightInLine, fontSize);
-
-    // Don't try to measure the height of newline tokens
-    if (isNewlineToken(token) === false) {
-      tallestHeightInLine = Math.max(tallestHeightInLine, height);
-    }
+    tallestHeightInLine = Math.max(tallestHeightInLine, height);
   }
 
   function positionTokenAtCursorAndAdvanceCursor(token: SegmentToken): void {

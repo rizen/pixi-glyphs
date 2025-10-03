@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [4.1.3](https://github.com/rizen/pixi-glyphs/compare/v4.1.2...v4.1.3) (2025-10-03)
 
+- Added: Line Endings example.
+- Fixed: A problem where a line wrap on an inline style would create weird gaps between the inline styles.
+
 ### [4.1.2](https://github.com/rizen/pixi-glyphs/compare/v4.1.1...v4.1.2) (2025-09-27)
 
 - Fixed: Outdated refereneces to yarn in the docs.

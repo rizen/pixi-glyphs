@@ -1498,6 +1498,199 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
       const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs;
       return new Glyphs(text, styles);
     }
+  },
+
+  lineEndings: {
+    title: "Line Endings",
+    description: "Show how inline styles affect line heights and line spacing on word wrap boundaries.",
+    code: `// Load fonts first
+await Promise.all([
+  new FontFace('Arimo Bold', 'url(Arimo_Bold.ttf)').load(),
+  new FontFace('Arimo Italic', 'url(Arimo_Italic.ttf)').load()
+]).then(fonts => fonts.forEach(font => document.fonts.add(font)));
+
+const text = \`<term>Roving</term>
+<def>(May move for free during rally.)</def>
+
+<term>Flak</term>
+<def>(Can damage aerial bots.)</def>
+
+<term>Clone 3</term>
+<def> (Comes into play with copies.)</def>\`;
+
+const styles = {
+  default: {
+    fontFamily: 'sans-serif',
+    fontSize: 80,
+    letterSpacing: 0,
+    fontVariant: 'normal',
+    textTransform: 'none',
+    fill: 0x000000,
+    valign: 'baseline',
+    padding: 0,
+    wordWrap: true,
+    wordWrapWidth: 425
+  },
+  term: {
+    fontFamily: 'Arimo Bold',
+    fontSize: 75,
+    textTransform: "uppercase",
+    fill: 0xFFFFFF
+  },
+  def: {
+    fontFamily: 'Arimo Italic',
+    fontSize: 30,
+    fill: 0x88CCFF
+  }
+};
+
+const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);
+
+// Draw dashed red border around text bounds
+const graphics = new PIXI.Graphics();
+graphics.setStrokeStyle({
+  width: 2,
+  color: 0xFF0000,
+  cap: 'round',
+  join: 'round'
+});
+
+const bounds = glyphs.getBounds();
+const dashLength = 10;
+const gapLength = 5;
+
+// Top line
+let x = bounds.x;
+while (x < bounds.x + bounds.width) {
+  graphics.moveTo(x, bounds.y);
+  graphics.lineTo(Math.min(x + dashLength, bounds.x + bounds.width), bounds.y);
+  x += dashLength + gapLength;
+}
+
+// Right line
+let y = bounds.y;
+while (y < bounds.y + bounds.height) {
+  graphics.moveTo(bounds.x + bounds.width, y);
+  graphics.lineTo(bounds.x + bounds.width, Math.min(y + dashLength, bounds.y + bounds.height));
+  y += dashLength + gapLength;
+}
+
+// Bottom line
+x = bounds.x + bounds.width;
+while (x > bounds.x) {
+  graphics.moveTo(x, bounds.y + bounds.height);
+  graphics.lineTo(Math.max(x - dashLength, bounds.x), bounds.y + bounds.height);
+  x -= dashLength + gapLength;
+}
+
+// Left line
+y = bounds.y + bounds.height;
+while (y > bounds.y) {
+  graphics.moveTo(bounds.x, y);
+  graphics.lineTo(bounds.x, Math.max(y - dashLength, bounds.y));
+  y -= dashLength + gapLength;
+}
+
+graphics.stroke();`,
+    init: async function() {
+      // Load fonts first
+      await Promise.all([
+        new FontFace('Arimo Bold', 'url(Arimo_Bold.ttf)').load(),
+        new FontFace('Arimo Italic', 'url(Arimo_Italic.ttf)').load()
+      ]).then(fonts => fonts.forEach(font => document.fonts.add(font)));
+
+      const text = `<term>Roving</term>
+<def>(May move for free during rally.)</def>
+
+<term>Flak</term>
+<def>(Can damage aerial bots.)</def>
+
+<term>Clone 3</term>
+<def> (Comes into play with copies.)</def>`;
+
+      const styles = {
+        default: {
+          fontFamily: 'sans-serif',
+          fontSize: 80,
+          letterSpacing: 0,
+          fontVariant: 'normal',
+          textTransform: 'none',
+          fill: 0x000000,
+          valign: 'baseline',
+          padding: 0,
+          wordWrap: true,
+          wordWrapWidth: 425
+        },
+        term: {
+          fontFamily: 'Arimo Bold',
+          fontSize: 75,
+          textTransform: "uppercase",
+          fill: 0xFFFFFF
+        },
+        def: {
+          fontFamily: 'Arimo Italic',
+          fontSize: 30,
+          fill: 0x88CCFF
+        }
+      };
+
+      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs;
+      const glyphs = new Glyphs(text, styles);
+
+      // Create a container to hold both text and border
+      const container = new PIXI.Container();
+      container.addChild(glyphs);
+
+      // Draw dashed red border around text bounds
+      const graphics = new PIXI.Graphics();
+      graphics.setStrokeStyle({
+        width: 2,
+        color: 0xFF0000,
+        cap: 'round',
+        join: 'round'
+      });
+
+      const bounds = glyphs.getBounds();
+      const dashLength = 10;
+      const gapLength = 5;
+
+      // Top line
+      let x = bounds.x;
+      while (x < bounds.x + bounds.width) {
+        graphics.moveTo(x, bounds.y);
+        graphics.lineTo(Math.min(x + dashLength, bounds.x + bounds.width), bounds.y);
+        x += dashLength + gapLength;
+      }
+
+      // Right line
+      let y = bounds.y;
+      while (y < bounds.y + bounds.height) {
+        graphics.moveTo(bounds.x + bounds.width, y);
+        graphics.lineTo(bounds.x + bounds.width, Math.min(y + dashLength, bounds.y + bounds.height));
+        y += dashLength + gapLength;
+      }
+
+      // Bottom line
+      x = bounds.x + bounds.width;
+      while (x > bounds.x) {
+        graphics.moveTo(x, bounds.y + bounds.height);
+        graphics.lineTo(Math.max(x - dashLength, bounds.x), bounds.y + bounds.height);
+        x -= dashLength + gapLength;
+      }
+
+      // Left line
+      y = bounds.y + bounds.height;
+      while (y > bounds.y) {
+        graphics.moveTo(bounds.x, y);
+        graphics.lineTo(bounds.x, Math.max(y - dashLength, bounds.y));
+        y -= dashLength + gapLength;
+      }
+
+      graphics.stroke();
+      container.addChild(graphics);
+
+      return container;
+    }
   }
 };
 
