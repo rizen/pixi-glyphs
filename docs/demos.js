@@ -1691,6 +1691,110 @@ graphics.stroke();`,
 
       return container;
     }
+  },
+
+  effects: {
+    title: "Effects",
+    description: "Text effects including drop shadow, stroke outline, and glow",
+    code: `const text = \`<h1>Text Effects Demo</h1>
+
+<shadow>Drop shadow - with hyphens, spaces & punctuation! It's amazing, isn't it?</shadow>
+
+<outline>Stroke outline - multi-word test: "Hello, world!" (works great)</outline>
+
+<glow>Glowing text - features: bright, eye-catching & beautiful!</glow>\`;
+
+const styles = {
+  default: {
+    fontFamily: "Arial",
+    fontSize: 24,
+    fill: "#FFFFFF",
+    align: "center",
+    wordWrap: true,
+    wordWrapWidth: 500
+  },
+  h1: {
+    fontSize: 36,
+    fill: "#FFCC00",
+    fontWeight: "bold"
+  },
+  shadow: {
+    fontSize: 28,
+    fill: "#FFFFFF",
+    dropShadow: true,
+    dropShadowColor: 0x000000,
+    dropShadowBlur: 4,
+    dropShadowAngle: 0.785,
+    dropShadowDistance: 6
+  },
+  outline: {
+    fontSize: 28,
+    fill: "#FFFFFF",
+    stroke: 0x000000,
+    strokeThickness: 4
+  },
+  glow: {
+    fontSize: 28,
+    fill: "#FFFF00",
+    dropShadow: true,
+    dropShadowColor: 0xFFFF00,
+    dropShadowBlur: 15,
+    dropShadowDistance: 0
+  }
+};
+
+const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);`,
+    init: function() {
+      const text = `<h1>Text Effects Demo</h1>
+
+<shadow>Drop shadow - with hyphens, spaces & punctuation! It's amazing, isn't it?</shadow>
+
+<outline>Stroke outline - multi-word test: "Hello, world!" (works great)</outline>
+
+<glow>Glowing text - features: bright, eye-catching & beautiful!</glow>`;
+
+      const styles = {
+        default: {
+          fontFamily: "Arial",
+          fontSize: 24,
+          fill: "#FFFFFF",
+          align: "center",
+          wordWrap: true,
+          wordWrapWidth: 500
+        },
+        h1: {
+          fontSize: 36,
+          fill: "#FFCC00",
+          fontWeight: "bold"
+        },
+        shadow: {
+          fontSize: 28,
+          fill: "#FFFFFF",
+          dropShadow: true,
+          dropShadowColor: 0x000000,
+          dropShadowBlur: 4,
+          dropShadowAngle: 0.785,
+          dropShadowDistance: 6
+        },
+        outline: {
+          fontSize: 28,
+          fill: "#FFFFFF",
+          stroke: 0x000000,
+          strokeThickness: 4
+        },
+        glow: {
+          fontSize: 28,
+          fill: "#FFFF00",
+          dropShadow: true,
+          dropShadowColor: 0xFFFF00,
+          dropShadowBlur: 15,
+          dropShadowDistance: 0
+        }
+      };
+
+      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs;
+      return new Glyphs(text, styles);
+    }
   }
 };
 

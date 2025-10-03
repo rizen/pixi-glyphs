@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 - Added: Line Endings example.
 - Fixed: A problem where a line wrap on an inline style would create weird gaps between the inline styles.
+- Added: Effects example.
 
 ### [4.1.2](https://github.com/rizen/pixi-glyphs/compare/v4.1.1...v4.1.2) (2025-09-27)
 
