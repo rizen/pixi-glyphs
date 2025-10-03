@@ -1119,8 +1119,16 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
   debug: {
     title: "Debug Mode",
     description: "Visual debugging tools to understand text layout",
-    code: `const text = \`You can use <blue>debug mode</blue> to help you figure out what your text is doing. Include <code>{debug: true} </code> in the options when you create your text.
-You can also set <code>debugConsole: true</code> if you want to log information about the text field to the console.\`;
+    code: `// Load icon image
+await PIXI.Assets.load('icon.png');
+const icon = new PIXI.Sprite(PIXI.Texture.from('icon.png'));
+
+const text = \`You can use <blue>debug mode</blue> to help you figure out what your text is doing. Include <code>{debug: true} </code> in the options when you create your text.
+You can also set <code>debugConsole: true</code> if you want to log information about the text field to the console.
+
+a b <icon/>
+a <icon/> c
+<icon/> b c\`;
 
 const styles = {
   default: {
@@ -1142,13 +1150,28 @@ const styles = {
     fill: "#ff8888",
     stroke: "#660000",
     strokeThickness: 8
+  },
+  icon: {
+    imgSrc: "icon",
+    imgDisplay: "icon"
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles, { debug: true });`,
-    init: function() {
+const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles, {
+  debug: true,
+  imgMap: { icon }
+});`,
+    init: async function() {
+      // Load icon image
+      await PIXI.Assets.load('icon.png');
+      const icon = new PIXI.Sprite(PIXI.Texture.from('icon.png'));
+
       const text = `You can use <blue>debug mode</blue> to help you figure out what your text is doing. Include <code>{debug: true} </code> in the options when you create your text.
-You can also set <code>debugConsole: true</code> if you want to log information about the text field to the console.`;
+You can also set <code>debugConsole: true</code> if you want to log information about the text field to the console.
+
+a b <icon/>
+a <icon/> c
+<icon/> b c`;
 
       const styles = {
         default: {
@@ -1170,10 +1193,18 @@ You can also set <code>debugConsole: true</code> if you want to log information 
           fill: "#ff8888",
           stroke: "#660000",
           strokeThickness: 8
+        },
+        icon: {
+          imgSrc: "icon",
+          imgDisplay: "icon"
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles, { debug: true });
+      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs;
+      return new Glyphs(text, styles, {
+        debug: true,
+        imgMap: { icon }
+      });
     }
   },
 
