@@ -451,6 +451,7 @@ export const verticalAlignInLines = (
   overrideValign?: VAlign // If you want to override the valign from the styles object, set it here.
 ): ParagraphToken => {
   let previousTallestToken: SegmentToken = createEmptySegmentToken();
+  let lastNonEmptyTallestToken: SegmentToken = createEmptySegmentToken();
   let previousLineBottom = 0;
   let paragraphModifier = 0;
 
@@ -481,11 +482,14 @@ export const verticalAlignInLines = (
     }
     tallestAscent += paragraphModifier;
 
-    // If the line is empty (only whitespace), use the previous line's tallest token for spacing
+    // If the line is empty (only whitespace), use the last non-empty line's tallest token for spacing
     // This ensures blank lines maintain proper vertical spacing
     if (tallestHeight === 0 && tallestAscent === 0) {
-      tallestHeight = previousTallestToken.bounds?.height ?? 0;
-      tallestAscent = previousTallestToken.fontProperties?.ascent ?? 0;
+      tallestHeight = lastNonEmptyTallestToken.bounds?.height ?? 0;
+      tallestAscent = lastNonEmptyTallestToken.fontProperties?.ascent ?? 0;
+    } else {
+      // Track the last non-empty line's tallest token
+      lastNonEmptyTallestToken = tallestToken;
     }
 
     const valignParagraphModifier = paragraphModifier;

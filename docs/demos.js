@@ -1543,6 +1543,7 @@ await Promise.all([
 const text = \`<term>Roving</term>
 <def>(May move for free during rally.)</def>
 
+
 <term>Flak</term>
 <def>(Can damage aerial bots.)</def>
 
@@ -1632,6 +1633,7 @@ graphics.stroke();`,
 
       const text = `<term>Roving</term>
 <def>(May move for free during rally.)</def>
+
 
 <term>Flak</term>
 <def>(Can damage aerial bots.)</def>

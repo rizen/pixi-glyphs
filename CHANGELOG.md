@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [4.1.4](https://github.com/rizen/pixi-glyphs/compare/v4.1.3...v4.1.4) (2025-10-06)
 
+- Multiple consecutive carriage returns will all render with proper vertical spacing based on the last non-empty line's height.
+
 ### [4.1.3](https://github.com/rizen/pixi-glyphs/compare/v4.1.2...v4.1.3) (2025-10-03)
 
 - Added: Line Endings example.
