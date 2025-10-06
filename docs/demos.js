@@ -1561,7 +1561,8 @@ const styles = {
     valign: 'baseline',
     padding: 0,
     wordWrap: true,
-    wordWrapWidth: 425
+    wordWrapWidth: 425,
+    paragraphSpacing: -10
   },
   term: {
     fontFamily: 'Arimo Bold',
@@ -1652,7 +1653,8 @@ graphics.stroke();`,
           valign: 'baseline',
           padding: 0,
           wordWrap: true,
-          wordWrapWidth: 425
+          wordWrapWidth: 425,
+          paragraphSpacing: -10
         },
         term: {
           fontFamily: 'Arimo Bold',

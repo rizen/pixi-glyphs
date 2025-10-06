@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [4.1.5](https://github.com/rizen/pixi-glyphs/compare/v4.1.4...v4.1.5) (2025-10-06)
 
+- The empty lines will now have proper spacing even with negative paragraph spacing!
+
 ### [4.1.4](https://github.com/rizen/pixi-glyphs/compare/v4.1.3...v4.1.4) (2025-10-06)
 
 - Multiple consecutive carriage returns will all render with proper vertical spacing based on the last non-empty line's height.
