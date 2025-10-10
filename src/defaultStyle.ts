@@ -5,6 +5,7 @@ export const DEFAULT_STYLE: TextStyleExtended = {
   fill: 0x000000,
   fontSize: 26,
   stroke: 0x000000,
+  strokeThickness: 0,
   [IMG_DISPLAY_PROPERTY]: "inline",
   wordWrap: true,
   wordWrapWidth: 500,
