@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.1.6](https://github.com/rizen/pixi-glyphs/compare/v4.1.5...v4.1.6) (2025-10-10)
+
 ### [4.1.5](https://github.com/rizen/pixi-glyphs/compare/v4.1.4...v4.1.5) (2025-10-06)
 
 - The empty lines will now have proper spacing even with negative paragraph spacing!
