@@ -1201,10 +1201,43 @@ a <icon/> c
       };
 
       const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs;
-      return new Glyphs(text, styles, {
+      const glyphs = new Glyphs(text, styles, {
         debug: true,
         imgMap: { icon }
       });
+
+      // Create interactive control for icon scale
+      setTimeout(() => {
+        const controlsDiv = document.createElement('div');
+        controlsDiv.style.cssText = 'margin-top: 20px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 5px; color: white; font-family: Arial; font-size: 14px;';
+        controlsDiv.innerHTML = `
+          <div style="margin-bottom: 10px;">
+            <label>Icon Scale: <span id="iconscale-value">1.0</span></label><br>
+            <input type="range" id="iconscale-slider" min="0" max="2" step="0.1" value="1" style="width: 300px;">
+          </div>
+        `;
+
+        const canvasSection = document.querySelector('.canvas-section');
+        if (canvasSection) {
+          canvasSection.appendChild(controlsDiv);
+
+          // Icon scale slider
+          const iconScaleSlider = document.getElementById('iconscale-slider');
+          const iconScaleValue = document.getElementById('iconscale-value');
+          iconScaleSlider.addEventListener('input', (e) => {
+            const iconScale = parseFloat(e.target.value);
+            iconScaleValue.textContent = iconScale.toFixed(1);
+
+            // Update iconScale in icon style
+            glyphs.setStyleForTag('icon', {
+              ...glyphs.tagStyles.icon,
+              iconScale: iconScale
+            });
+          });
+        }
+      }, 100);
+
+      return glyphs;
     }
   },
 
