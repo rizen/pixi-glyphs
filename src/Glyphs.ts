@@ -838,11 +838,13 @@ export default class Glyphs<
     const cleanedStyle = { ...style };
 
     // In PIXI v8, stroke needs to be an object if it exists
-    if (cleanedStyle.stroke && typeof cleanedStyle.stroke === 'string') {
+    // Convert old format (stroke: color, strokeThickness: number) to new format
+    if (cleanedStyle.stroke && typeof cleanedStyle.stroke !== 'object') {
       cleanedStyle.stroke = {
         color: cleanedStyle.stroke,
         width: cleanedStyle.strokeThickness || 0
       } as any;
+      delete cleanedStyle.strokeThickness;
     }
 
     const textField = new PIXI.Text({
@@ -1106,7 +1108,11 @@ export default class Glyphs<
             baseline = adjustedY + segmentToken.fontProperties.ascent;
 
             // Add offset based on font characteristics
-            const hasStroke = segmentToken.style?.stroke && (segmentToken.style as any).strokeThickness > 0;
+            // Support both PIXI v8 format (stroke.width) and legacy format (strokeThickness)
+            const strokeWidth = typeof segmentToken.style?.stroke === 'object' ? (segmentToken.style.stroke as any).width : 0;
+            const legacyStrokeThickness = (segmentToken.style as any).strokeThickness || 0;
+            const strokeThickness = strokeWidth || legacyStrokeThickness;
+            const hasStroke = segmentToken.style?.stroke && strokeThickness > 0;
 
             // Check for red code text first (36px with stroke)
             if (fontSize === 36) {

@@ -554,8 +554,11 @@ export const verticalAlignInLines = (
         let newY = previousLineBottom;
 
         // Check if text has stroke for adjustment
-        const hasStroke = style?.stroke && (style as any).strokeThickness > 0;
-        const strokeThickness = hasStroke ? (style as any).strokeThickness : 0;
+        // Support both PIXI v8 format (stroke.width) and legacy format (strokeThickness)
+        const strokeWidth = typeof style?.stroke === 'object' ? (style.stroke as any).width : 0;
+        const legacyStrokeThickness = (style as any).strokeThickness || 0;
+        const strokeThickness = strokeWidth || legacyStrokeThickness;
+        const hasStroke = style?.stroke && strokeThickness > 0;
 
         switch (valign) {
           case "bottom":
@@ -879,7 +882,10 @@ export const calculateTokens = (
 
       // Remove stroke from sizer style to avoid PIXI v8 errors
       // but keep track of it for manual adjustments
-      const strokeThickness = (sizerStyle as any).strokeThickness;
+      // Support both PIXI v8 format (stroke.width) and legacy format (strokeThickness)
+      const strokeWidth = typeof (sizerStyle as any).stroke === 'object' ? (sizerStyle as any).stroke.width : 0;
+      const legacyStrokeThickness = (sizerStyle as any).strokeThickness || 0;
+      const strokeThickness = strokeWidth || legacyStrokeThickness;
       delete (sizerStyle as any).stroke;
       delete (sizerStyle as any).strokeThickness;
 
