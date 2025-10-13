@@ -844,6 +844,10 @@ export default class Glyphs<
         color: cleanedStyle.stroke,
         width: cleanedStyle.strokeThickness || 0
       } as any;
+    }
+
+    // Always delete strokeThickness to prevent PIXI v8 deprecation warnings
+    if (cleanedStyle.strokeThickness !== undefined) {
       delete cleanedStyle.strokeThickness;
     }
 
