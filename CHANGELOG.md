@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.1.8](https://github.com/rizen/pixi-glyphs/compare/v4.1.7...v4.1.8) (2025-10-13)
+
 ### [4.1.7](https://github.com/rizen/pixi-glyphs/compare/v4.1.6...v4.1.7) (2025-10-10)
 
 - Fixed: PixiJS Deprecation Warning: strokeThickness is now a part of strokeDeprecated since v8.0.0 by using the new api
