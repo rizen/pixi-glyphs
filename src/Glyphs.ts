@@ -1018,13 +1018,13 @@ export default class Glyphs<
 
     // Create and add line-height graphics second (on top)
     let lineHeightGraphics = new PIXI.Graphics();
-    lineHeightGraphics.name = 'lineHeightGraphics';
+    lineHeightGraphics.label = 'lineHeightGraphics';
     debugContainer.addChild(lineHeightGraphics);
     lineHeightGraphics.clear();
 
     // Create and add baseline graphics third (topmost layer)
     let baselineGraphics = new PIXI.Graphics();
-    baselineGraphics.name = 'baselineGraphics';
+    baselineGraphics.label = 'baselineGraphics';
     baselineGraphics.visible = true;
     baselineGraphics.alpha = 1;
     debugContainer.addChild(baselineGraphics);
@@ -1068,9 +1068,9 @@ export default class Glyphs<
 
       if (this.defaultStyle.wordWrap) {
         const w = (this.defaultStyle.wordWrapWidth ?? this.width) as number;
-        // In PIXI v8, use lineStyle and drawRect
-        g.lineStyle(0.5, DEBUG.LINE_COLOR, 0.2);
-        g.drawRect(0, lineBoxY, w, lineBoxHeight);
+        // In PIXI v8, use rect with stroke
+        g.rect(0, lineBoxY, w, lineBoxHeight)
+          .stroke({ width: 0.5, color: DEBUG.LINE_COLOR, alpha: 0.2 });
       }
 
       for (let wordNumber = 0; wordNumber < line.length; wordNumber++) {
@@ -1191,12 +1191,11 @@ export default class Glyphs<
     // Try different approach for PIXI v8
     if (baselines.length > 0) {
       // Use rect instead of lines for better visibility
-      baselineGraphics.beginFill(DEBUG.BASELINE_COLOR, 0.8);
       for (const { x, baseline, width } of baselines) {
         // Draw a thin rectangle instead of a line
-        baselineGraphics.drawRect(x, baseline - 1, width, 2);
+        baselineGraphics.rect(x, baseline - 1, width, 2)
+          .fill({ color: DEBUG.BASELINE_COLOR, alpha: 0.8 });
       }
-      baselineGraphics.endFill();
     }
 
     // Show the outlines of the actual text fields,

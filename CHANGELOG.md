@@ -4,9 +4,16 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [4.1.8](https://github.com/rizen/pixi-glyphs/compare/v4.1.7...v4.1.8) (2025-10-13)
 
+- Fixed: PixiJS Deprecation Warning: Container.name property has been removed, use Container.label instead
+- Fixed: PixiJS Deprecation Warning: Graphics#lineStyle is no longer needed. Use Graphics#setStrokeStyle to set the stroke style.
+- Fixed: PixiJS Deprecation Warning: Graphics#drawRect has been renamed to Graphics#rect
+- Fixed: PixiJS Deprecation Warning: Graphics#beginFill is no longer needed. Use Graphics#fill to fill the shape with the desired style.
+- Fixed: PixiJS Deprecation Warning: Graphics#endFill is no longer needed. Use Graphics#fill to fill the shape with the desired style.
+
+
 ### [4.1.7](https://github.com/rizen/pixi-glyphs/compare/v4.1.6...v4.1.7) (2025-10-10)
 
-- Fixed: PixiJS Deprecation Warning: strokeThickness is now a part of strokeDeprecated since v8.0.0 by using the new api
+- Fixed: PixiJS Deprecation Warning: strokeThickness is now a part of stroke by using the new api
 
 ### [4.1.6](https://github.com/rizen/pixi-glyphs/compare/v4.1.5...v4.1.6) (2025-10-10)
 
