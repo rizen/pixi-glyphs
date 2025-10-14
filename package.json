@@ -1,6 +1,6 @@
 {
   "name": "pixi-glyphs",
-  "version": "4.1.8",
+  "version": "4.2.0",
   "description": "Glyphs - Advanced text rendering for pixi.js",
   "author": "Mims Wright, JT Smith, tleunen",
   "license": "MIT",
@@ -95,6 +95,8 @@
     "fix:prettier": "prettier ./**/*.{ts,js,json,html,css,md} -w",
     "lint": "npm run lint:prettier && npm run lint:eslint",
     "prepublishOnly": "npm run build",
-    "release": "standard-version"
+    "release": "standard-version",
+    "release:minor": "standard-version --release-as minor",
+    "release:major": "standard-version --release-as major"
   }
 }
