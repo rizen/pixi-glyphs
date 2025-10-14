@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file. See [standa
 - Fixed: PixiJS Deprecation Warning: Graphics#endFill is no longer needed. Use Graphics#fill to fill the shape with the desired style.
 - Added: Giant text demo
 - Fixed: Refactored font metrics measurement to use PIXI.CanvasTextMetrics for consistent baseline alignment and removed size-based y-position adjustments
+- Fixed: Empty line baseline calculation in layout.ts by detecting lines with only newline tokens and using the newline's ascent value instead of skipping it, which prevented text overlap when empty lines (paragraph spacing) appeared after giant styled text.
 
 
 ### [4.1.7](https://github.com/rizen/pixi-glyphs/compare/v4.1.6...v4.1.7) (2025-10-10)

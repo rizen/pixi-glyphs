@@ -1872,9 +1872,9 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
 await new FontFace('Digital-7', 'url(Digital-7.ttf)').load()
   .then(font => document.fonts.add(font));
 
-const text = \`<red><s300><digit>L</digit></s300></red>
+const text = \`<red><s50><digit>L</digit></s50></red> <red><s100><digit>L</digit></s100></red> <red><s200><digit>L</digit></s200></red> <red><s300><digit>L</digit></s300></red>
 
-<hint>11 = I</hint>\`;
+<hint>Testing 50px, 100px, 200px, and 300px sizes</hint>\`;
 
 const styles = {
   default: {
@@ -1885,6 +1885,15 @@ const styles = {
     fill: "#ff0000",
     stroke: "#FFFFFF",
     strokeThickness: 10
+  },
+  s50: {
+    fontSize: "50px"
+  },
+  s100: {
+    fontSize: "100px"
+  },
+  s200: {
+    fontSize: "200px"
   },
   s300: {
     fontSize: "300px"
@@ -1898,31 +1907,7 @@ const styles = {
 };
 
 const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles, {
-  debug: true,
-  debugConsole: true
-});
-
-// Additional measurements
-console.log('=== GIANT TEXT DEBUG ===');
-console.log('Glyphs container bounds:', glyphs.getBounds());
-console.log('Glyphs position:', { x: glyphs.x, y: glyphs.y });
-console.log('Glyphs width/height:', { width: glyphs.width, height: glyphs.height });
-console.log('Number of text fields:', glyphs.textFields.length);
-
-glyphs.textFields.forEach((field, i) => {
-  console.log(\`Field \${i} ("\${field.text}"):\`, {
-    x: field.x,
-    y: field.y,
-    width: field.width,
-    height: field.height,
-    bounds: field.getBounds(),
-    style: {
-      fontSize: field.style?.fontSize,
-      fontFamily: field.style?.fontFamily,
-      fill: field.style?.fill,
-      strokeThickness: field.style?.strokeThickness
-    }
-  });
+  debug: true
 });`,
     init: async function() {
       // Load custom font

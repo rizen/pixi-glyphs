@@ -427,7 +427,7 @@ const getTallestToken = (line: LineToken): SegmentToken => {
     ? line.slice(0, lastNonWhitespaceIndex + 1)
     : line;
 
-  return flatReduce<SegmentToken, SegmentToken>((tallest, current) => {
+  const tallest = flatReduce<SegmentToken, SegmentToken>((tallest, current) => {
     // Skip whitespace and newline tokens when determining tallest
     if (isWhitespaceToken(current) || isNewlineToken(current)) {
       return tallest;
@@ -443,6 +443,19 @@ const getTallestToken = (line: LineToken): SegmentToken => {
     }
     return tallest;
   }, createEmptySegmentToken())(relevantWords);
+
+  // If tallest is still empty (line contains only whitespace/newlines),
+  // use the first newline token's font properties for proper line height
+  // This ensures empty lines (double newlines) use the default style's fontSize
+  if ((tallest.bounds?.height ?? 0) === 0) {
+    const allTokens = line.flat(2);
+    const firstNewline = allTokens.find(t => isNewlineToken(t));
+    if (firstNewline) {
+      return firstNewline;
+    }
+  }
+
+  return tallest;
 };
 
 export const verticalAlignInLines = (
@@ -466,16 +479,14 @@ export const verticalAlignInLines = (
     let baseHeight = tallestToken.bounds?.height ?? 0;
     let baseTallestAscent = 0;
 
+    // Check if line has any non-whitespace/non-newline content
+    const hasRealContent = line.flat(2).some(seg => !isWhitespaceToken(seg) && !isNewlineToken(seg));
+
     // For baseline alignment, we need the tallest ascent in the line
     // We should find the actual tallest ascent, not just from the tallest height token
-    // Skip NEWLINE tokens but INCLUDE whitespace if they have stroke
+    // Skip NEWLINE tokens UNLESS the line contains only newlines (empty line)
     for (const word of line) {
       for (const segment of word) {
-        // Skip newline tokens only
-        if (isNewlineToken(segment)) {
-          continue;
-        }
-
         // Get the base ascent from font metrics
         let segAscent = segment.fontProperties?.ascent ?? 0;
 
@@ -490,10 +501,21 @@ export const verticalAlignInLines = (
           segAscent += strokeThickness / 2;
         }
 
-        // Skip whitespace tokens that don't have stroke (use default style metrics)
-        const shouldSkip = isWhitespaceToken(segment) && !(strokeThickness && strokeThickness > 0);
+        const isNewline = isNewlineToken(segment);
+        const isWhitespace = isWhitespaceToken(segment);
 
-        if (shouldSkip) {
+        // Skip newline tokens only if there's actual content in the line
+        // For empty lines (only newlines/whitespace), we need to use the newline's ascent
+        const skipNewline = isNewlineToken(segment) && hasRealContent;
+
+        // Skip whitespace tokens (but not newlines on empty lines) that don't have stroke
+        // For empty lines, the newline token provides the proper line height
+        const skipWhitespace = isWhitespaceToken(segment) && !isNewline && !(strokeThickness && strokeThickness > 0);
+
+        // Special case: For empty lines, don't skip the newline token
+        const isEmptyLineNewline = isNewline && !hasRealContent;
+
+        if ((skipNewline || skipWhitespace) && !isEmptyLineNewline) {
           continue;
         }
 
