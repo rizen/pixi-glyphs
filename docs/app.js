@@ -120,7 +120,7 @@ async function loadDemo(demoId) {
 
   // Apply syntax highlighting
   document.querySelectorAll('pre code').forEach(block => {
-    hljs.highlightBlock(block);
+    hljs.highlightElement(block);
   });
 
   // Initialize PIXI demo

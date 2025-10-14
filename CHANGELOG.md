@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 - Added: release:minor and release:major scripts to package.json.
 - Added: new property called `topTrim` that allows you to adjust the top of a word to align it with the line height, which is mostly useful for very large fonts.
+- Fixed: Updated the deprecated highlightBlock method to highlightElement to stop the deprecation warning that was appearing in the console when loading the demos.
 
 ### [4.1.8](https://github.com/rizen/pixi-glyphs/compare/v4.1.7...v4.1.8) (2025-10-13)
 
