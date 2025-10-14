@@ -482,8 +482,8 @@ export const verticalAlignInLines = (
     // Check if line has any non-whitespace/non-newline content
     const hasRealContent = line.flat(2).some(seg => !isWhitespaceToken(seg) && !isNewlineToken(seg));
 
-    // For baseline alignment, we need the tallest ascent in the line
-    // We should find the actual tallest ascent, not just from the tallest height token
+    // For baseline alignment, we need the tallest EFFECTIVE ascent in the line
+    // after applying each segment's individual topTrim
     // Skip NEWLINE tokens UNLESS the line contains only newlines (empty line)
     for (const word of line) {
       for (const segment of word) {
@@ -499,6 +499,12 @@ export const verticalAlignInLines = (
         const strokeThickness = strokeWidth || legacyStrokeThickness;
         if (strokeThickness && strokeThickness > 0) {
           segAscent += strokeThickness / 2;
+        }
+
+        // Apply this segment's individual topTrim BEFORE comparing
+        const topTrim = segment.style.topTrim ?? 0;
+        if (topTrim !== 0) {
+          segAscent = Math.max(0, segAscent - topTrim);
         }
 
         const isNewline = isNewlineToken(segment);
@@ -519,11 +525,15 @@ export const verticalAlignInLines = (
           continue;
         }
 
+        // Now compare the effective ascent (after topTrim) to find the tallest
         if (segAscent > baseTallestAscent) {
           baseTallestAscent = segAscent;
         }
       }
     }
+
+    // Note: We no longer apply a global maxTopTrim - each segment's topTrim
+    // is applied individually above, and we find the tallest effective ascent
 
     // If the line is empty (only whitespace), use the last non-empty line's tallest token for spacing
     // This ensures blank lines maintain proper vertical spacing

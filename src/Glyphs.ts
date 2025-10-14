@@ -1065,10 +1065,47 @@ export default class Glyphs<
       const line = paragraph[lineNumber];
       const lineBounds = getBoundsNested(line);
 
-      // Just add a simple offset to move the line box down to align with word boxes
-      // The line box needs to move down slightly to encompass the adjusted text
-      let lineBoxY = lineBounds.y + 2;  // Move down 2px to better align
-      let lineBoxHeight = lineBounds.height;
+      // Calculate the maximum topTrim for this line to apply to debug boxes
+      // This matches the logic in layout.ts
+      let maxTopTrim = 0;
+      for (const word of line) {
+        for (const segment of word) {
+          const topTrim = segment.style.topTrim ?? 0;
+          if (Math.abs(topTrim) > Math.abs(maxTopTrim)) {
+            maxTopTrim = topTrim;
+          }
+        }
+      }
+
+      // Calculate the actual tallest effective height in the line after topTrim adjustments
+      // This determines the overall line height box
+      let tallestEffectiveHeight = 0;
+      let tallestEffectiveY = Number.POSITIVE_INFINITY;
+
+      for (const word of line) {
+        for (const segment of word) {
+          const topTrim = segment.style.topTrim ?? 0;
+          let segmentAscent = segment.fontProperties.ascent;
+          const segmentDescent = segment.fontProperties.descent;
+
+          // Apply topTrim to this segment's ascent
+          if (topTrim !== 0) {
+            segmentAscent = Math.max(0, segmentAscent - topTrim);
+          }
+
+          const effectiveHeight = segmentAscent + segmentDescent;
+          const effectiveY = segment.bounds.y + segment.fontProperties.ascent - segmentAscent;
+
+          if (effectiveHeight > tallestEffectiveHeight) {
+            tallestEffectiveHeight = effectiveHeight;
+            tallestEffectiveY = effectiveY;
+          }
+        }
+      }
+
+      // Set line box dimensions based on the tallest effective segment
+      let lineBoxY = tallestEffectiveY;
+      let lineBoxHeight = tallestEffectiveHeight;
 
       if (this.defaultStyle.wordWrap) {
         const w = (this.defaultStyle.wordWrapWidth ?? this.width) as number;
@@ -1116,8 +1153,15 @@ export default class Glyphs<
 
           if (!isSprite) {
             // For text, the box should show from top of ascent to bottom of descent
-            const ascent = segmentToken.fontProperties.ascent;
+            let ascent = segmentToken.fontProperties.ascent;
             const descent = segmentToken.fontProperties.descent;
+
+            // Apply THIS SEGMENT'S individual topTrim to the ascent for the debug box
+            // This reflects the actual line height adjustment from layout.ts
+            const segmentTopTrim = segmentToken.style.topTrim ?? 0;
+            if (segmentTopTrim !== 0) {
+              ascent = Math.max(0, ascent - segmentTopTrim);
+            }
 
             // The baseline is at y + ascent (as calculated above)
             // So the top should be at baseline - ascent = y

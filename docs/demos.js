@@ -1938,7 +1938,8 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
           fontSize: "200px"
         },
         s300: {
-          fontSize: "300px"
+          fontSize: "300px",
+          topTrim: 0
         },
         digit: {
           fontFamily: "Digital-7"
@@ -1953,6 +1954,37 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
       const glyphs = new Glyphs(text, styles, {
         debug: true
       });
+
+      // Create interactive control for topTrim
+      setTimeout(() => {
+        const controlsDiv = document.createElement('div');
+        controlsDiv.style.cssText = 'margin-top: 20px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 5px; color: white; font-family: Arial; font-size: 14px;';
+        controlsDiv.innerHTML = `
+          <div style="margin-bottom: 10px;">
+            <label>Top Trim (s300 style): <span id="toptrim-value">0</span>px</label><br>
+            <input type="range" id="toptrim-slider" min="-100" max="200" step="1" value="0" style="width: 300px;">
+          </div>
+        `;
+
+        const canvasSection = document.querySelector('.canvas-section');
+        if (canvasSection) {
+          canvasSection.appendChild(controlsDiv);
+
+          // Top trim slider
+          const topTrimSlider = document.getElementById('toptrim-slider');
+          const topTrimValue = document.getElementById('toptrim-value');
+          topTrimSlider.addEventListener('input', (e) => {
+            const topTrim = parseInt(e.target.value);
+            topTrimValue.textContent = topTrim;
+
+            // Update topTrim in s300 style
+            glyphs.setStyleForTag('s300', {
+              ...glyphs.tagStyles.s300,
+              topTrim: topTrim
+            });
+          });
+        }
+      }, 100);
 
       return glyphs;
     }

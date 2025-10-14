@@ -194,6 +194,7 @@ export interface VerticalSpacingStyles {
   lineSpacing?: number;
   paragraphSpacing?: number;
   adjustBaseline?: number;
+  topTrim?: number;
 }
 export interface FontScaleStyles {
   fontScaleWidth?: number;
