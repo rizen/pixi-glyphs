@@ -1955,6 +1955,61 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
         debug: true
       });
 
+      // Create a container positioned at 25,25
+      const container = new PIXI.Container();
+      container.x = 25;
+      container.y = 25;
+      container.addChild(glyphs);
+
+      // Draw dashed blue border around the container area (550x550)
+      const border = new PIXI.Graphics();
+      border.setStrokeStyle({
+        width: 2,
+        color: 0x0000FF,
+        cap: 'round',
+        join: 'round'
+      });
+
+      const dashLength = 10;
+      const gapLength = 5;
+      const boxWidth = 550;
+      const boxHeight = 550;
+
+      // Top line
+      let x = 0;
+      while (x < boxWidth) {
+        border.moveTo(x, 0);
+        border.lineTo(Math.min(x + dashLength, boxWidth), 0);
+        x += dashLength + gapLength;
+      }
+
+      // Right line
+      let y = 0;
+      while (y < boxHeight) {
+        border.moveTo(boxWidth, y);
+        border.lineTo(boxWidth, Math.min(y + dashLength, boxHeight));
+        y += dashLength + gapLength;
+      }
+
+      // Bottom line
+      x = boxWidth;
+      while (x > 0) {
+        border.moveTo(x, boxHeight);
+        border.lineTo(Math.max(x - dashLength, 0), boxHeight);
+        x -= dashLength + gapLength;
+      }
+
+      // Left line
+      y = boxHeight;
+      while (y > 0) {
+        border.moveTo(0, y);
+        border.lineTo(0, Math.max(y - dashLength, 0));
+        y -= dashLength + gapLength;
+      }
+
+      border.stroke();
+      container.addChild(border);
+
       // Create interactive control for topTrim
       setTimeout(() => {
         const controlsDiv = document.createElement('div');
@@ -1986,7 +2041,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
         }
       }, 100);
 
-      return glyphs;
+      return container;
     }
   }
 };

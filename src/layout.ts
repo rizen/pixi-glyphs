@@ -478,6 +478,7 @@ export const verticalAlignInLines = (
     // Get the base height without paragraph modifier first
     let baseHeight = tallestToken.bounds?.height ?? 0;
     let baseTallestAscent = 0;
+    let baseTallestDescent = 0;
 
     // Check if line has any non-whitespace/non-newline content
     const hasRealContent = line.flat(2).some(seg => !isWhitespaceToken(seg) && !isNewlineToken(seg));
@@ -489,6 +490,7 @@ export const verticalAlignInLines = (
       for (const segment of word) {
         // Get the base ascent from font metrics
         let segAscent = segment.fontProperties?.ascent ?? 0;
+        const segDescent = segment.fontProperties?.descent ?? 0;
 
         // Add stroke to ascent for LINE HEIGHT calculation only
         // This ensures stroked text doesn't overlap with lines above
@@ -528,9 +530,14 @@ export const verticalAlignInLines = (
         // Now compare the effective ascent (after topTrim) to find the tallest
         if (segAscent > baseTallestAscent) {
           baseTallestAscent = segAscent;
+          baseTallestDescent = segDescent;
         }
       }
     }
+
+    // Calculate baseHeight from the effective ascent + descent
+    // This ensures topTrim affects the line height calculation
+    baseHeight = baseTallestAscent + baseTallestDescent;
 
     // Note: We no longer apply a global maxTopTrim - each segment's topTrim
     // is applied individually above, and we find the tallest effective ascent

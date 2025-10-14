@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [4.2.1](https://github.com/rizen/pixi-glyphs/compare/v4.2.0...v4.2.1) (2025-10-14)
 
+- Fix: Ensure that when topTrim reduces the ascent of a line, the baseHeight is recalculated from the effective ascent (with topTrim applied) plus descent. This makes subsequent lines move up properly without creating gaps.
+
 ## [4.2.0](https://github.com/rizen/pixi-glyphs/compare/v4.1.8...v4.2.0) (2025-10-14)
 
 - Added: release:minor and release:major scripts to package.json.
