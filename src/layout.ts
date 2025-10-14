@@ -468,14 +468,35 @@ export const verticalAlignInLines = (
 
     // For baseline alignment, we need the tallest ascent in the line
     // We should find the actual tallest ascent, not just from the tallest height token
-    // Skip whitespace/newline tokens to avoid using default style's font metrics
+    // Skip NEWLINE tokens but INCLUDE whitespace if they have stroke
     for (const word of line) {
       for (const segment of word) {
-        // Skip whitespace and newline tokens
-        if (isWhitespaceToken(segment) || isNewlineToken(segment)) {
+        // Skip newline tokens only
+        if (isNewlineToken(segment)) {
           continue;
         }
-        const segAscent = segment.fontProperties?.ascent ?? 0;
+
+        // Get the base ascent from font metrics
+        let segAscent = segment.fontProperties?.ascent ?? 0;
+
+        // Add stroke to ascent for LINE HEIGHT calculation only
+        // This ensures stroked text doesn't overlap with lines above
+        // IMPORTANT: This must include spaces with stroke so they align with stroked text
+        const style = segment.style;
+        const strokeWidth = typeof style?.stroke === 'object' ? (style.stroke as any).width : 0;
+        const legacyStrokeThickness = (style as any).strokeThickness || 0;
+        const strokeThickness = strokeWidth || legacyStrokeThickness;
+        if (strokeThickness && strokeThickness > 0) {
+          segAscent += strokeThickness / 2;
+        }
+
+        // Skip whitespace tokens that don't have stroke (use default style metrics)
+        const shouldSkip = isWhitespaceToken(segment) && !(strokeThickness && strokeThickness > 0);
+
+        if (shouldSkip) {
+          continue;
+        }
+
         if (segAscent > baseTallestAscent) {
           baseTallestAscent = segAscent;
         }
@@ -526,14 +547,27 @@ export const verticalAlignInLines = (
         const newBounds: Bounds = { ...bounds };
         const valign = overrideValign ?? style.valign;
 
+        // Check if text has stroke for adjustment
+        // Support both PIXI v8 format (stroke.width) and legacy format (strokeThickness)
+        const strokeWidth = typeof style?.stroke === 'object' ? (style.stroke as any).width : 0;
+        const legacyStrokeThickness = (style as any).strokeThickness || 0;
+        const strokeThickness = strokeWidth || legacyStrokeThickness;
+        const hasStroke = style?.stroke && strokeThickness > 0;
+
         let { ascent } = fontProperties;
+
+        // DON'T add stroke to individual segment ascent - stroke should not affect baseline!
+        // All text (stroked or not) should sit on the same baseline.
+        // Stroke only affects line height (calculated in tallestAscent above)
+
         // For sprites, use their height as ascent
         if (isSpriteToken(segment)) {
           const imgDisplay = segment.style[IMG_DISPLAY_PROPERTY];
           if (imgDisplay === 'icon') {
-            // For icons, reduce ascent by 4px to move baseline down to align with text
-            ascent = segment.bounds.height - 4;
-
+            // For icons, use fontProperties.ascent which was calculated based on the
+            // surrounding text's font metrics. This ensures icons align with text baseline.
+            // The icon height is already scaled to match the font size in calculateTokens
+            ascent = fontProperties.ascent;
           } else {
             // For non-icon images (regular inline images), use the full height as ascent
             // This maintains v6 behavior
@@ -552,13 +586,6 @@ export const verticalAlignInLines = (
 
         // Every valignment starts at the previous line bottom.
         let newY = previousLineBottom;
-
-        // Check if text has stroke for adjustment
-        // Support both PIXI v8 format (stroke.width) and legacy format (strokeThickness)
-        const strokeWidth = typeof style?.stroke === 'object' ? (style.stroke as any).width : 0;
-        const legacyStrokeThickness = (style as any).strokeThickness || 0;
-        const strokeThickness = strokeWidth || legacyStrokeThickness;
-        const hasStroke = style?.stroke && strokeThickness > 0;
 
         switch (valign) {
           case "bottom":
@@ -591,11 +618,11 @@ export const verticalAlignInLines = (
             // we get consistent ascent/descent values like PIXI v6 did
             newY = previousLineBottom + tallestAscent - ascent;
 
-            // Don't modify newY here - we'll handle icon offset separately
-
-            // Adjust for stroke if present
-            // PIXI positions stroked text from the outer edge of the stroke
-            // So we compensate by subtracting half the stroke width
+            // CRITICAL: When text has stroke, PIXI includes the stroke in the rendered bounds
+            // The stroke extends equally above and below the text (strokeThickness/2 each direction)
+            // Since we added stroke to bounds.height, the bounds are taller by strokeThickness
+            // This extra height is split: half above the ascent, half below the descent
+            // So we need to subtract strokeThickness/2 to position the text baseline correctly
             if (hasStroke) {
               newY -= strokeThickness / 2;
             }
@@ -918,16 +945,9 @@ export const calculateTokens = (
 
           fontProperties = { ...getFontPropertiesOfText(localSizer, true) };
 
-          // Incorporate the size of the stroke into the size of the text.
-          if (isOnlyWhitespace(token) === false) {
-            const stroke = (localSizer.style as any).stroke ?? 0;
-            if (stroke > 0) {
-              fontProperties.descent += stroke / 2;
-              fontProperties.ascent += stroke / 2;
-              fontProperties.fontSize =
-                fontProperties.ascent + fontProperties.descent;
-            }
-          }
+          // DON'T add stroke to fontProperties.ascent here!
+          // The ascent is used for baseline calculation and should be the font's natural ascent
+          // Stroke will be accounted for when calculating line height in verticalAlignInLines
 
           const sw = style.fontScaleWidth ?? 1.0;
           const sh = style.fontScaleHeight ?? 1.0;
@@ -952,7 +972,13 @@ export const calculateTokens = (
               : localSizer.style.fontSize || 24;
 
             const spaceWidth = fontSize * 0.3 * str.length;
-            const height = fontProperties.fontSize;
+            let height = fontProperties.fontSize;
+
+            // CRITICAL: Add stroke to whitespace height so spaces align with stroked text
+            // Without this, spaces inside stroked tags would be positioned higher than the text
+            if (strokeThickness && strokeThickness > 0) {
+              height += strokeThickness;
+            }
 
             bounds = new PIXI.Rectangle(0, 0, spaceWidth, height);
 
@@ -1040,13 +1066,8 @@ export const calculateTokens = (
 
         fontProperties = { ...getFontPropertiesOfText(localSizer, true) };
 
-        // Icons need to scale relative to text WITH stroke if present
-        // Since we removed stroke from localSizer, we need to add it back for proper scaling
-        if (strokeThickness && strokeThickness > 0) {
-          fontProperties.ascent += strokeThickness / 2;
-          fontProperties.descent += strokeThickness / 2;
-          fontProperties.fontSize = fontProperties.ascent + fontProperties.descent;
-        }
+        // Icons scale based on the font's natural metrics
+        // Stroke is handled in verticalAlignInLines for line height calculation
 
         if (isIcon) {
           // Set to minimum of 1 to avoid devide by zero.

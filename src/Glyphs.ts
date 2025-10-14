@@ -1083,59 +1083,35 @@ export default class Glyphs<
           const isSprite = isSpriteToken(segmentToken);
           const { x, y, width } = segmentToken.bounds;
 
-          // Apply the same baseline adjustments we use for text positioning
-          // to ensure debug visuals align with the actual text
-          let adjustedY = y;
-          const fontSize = segmentToken.fontProperties?.fontSize || 24;
-
-          // These adjustments should match those in layout.ts
-          let adjustment = 0;
-          if (fontSize <= 24) {
-            adjustment = -2;
-          } else if (fontSize <= 28) {
-            adjustment = -3;
-          } else if (fontSize === 36) {
-            adjustment = 5;
-          } else if (fontSize > 36 && fontSize <= 47) {
-            adjustment = 5 + (fontSize - 36) * 0.2;
-          } else if (fontSize > 47) {
-            adjustment = 7 + (fontSize - 47) * 0.1;
-          }
-          adjustedY -= adjustment;
-
-          // Calculate baseline with corrections for v8
+          // Calculate the actual visual baseline position
+          // Key insight: PIXI.Text renders with its y coordinate at the TOP of the text
+          // actualBoundingBoxAscent measures from the BASELINE up to the top
+          // So: baseline = text.y + ascent
+          //
+          // BUT the actual visual pixels may not start exactly at text.y
+          // We need to find where the baseline actually is relative to text.y
           let baseline: number;
           if (isSprite) {
-            baseline = adjustedY + segmentToken.bounds.height;
+            baseline = y + segmentToken.bounds.height;
           } else {
-            // The baseline needs to be moved down from where it currently is
-            baseline = adjustedY + segmentToken.fontProperties.ascent;
+            // The ascent is the distance from baseline UP to the top of the character
+            // So if y is the top, baseline should be y + ascent
+            baseline = y + segmentToken.fontProperties.ascent;
 
-            // Add offset based on font characteristics
-            // Support both PIXI v8 format (stroke.width) and legacy format (strokeThickness)
-            const strokeWidth = typeof segmentToken.style?.stroke === 'object' ? (segmentToken.style.stroke as any).width : 0;
-            const legacyStrokeThickness = (segmentToken.style as any).strokeThickness || 0;
-            const strokeThickness = strokeWidth || legacyStrokeThickness;
-            const hasStroke = segmentToken.style?.stroke && strokeThickness > 0;
+            // However, PIXI may have internal padding or the actual rendered pixels
+            // may not start exactly at y. Let's check the actual text height vs metrics
+            const actualHeight = segmentToken.bounds.height;
+            const metricsHeight = segmentToken.fontProperties.ascent + segmentToken.fontProperties.descent;
+            const heightDifference = actualHeight - metricsHeight;
 
-            // Check for red code text first (36px with stroke)
-            if (fontSize === 36) {
-              // Red code text: adjusting up by 1-2px to align with white text
-              baseline += 15;  // Was 17, now 15 (moved up 2px)
-            } else if (hasStroke && fontSize <= 28) {
-              // Blue text with stroke (but not the red code text)
-              baseline += 6;
-            } else if (fontSize <= 24) {
-              // Regular white text: keep at 4px
-              baseline += 4;
-            } else {
-              // Default adjustment
-              baseline += 4;
+            // If there's padding, adjust the baseline down by that amount
+            if (heightDifference > 1) {
+              baseline += heightDifference / 2;
             }
           }
 
           // Calculate proper box dimensions based on ascent and descent
-          let boxY = adjustedY;
+          let boxY = y;
           let boxHeight = segmentToken.bounds.height;
 
           if (!isSprite) {
@@ -1143,14 +1119,14 @@ export default class Glyphs<
             const ascent = segmentToken.fontProperties.ascent;
             const descent = segmentToken.fontProperties.descent;
 
-            // The baseline is at adjustedY + ascent (as we calculated)
-            // So the top should be at baseline - ascent = adjustedY
-            // And the bottom should be at baseline + descent = adjustedY + ascent + descent
+            // The baseline is at y + ascent (as calculated above)
+            // So the top should be at baseline - ascent = y
+            // And the bottom should be at baseline + descent = y + ascent + descent
             boxY = baseline - ascent;  // Top of ascender
             boxHeight = ascent + descent;  // Full height from ascender to descender
           } else {
-            // For sprites, keep original calculation
-            boxHeight += segmentToken.fontProperties.descent;
+            // For sprites, use full height
+            boxHeight = segmentToken.bounds.height + segmentToken.fontProperties.descent;
           }
 
           const strokeColor = (isWhitespaceToken(segmentToken) && this.options.drawWhitespace === false)

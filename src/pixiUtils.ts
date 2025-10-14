@@ -61,15 +61,27 @@ export const getFontPropertiesOfText = (
   textField: PIXI.Text,
   forceUpdate = false
 ): IFontMetrics => {
-  // In Pixi v8, we need to work with the text style directly
+  const text = textField.text;
   const style = textField.style;
-  const fontSize = typeof style.fontSize === 'number' ? style.fontSize : 16;
-  const fontFamily = style.fontFamily || 'Arial';
-  const fontWeight = (style as any).fontWeight || 'normal';
-  const fontStyle = style.fontStyle || 'normal';
-  const font = `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
 
-  return measureFont(font);
+  // For spaces and empty text, use a representative character to get consistent metrics
+  // This ensures spaces align on the same baseline as other text
+  const measureText = (text && text.trim().length > 0) ? text : 'M';
+
+  // Use PIXI's CanvasTextMetrics which measures the text
+  const metrics = PIXI.CanvasTextMetrics.measureText(measureText, style as any);
+
+  // Get fontSize from the metrics or fall back to style
+  const fontSize = metrics.fontProperties?.fontSize ||
+    (typeof style.fontSize === 'number' ? style.fontSize : 16);
+
+  // Use the actual measured ascent/descent from PIXI
+  // For spaces, this gives us the same baseline as regular characters in that font
+  return {
+    ascent: metrics.fontProperties?.ascent || fontSize * 0.88,
+    descent: metrics.fontProperties?.descent || fontSize * 0.12,
+    fontSize: fontSize
+  };
 };
 
 export const addChildrenToContainer = (
