@@ -308,6 +308,8 @@ export default class Glyphs<
     return this._debugContainer;
   }
 
+  private _maskGraphics: PIXI.Graphics | null = null;
+
   private logWarning = (code: string, message: string): void =>
     _logWarning(
       this.options.errorHandler,
@@ -409,6 +411,12 @@ export default class Glyphs<
    * Deletes references to sprites and text fields.
    */
   protected resetChildren() {
+    // Remove the mask first before clearing children
+    if (this._maskGraphics && this._maskGraphics.parent === this) {
+      this.removeChild(this._maskGraphics);
+      // Don't destroy it, we'll reuse it
+    }
+
     // Add highlight container first so it appears behind everything
     if (this._highlightContainer) {
       // Properly destroy all children to prevent memory leaks
@@ -777,12 +785,23 @@ export default class Glyphs<
 
     // Add a mask to clip content above y=0 relative to the Glyphs container
     // This ensures that when topTrim reduces line height, the bounds actually shrink visually
-    const glyphsMask = new PIXI.Graphics();
-    glyphsMask.rect(0, 0, 10000, 10000); // Large rectangle starting at y=0
-    glyphsMask.fill({ color: 0xffffff });
-    // Don't add the mask as a child - just assign it as the mask
-    // In PIXI v8, masks don't need to be in the display tree
-    this.mask = glyphsMask;
+    // Create or reuse the mask graphics
+    if (!this._maskGraphics) {
+      this._maskGraphics = new PIXI.Graphics();
+    } else {
+      this._maskGraphics.clear();
+    }
+
+    this._maskGraphics.rect(0, 0, 10000, 10000); // Large rectangle starting at y=0
+    this._maskGraphics.fill({ color: 0xffffff });
+
+    // Add the mask to the container hierarchy so it's in the scene graph
+    // Add it at index 0 so it's behind all other content
+    // Set alpha to 0 so it doesn't render visually but still functions as a mask
+    this._maskGraphics.alpha = 0;
+    this.addChildAt(this._maskGraphics, 0);
+
+    this.mask = this._maskGraphics;
 
     if (this.options.debug) {
       this.drawDebug();
