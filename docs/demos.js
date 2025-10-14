@@ -1959,6 +1959,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
       const container = new PIXI.Container();
       container.x = 25;
       container.y = 25;
+
       container.addChild(glyphs);
 
       // Draw dashed blue border around the container area (550x550)
@@ -2010,6 +2011,61 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
       border.stroke();
       container.addChild(border);
 
+      // Draw green border around the glyphs object bounds (local coordinates)
+      let glyphsBorder = new PIXI.Graphics();
+      glyphsBorder.setStrokeStyle({
+        width: 2,
+        color: 0x00FF00,
+        cap: 'round',
+        join: 'round'
+      });
+
+      const glyphsDashLength = 10;
+      const glyphsGapLength = 5;
+
+      // Position from glyphs.x, glyphs.y
+      const startX = glyphs.x;
+      const startY = glyphs.y;
+      // Size from localBounds.maxX, maxY (which includes all visual content)
+      const localBounds = glyphs.getLocalBounds();
+      const endX = glyphs.x + localBounds.maxX;
+      const endY = glyphs.y + localBounds.maxY;
+
+      // Top line
+      let gx = startX;
+      while (gx < endX) {
+        glyphsBorder.moveTo(gx, startY);
+        glyphsBorder.lineTo(Math.min(gx + glyphsDashLength, endX), startY);
+        gx += glyphsDashLength + glyphsGapLength;
+      }
+
+      // Right line
+      let gy = startY;
+      while (gy < endY) {
+        glyphsBorder.moveTo(endX, gy);
+        glyphsBorder.lineTo(endX, Math.min(gy + glyphsDashLength, endY));
+        gy += glyphsDashLength + glyphsGapLength;
+      }
+
+      // Bottom line
+      gx = endX;
+      while (gx > startX) {
+        glyphsBorder.moveTo(gx, endY);
+        glyphsBorder.lineTo(Math.max(gx - glyphsDashLength, startX), endY);
+        gx -= glyphsDashLength + glyphsGapLength;
+      }
+
+      // Left line
+      gy = endY;
+      while (gy > startY) {
+        glyphsBorder.moveTo(startX, gy);
+        glyphsBorder.lineTo(startX, Math.max(gy - glyphsDashLength, startY));
+        gy -= glyphsDashLength + glyphsGapLength;
+      }
+
+      glyphsBorder.stroke();
+      container.addChild(glyphsBorder);
+
       // Create interactive control for topTrim
       setTimeout(() => {
         const controlsDiv = document.createElement('div');
@@ -2025,6 +2081,70 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
         if (canvasSection) {
           canvasSection.appendChild(controlsDiv);
 
+          // Helper function to redraw the green border
+          const redrawGreenBorder = () => {
+            // Remove old border
+            container.removeChild(glyphsBorder);
+
+            // Create new border
+            const newGlyphsBorder = new PIXI.Graphics();
+            newGlyphsBorder.setStrokeStyle({
+              width: 2,
+              color: 0x00FF00,
+              cap: 'round',
+              join: 'round'
+            });
+
+            const glyphsDashLength = 10;
+            const glyphsGapLength = 5;
+
+            // Position from glyphs.x, glyphs.y
+            const startX = glyphs.x;
+            const startY = glyphs.y;
+            // Size from localBounds.maxX, maxY (which includes all visual content)
+            const localBounds = glyphs.getLocalBounds();
+            const endX = glyphs.x + localBounds.maxX;
+            const endY = glyphs.y + localBounds.maxY;
+
+            // Top line
+            let gx = startX;
+            while (gx < endX) {
+              newGlyphsBorder.moveTo(gx, startY);
+              newGlyphsBorder.lineTo(Math.min(gx + glyphsDashLength, endX), startY);
+              gx += glyphsDashLength + glyphsGapLength;
+            }
+
+            // Right line
+            let gy = startY;
+            while (gy < endY) {
+              newGlyphsBorder.moveTo(endX, gy);
+              newGlyphsBorder.lineTo(endX, Math.min(gy + glyphsDashLength, endY));
+              gy += glyphsDashLength + glyphsGapLength;
+            }
+
+            // Bottom line
+            gx = endX;
+            while (gx > startX) {
+              newGlyphsBorder.moveTo(gx, endY);
+              newGlyphsBorder.lineTo(Math.max(gx - glyphsDashLength, startX), endY);
+              gx -= glyphsDashLength + glyphsGapLength;
+            }
+
+            // Left line
+            gy = endY;
+            while (gy > startY) {
+              newGlyphsBorder.moveTo(startX, gy);
+              newGlyphsBorder.lineTo(startX, Math.max(gy - glyphsDashLength, startY));
+              gy -= glyphsDashLength + glyphsGapLength;
+            }
+
+            newGlyphsBorder.stroke();
+            container.addChild(newGlyphsBorder);
+
+            // Update reference
+            glyphsBorder = newGlyphsBorder;
+          };
+
           // Top trim slider
           const topTrimSlider = document.getElementById('toptrim-slider');
           const topTrimValue = document.getElementById('toptrim-value');
@@ -2037,6 +2157,9 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
               ...glyphs.tagStyles.s300,
               topTrim: topTrim
             });
+
+            // Redraw the green border to reflect new bounds
+            redrawGreenBorder();
           });
         }
       }, 100);

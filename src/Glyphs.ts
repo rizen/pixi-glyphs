@@ -775,6 +775,15 @@ export default class Glyphs<
       );
     }
 
+    // Add a mask to clip content above y=0 relative to the Glyphs container
+    // This ensures that when topTrim reduces line height, the bounds actually shrink visually
+    const glyphsMask = new PIXI.Graphics();
+    glyphsMask.rect(0, 0, 10000, 10000); // Large rectangle starting at y=0
+    glyphsMask.fill({ color: 0xffffff });
+    // Don't add the mask as a child - just assign it as the mask
+    // In PIXI v8, masks don't need to be in the display tree
+    this.mask = glyphsMask;
+
     if (this.options.debug) {
       this.drawDebug();
     }
