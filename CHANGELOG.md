@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file. See [standa
 - Fixed: PixiJS Deprecation Warning: Graphics#drawRect has been renamed to Graphics#rect
 - Fixed: PixiJS Deprecation Warning: Graphics#beginFill is no longer needed. Use Graphics#fill to fill the shape with the desired style.
 - Fixed: PixiJS Deprecation Warning: Graphics#endFill is no longer needed. Use Graphics#fill to fill the shape with the desired style.
+- Added: Giant text demo
+- Fixed: Refactored font metrics measurement to use PIXI.CanvasTextMetrics for consistent baseline alignment and removed size-based y-position adjustments
 
 
 ### [4.1.7](https://github.com/rizen/pixi-glyphs/compare/v4.1.6...v4.1.7) (2025-10-10)
