@@ -1893,10 +1893,12 @@ const styles = {
     fontSize: "100px"
   },
   s200: {
-    fontSize: "200px"
+    fontSize: "200px",
+    topTrim: 0
   },
   s300: {
-    fontSize: "300px"
+    fontSize: "300px",
+    topTrim: 0
   },
   digit: {
     fontFamily: "Digital-7"
@@ -1935,7 +1937,8 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
           fontSize: "100px"
         },
         s200: {
-          fontSize: "200px"
+          fontSize: "200px",
+          topTrim: 0
         },
         s300: {
           fontSize: "300px",
@@ -2075,6 +2078,10 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
             <label>Top Trim (s300 style): <span id="toptrim-value">0</span>px</label><br>
             <input type="range" id="toptrim-slider" min="-100" max="200" step="1" value="0" style="width: 300px;">
           </div>
+          <div style="margin-bottom: 10px;">
+            <label>Top Trim (s200 style): <span id="toptrim200-value">0</span>px</label><br>
+            <input type="range" id="toptrim200-slider" min="-100" max="200" step="1" value="0" style="width: 300px;">
+          </div>
         `;
 
         const canvasSection = document.querySelector('.canvas-section');
@@ -2145,7 +2152,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
             glyphsBorder = newGlyphsBorder;
           };
 
-          // Top trim slider
+          // Top trim slider for s300
           const topTrimSlider = document.getElementById('toptrim-slider');
           const topTrimValue = document.getElementById('toptrim-value');
           topTrimSlider.addEventListener('input', (e) => {
@@ -2155,6 +2162,23 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
             // Update topTrim in s300 style
             glyphs.setStyleForTag('s300', {
               ...glyphs.tagStyles.s300,
+              topTrim: topTrim
+            });
+
+            // Redraw the green border to reflect new bounds
+            redrawGreenBorder();
+          });
+
+          // Top trim slider for s200
+          const topTrim200Slider = document.getElementById('toptrim200-slider');
+          const topTrim200Value = document.getElementById('toptrim200-value');
+          topTrim200Slider.addEventListener('input', (e) => {
+            const topTrim = parseInt(e.target.value);
+            topTrim200Value.textContent = topTrim;
+
+            // Update topTrim in s200 style
+            glyphs.setStyleForTag('s200', {
+              ...glyphs.tagStyles.s200,
               topTrim: topTrim
             });
 

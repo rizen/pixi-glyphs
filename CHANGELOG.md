@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [4.3.0](https://github.com/rizen/pixi-glyphs/compare/v4.2.1...v4.3.0) (2025-10-23)
 
+- Fix: Sprite/image tokens by tracking tallestSpriteHeight separately and using bounds.height instead of fontProperties.
+- Add: Wired up a second slider on the giant text demo to demonstrate topTrim across multiple styles.
+
 ### [4.2.1](https://github.com/rizen/pixi-glyphs/compare/v4.2.0...v4.2.1) (2025-10-14)
 
 - Fix: Ensure that when topTrim reduces the ascent of a line, the baseHeight is recalculated from the effective ascent (with topTrim applied) plus descent. This makes subsequent lines move up properly without creating gaps.
