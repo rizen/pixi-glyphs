@@ -479,6 +479,7 @@ export const verticalAlignInLines = (
     let baseHeight = tallestToken.bounds?.height ?? 0;
     let baseTallestAscent = 0;
     let baseTallestDescent = 0;
+    let tallestSpriteHeight = 0;
 
     // Check if line has any non-whitespace/non-newline content
     const hasRealContent = line.flat(2).some(seg => !isWhitespaceToken(seg) && !isNewlineToken(seg));
@@ -488,6 +489,16 @@ export const verticalAlignInLines = (
     // Skip NEWLINE tokens UNLESS the line contains only newlines (empty line)
     for (const word of line) {
       for (const segment of word) {
+        // Special handling for sprite tokens (images)
+        // Sprites use bounds.height for line height, not fontProperties
+        if (isSpriteToken(segment)) {
+          const spriteHeight = segment.bounds?.height ?? 0;
+          if (spriteHeight > tallestSpriteHeight) {
+            tallestSpriteHeight = spriteHeight;
+          }
+          continue;
+        }
+
         // Get the base ascent from font metrics
         let segAscent = segment.fontProperties?.ascent ?? 0;
         const segDescent = segment.fontProperties?.descent ?? 0;
@@ -535,9 +546,12 @@ export const verticalAlignInLines = (
       }
     }
 
-    // Calculate baseHeight from the effective ascent + descent
+    // Calculate baseHeight from the effective ascent + descent for text tokens
     // This ensures topTrim affects the line height calculation
-    baseHeight = baseTallestAscent + baseTallestDescent;
+    // For sprites, use the tallest sprite height
+    // Take the maximum of text height and sprite height
+    const textBasedHeight = baseTallestAscent + baseTallestDescent;
+    baseHeight = Math.max(textBasedHeight, tallestSpriteHeight);
 
     // Note: We no longer apply a global maxTopTrim - each segment's topTrim
     // is applied individually above, and we find the tallest effective ascent
