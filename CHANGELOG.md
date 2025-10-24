@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 - Breaking: Removed the default export. Use `import {Glyphs} from 'pixi-glyphs'` instead.
 - Fix: Icons not lining up at their base. 
+- Fix: Moved baseUrl inside the compilerOptions object where it belongs.
 
 ## [4.3.0](https://github.com/rizen/pixi-glyphs/compare/v4.2.1...v4.3.0) (2025-10-23)
 
