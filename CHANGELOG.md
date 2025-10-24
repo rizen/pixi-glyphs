@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file. See [standa
 - Fix: Moved baseUrl inside the compilerOptions object where it belongs.
 - Add: SVG icon to the inline images demo.
 - Fix: Removed the download measurements button from the demos.
+- Fix: Duplicated controls in the demos.
 
 ## [4.3.0](https://github.com/rizen/pixi-glyphs/compare/v4.2.1...v4.3.0) (2025-10-23)
 

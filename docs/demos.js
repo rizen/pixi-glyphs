@@ -177,23 +177,30 @@ You can even load images from a URL <url /> (if you can figure out the CORS stuf
 
       // Create interactive controls
       setTimeout(() => {
-        const controlsDiv = document.createElement('div');
-        controlsDiv.style.cssText = 'margin-top: 20px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 5px; color: white; font-family: Arial; font-size: 14px;';
-        controlsDiv.innerHTML = `
-          <div style="margin-bottom: 10px;">
-            <label>Vertical Align:
-              <select id="valign-select" style="margin-left: 10px; padding: 5px; background: #333; color: white; border: 1px solid #666; border-radius: 3px;">
-                <option value="top">top</option>
-                <option value="middle">middle</option>
-                <option value="bottom" selected>bottom</option>
-                <option value="baseline">baseline</option>
-              </select>
-            </label>
-          </div>
-        `;
-
         const canvasSection = document.querySelector('.canvas-section');
         if (canvasSection) {
+          // Remove any existing controls to prevent duplicates
+          const existing = canvasSection.querySelector('.demo-controls');
+          if (existing) {
+            existing.remove();
+          }
+
+          const controlsDiv = document.createElement('div');
+          controlsDiv.className = 'demo-controls';
+          controlsDiv.style.cssText = 'margin-top: 20px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 5px; color: white; font-family: Arial; font-size: 14px;';
+          controlsDiv.innerHTML = `
+            <div style="margin-bottom: 10px;">
+              <label>Vertical Align:
+                <select id="valign-select" style="margin-left: 10px; padding: 5px; background: #333; color: white; border: 1px solid #666; border-radius: 3px;">
+                  <option value="top">top</option>
+                  <option value="middle">middle</option>
+                  <option value="bottom" selected>bottom</option>
+                  <option value="baseline">baseline</option>
+                </select>
+              </label>
+            </div>
+          `;
+
           canvasSection.appendChild(controlsDiv);
 
           // Valign dropdown
@@ -841,29 +848,36 @@ const glyphs = new (window.Glyphs.Glyphs)(text, styles, options);`,
 
       // Create interactive controls
       setTimeout(() => {
-        const controlsDiv = document.createElement('div');
-        controlsDiv.style.cssText = 'margin-top: 20px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 5px; color: white; font-family: Arial; font-size: 14px;';
-        controlsDiv.innerHTML = `
-          <div style="margin-bottom: 10px;">
-            <label>Letter Spacing: <span id="letter-value">0</span>px</label><br>
-            <input type="range" id="letter-spacing" min="-5" max="20" value="0" style="width: 300px;">
-          </div>
-          <div style="margin-bottom: 10px;">
-            <label>Word Spacing: <span id="word-value">0</span>px</label><br>
-            <input type="range" id="word-spacing" min="-20" max="50" value="0" style="width: 300px;">
-          </div>
-          <div style="margin-bottom: 10px;">
-            <label>Line Spacing: <span id="line-value">15</span>px</label><br>
-            <input type="range" id="line-spacing" min="0" max="50" value="15" style="width: 300px;">
-          </div>
-          <div style="margin-bottom: 10px;">
-            <label>Paragraph Spacing: <span id="paragraph-value">40</span>px</label><br>
-            <input type="range" id="paragraph-spacing" min="0" max="100" value="40" style="width: 300px;">
-          </div>
-        `;
-
         const canvasSection = document.querySelector('.canvas-section');
         if (canvasSection) {
+          // Remove any existing controls to prevent duplicates
+          const existing = canvasSection.querySelector('.demo-controls');
+          if (existing) {
+            existing.remove();
+          }
+
+          const controlsDiv = document.createElement('div');
+          controlsDiv.className = 'demo-controls';
+          controlsDiv.style.cssText = 'margin-top: 20px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 5px; color: white; font-family: Arial; font-size: 14px;';
+          controlsDiv.innerHTML = `
+            <div style="margin-bottom: 10px;">
+              <label>Letter Spacing: <span id="letter-value">0</span>px</label><br>
+              <input type="range" id="letter-spacing" min="-5" max="20" value="0" style="width: 300px;">
+            </div>
+            <div style="margin-bottom: 10px;">
+              <label>Word Spacing: <span id="word-value">0</span>px</label><br>
+              <input type="range" id="word-spacing" min="-20" max="50" value="0" style="width: 300px;">
+            </div>
+            <div style="margin-bottom: 10px;">
+              <label>Line Spacing: <span id="line-value">15</span>px</label><br>
+              <input type="range" id="line-spacing" min="0" max="50" value="15" style="width: 300px;">
+            </div>
+            <div style="margin-bottom: 10px;">
+              <label>Paragraph Spacing: <span id="paragraph-value">40</span>px</label><br>
+              <input type="range" id="paragraph-spacing" min="0" max="100" value="40" style="width: 300px;">
+            </div>
+          `;
+
           canvasSection.appendChild(controlsDiv);
 
           // Letter spacing slider
