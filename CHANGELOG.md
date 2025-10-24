@@ -4,10 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [5.0.0](https://github.com/rizen/pixi-glyphs/compare/v4.3.0...v5.0.0) (2025-10-24)
 
-
-### Bug Fixes
-
-* Icons not lining up at their base. ([86eda58](https://github.com/rizen/pixi-glyphs/commit/86eda588d40378512e014a6d3a577e0d619e4201))
+- Breaking: Removed the default export. Use `import {Glyphs} from 'pixi-glyphs'` instead.
+- Icons not lining up at their base. 
 
 ## [4.3.0](https://github.com/rizen/pixi-glyphs/compare/v4.2.1...v4.3.0) (2025-10-23)
 

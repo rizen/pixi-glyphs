@@ -31,7 +31,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);`,
+const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
     init: function() {
       const text = `Let's make some
 <ml>multiline</ml>
@@ -60,7 +60,7 @@ and <ms>multistyle</ms> text for
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles, {});
+      const Glyphs = window.Glyphs.Glyphs; return new Glyphs(text, styles, {});
     }
   },
 
@@ -108,7 +108,7 @@ const styles = {
   url: { imgDisplay: "icon" }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles, {
+const glyphs = new (window.Glyphs.Glyphs)(text, styles, {
   imgMap: { thinking, doot, url }
 });`,
     init: async function() {
@@ -153,7 +153,7 @@ You can even load images from a URL <url /> (if you can figure out the CORS stuf
         url: { imgDisplay: "icon" }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles, {
+      const Glyphs = window.Glyphs.Glyphs; return new Glyphs(text, styles, {
         imgMap: { thinking, doot, url }
       });
     }
@@ -200,7 +200,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles, {
+const glyphs = new (window.Glyphs.Glyphs)(text, styles, {
   wrapEmoji: true
 });`,
     init: function() {
@@ -242,7 +242,7 @@ The 🏃‍♀️, 🟫, 🦊 jumps ⤵️ the 💤 🐶.
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles, { wrapEmoji: true });
+      const Glyphs = window.Glyphs.Glyphs; return new Glyphs(text, styles, { wrapEmoji: true });
     }
   },
 
@@ -262,7 +262,7 @@ const baseStyle = {
 };
 
 // Create four text objects with different alignments
-const Glyphs = window.Glyphs?.default || window.Glyphs; let left = new Glyphs(
+const Glyphs = window.Glyphs.Glyphs; let left = new Glyphs(
   text.replace("left", "<b>left</b>"),
   {
     ...baseStyle,
@@ -307,7 +307,7 @@ let justify = new Glyphs(
 
       const texts = [];
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs; let left = new Glyphs(
+      const Glyphs = window.Glyphs.Glyphs; let left = new Glyphs(
         alignText.replace("left", "<b>left</b>"),
         {
           ...alignStyle,
@@ -403,7 +403,7 @@ const styles = {
   img: { imgSrc: "valignImg", imgDisplay: "icon" }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles, {
+const glyphs = new (window.Glyphs.Glyphs)(text, styles, {
   imgMap: { valignImg }
 });`,
     init: async function() {
@@ -440,7 +440,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
         img: { imgSrc: "valignImg", imgDisplay: "icon" }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles, {
+      const Glyphs = window.Glyphs.Glyphs; return new Glyphs(text, styles, {
         imgMap: { valignImg }
       });
     }
@@ -474,7 +474,7 @@ const styles = {
   smallcaps: { fontVariant: "small-caps" }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);`,
+const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
     init: function() {
       const text = `<h1>Text transformations:</h1>
 <code>textTransform: "lowercase"</code>
@@ -501,7 +501,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
         smallcaps: { fontVariant: "small-caps" }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles);
+      const Glyphs = window.Glyphs.Glyphs; return new Glyphs(text, styles);
     }
   },
 
@@ -566,7 +566,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles, {
+const glyphs = new (window.Glyphs.Glyphs)(text, styles, {
   drawWhitespace: true,
   overdrawDecorations: 2
 });`,
@@ -629,7 +629,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles, {
+      const Glyphs = window.Glyphs.Glyphs; return new Glyphs(text, styles, {
         drawWhitespace: true,
         overdrawDecorations: 2
       });
@@ -654,7 +654,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);`,
+const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
     init: function() {
       const text = `You can add <em>attributes</em> to your tags!\nThey will <em fontStyle="italic">overwrite</em> the <em fill="#FF8822">values</em> for any existing <em fontFamily="Courier" fill="#FFFF00" fontWeight="400">tag styles</em>.`;
 
@@ -671,7 +671,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles, {});
+      const Glyphs = window.Glyphs.Glyphs; return new Glyphs(text, styles, {});
     }
   },
 
@@ -699,7 +699,7 @@ const styles = {
   large: { fontSize: "36px" }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);`,
+const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
     init: function() {
       const text = `You can <outline>nest <b>tags <red>as <i>deeply <thicker>as you'd <large>like, <blue>dude!</blue></large></thicker></i></red></b></outline>`;
 
@@ -722,7 +722,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
         large: { fontSize: "36px" }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles);
+      const Glyphs = window.Glyphs.Glyphs; return new Glyphs(text, styles);
     }
   },
 
@@ -755,7 +755,7 @@ const options = {
   paragraphSpacing: 40
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles, options);`,
+const glyphs = new (window.Glyphs.Glyphs)(text, styles, options);`,
     init: function() {
       const text = "You can <narrow>set line and letter spacing</narrow> to <wide>give your text some drama.</wide>\nThis line demonstrates lineSpacing between lines in the same paragraph.\n\nNotice the extra spacing between paragraphs from paragraphSpacing.\nParagraph spacing only applies between different paragraphs.";
 
@@ -783,7 +783,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
         paragraphSpacing: 40
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs;
+      const Glyphs = window.Glyphs.Glyphs;
       const glyphs = new Glyphs(text, styles, options);
 
       // Create interactive controls
@@ -892,7 +892,7 @@ const wrappingStyle = {
   }
 };
 
-const wrapping = new (window.Glyphs?.default || window.Glyphs)(wrappingText, wrappingStyle);
+const wrapping = new (window.Glyphs.Glyphs)(wrappingText, wrappingStyle);
 
 // Without word wrap
 const nonWrappingText = \`This one doesn't have \\\`wordWrap\\\` so it just keeps going and going and going off the edge!\`;
@@ -910,7 +910,7 @@ const nonWrappingStyle = {
 
 const nonWrapping = new Glyphs(nonWrappingText, nonWrappingStyle);`,
     init: function() {
-      const Glyphs = window.Glyphs?.default || window.Glyphs;
+      const Glyphs = window.Glyphs.Glyphs;
       const texts = [];
 
       const wrappingText = `Global word wrap and alignment properties are controlled by the "default" style, and can\'t be overridden by other styles.`;
@@ -1003,7 +1003,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);`,
+const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
     init: function() {
       const text = `You can change the scaling of the font:
 
@@ -1061,7 +1061,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles);
+      const Glyphs = window.Glyphs.Glyphs; return new Glyphs(text, styles);
     }
   },
 
@@ -1098,7 +1098,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);`,
+const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
     init: function() {
       const text = `Use <code>splitStyle: "characters"</code> and <code>breakWords: true</code> to allow line breaks between characters. Can be useful for languages such as chinese.
 
@@ -1130,7 +1130,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs; return new Glyphs(text, styles, {});
+      const Glyphs = window.Glyphs.Glyphs; return new Glyphs(text, styles, {});
     }
   },
 
@@ -1175,7 +1175,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles, {
+const glyphs = new (window.Glyphs.Glyphs)(text, styles, {
   debug: true,
   imgMap: { icon }
 });`,
@@ -1218,7 +1218,7 @@ a <icon/> c
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs;
+      const Glyphs = window.Glyphs.Glyphs;
       const glyphs = new Glyphs(text, styles, {
         debug: true,
         imgMap: { icon }
@@ -1288,7 +1288,7 @@ const styles = {
   red: { fill: 0xff8888, stroke: 0xcc4444 }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles, {
+const glyphs = new (window.Glyphs.Glyphs)(text, styles, {
   splitStyle: "characters"
 });
 
@@ -1338,7 +1338,7 @@ app.ticker.add((delta) => {
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs;
+      const Glyphs = window.Glyphs.Glyphs;
       const glyphs = new Glyphs(text, styles, {
         splitStyle: "characters"
       });
@@ -1412,7 +1412,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, {
+const glyphs = new (window.Glyphs.Glyphs)(text, styles, {
   imgMap: { dole }
 });`,
     init: async function() {
@@ -1457,7 +1457,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs)(text, styles, {
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs;
+      const Glyphs = window.Glyphs.Glyphs;
       return new Glyphs(text, styles, {
         imgMap: { dole }
       });
@@ -1521,7 +1521,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);`,
+const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
     init: function() {
       const text = "You can <yellow>highlight text</yellow> to make it stand out!\n\n" +
         "Use <blue>different colors</blue> for <green>different meanings</green>.\n" +
@@ -1577,7 +1577,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs;
+      const Glyphs = window.Glyphs.Glyphs;
       return new Glyphs(text, styles);
     }
   },
@@ -1628,7 +1628,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);
+const glyphs = new (window.Glyphs.Glyphs)(text, styles);
 
 // Draw dashed red border around text bounds
 const graphics = new PIXI.Graphics();
@@ -1720,7 +1720,7 @@ graphics.stroke();`,
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs;
+      const Glyphs = window.Glyphs.Glyphs;
       const glyphs = new Glyphs(text, styles);
 
       // Create a container to hold both text and border
@@ -1829,7 +1829,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles);`,
+const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
     init: function() {
       const text = `<h1>Text Effects Demo</h1>
 
@@ -1878,7 +1878,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs;
+      const Glyphs = window.Glyphs.Glyphs;
       return new Glyphs(text, styles);
     }
   },
@@ -1926,7 +1926,7 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, styles, {
+const glyphs = new (window.Glyphs.Glyphs)(text, styles, {
   debug: true
 });`,
     init: async function() {
@@ -1970,7 +1970,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
         }
       };
 
-      const Glyphs = window.Glyphs?.default || window.Glyphs?.Glyphs;
+      const Glyphs = window.Glyphs.Glyphs;
 
       const glyphs = new Glyphs(text, styles, {
         debug: true

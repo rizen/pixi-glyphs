@@ -69,7 +69,7 @@ const DEFAULT_DESTROY_OPTIONS = {
   context: false,
 };
 
-export default class Glyphs<
+export class Glyphs<
   TextType extends PixiTextTypes = PIXI.Text,
 > extends PIXI.Container {
   public static get defaultStyles(): TextStyleSet {

@@ -1,4 +1,1 @@
-import Glyphs from "./Glyphs";
-
-export default Glyphs;
-export { Glyphs };
+export { Glyphs } from "./Glyphs";

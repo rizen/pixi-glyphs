@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import Glyphs from "./Glyphs";
+import { Glyphs } from "./Glyphs";
 import { complement, flatEvery } from "./functionalUtils";
 import { logWarning } from "./errorMessaging";
 
