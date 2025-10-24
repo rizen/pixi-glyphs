@@ -82,7 +82,9 @@ Make it an icon <thinking imgDisplay="icon" /> with <code>imgDisplay="icon"</cod
 
 Control the icon size with <code>iconScale=</code> <thinking imgDisplay="icon" /><thinking imgDisplay="icon" iconScale="1.5" /><thinking imgDisplay="icon" iconScale="2" /><thinking imgDisplay="icon" iconScale="1.5" /><thinking imgDisplay="icon" />
 
-You can even load images from a URL <url /> (if you can figure out the CORS stuff!)\`;
+You can even load images from a URL <url /> (if you can figure out the CORS stuff!)
+
+<valign>Also use <blackmeeple/> SVG!</valign>\`;
 
 const styles = {
   default: {
@@ -102,22 +104,29 @@ const styles = {
     fontFamily: "monospace",
     color: "#66FF00"
   },
+  valign: {
+    imgDisplay: "icon",
+    iconScale: 1.5,
+    valign: "bottom"
+  },
   img: {},
   doot: {},
   thinking: {},
-  url: { imgDisplay: "icon" }
+  url: { imgDisplay: "icon" },
+  blackmeeple: {}
 };
 
 const glyphs = new (window.Glyphs.Glyphs)(text, styles, {
-  imgMap: { thinking, doot, url }
+  imgMap: { thinking, doot, url, blackmeeple }
 });`,
     init: async function() {
       // Load textures asynchronously
-      await PIXI.Assets.load(['icon.png', 'doot.png', '100.png']);
+      await PIXI.Assets.load(['icon.png', 'doot.png', '100.png', 'meepleblack.svg']);
 
       const thinking = new PIXI.Sprite(PIXI.Texture.from("icon.png"));
       const doot = PIXI.Texture.from("doot.png");
       const url = "100.png";
+      const blackmeeple = PIXI.Texture.from("meepleblack.svg");
 
       const text = `<h2>Inline Images!</h2>
 
@@ -127,7 +136,9 @@ Make it an icon <thinking imgDisplay="icon" /> with <code>imgDisplay="icon"</cod
 
 Control the icon size with <code>iconScale=</code> <thinking imgDisplay="icon" /><thinking imgDisplay="icon" iconScale="1.5" /><thinking imgDisplay="icon" iconScale="2" /><thinking imgDisplay="icon" iconScale="1.5" /><thinking imgDisplay="icon" />
 
-You can even load images from a URL <url /> (if you can figure out the CORS stuff!)`;
+You can even load images from a URL <url /> (if you can figure out the CORS stuff!)
+
+<valign>Also use <blackmeeple/> SVG!</valign>`;
 
       const styles = {
         default: {
@@ -147,15 +158,57 @@ You can even load images from a URL <url /> (if you can figure out the CORS stuf
           fontFamily: "monospace",
           color: "#66FF00"
         },
+        valign: {
+          imgDisplay: "icon",
+          iconScale: 1.5,
+          valign: "bottom"
+        },
         img: {},
         doot: {},
         thinking: {},
-        url: { imgDisplay: "icon" }
+        url: { imgDisplay: "icon" },
+        blackmeeple: {}
       };
 
-      const Glyphs = window.Glyphs.Glyphs; return new Glyphs(text, styles, {
-        imgMap: { thinking, doot, url }
+      const Glyphs = window.Glyphs.Glyphs;
+      const glyphs = new Glyphs(text, styles, {
+        imgMap: { thinking, doot, url, blackmeeple }
       });
+
+      // Create interactive controls
+      setTimeout(() => {
+        const controlsDiv = document.createElement('div');
+        controlsDiv.style.cssText = 'margin-top: 20px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 5px; color: white; font-family: Arial; font-size: 14px;';
+        controlsDiv.innerHTML = `
+          <div style="margin-bottom: 10px;">
+            <label>Vertical Align:
+              <select id="valign-select" style="margin-left: 10px; padding: 5px; background: #333; color: white; border: 1px solid #666; border-radius: 3px;">
+                <option value="top">top</option>
+                <option value="middle">middle</option>
+                <option value="bottom" selected>bottom</option>
+                <option value="baseline">baseline</option>
+              </select>
+            </label>
+          </div>
+        `;
+
+        const canvasSection = document.querySelector('.canvas-section');
+        if (canvasSection) {
+          canvasSection.appendChild(controlsDiv);
+
+          // Valign dropdown
+          const valignSelect = document.getElementById('valign-select');
+          valignSelect.addEventListener('change', (e) => {
+            const valignValue = e.target.value;
+            glyphs.setStyleForTag('valign', {
+              ...glyphs.tagStyles.valign,
+              valign: valignValue
+            });
+          });
+        }
+      }, 100);
+
+      return glyphs;
     }
   },
 
