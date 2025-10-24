@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+- Fix: Icons not lining up at their base. 
+
 ## [4.3.0](https://github.com/rizen/pixi-glyphs/compare/v4.2.1...v4.3.0) (2025-10-23)
 
 - Fix: Sprite/image tokens by tracking tallestSpriteHeight separately and using bounds.height instead of fontProperties.

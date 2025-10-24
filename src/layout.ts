@@ -613,19 +613,10 @@ export const verticalAlignInLines = (
         // All text (stroked or not) should sit on the same baseline.
         // Stroke only affects line height (calculated in tallestAscent above)
 
-        // For sprites, use their height as ascent
+        // For sprites, use their height as ascent for baseline alignment
+        // This ensures the bottom of the sprite sits on the baseline
         if (isSpriteToken(segment)) {
-          const imgDisplay = segment.style[IMG_DISPLAY_PROPERTY];
-          if (imgDisplay === 'icon') {
-            // For icons, use fontProperties.ascent which was calculated based on the
-            // surrounding text's font metrics. This ensures icons align with text baseline.
-            // The icon height is already scaled to match the font size in calculateTokens
-            ascent = fontProperties.ascent;
-          } else {
-            // For non-icon images (regular inline images), use the full height as ascent
-            // This maintains v6 behavior
-            ascent = segment.bounds.height;
-          }
+          ascent = segment.bounds.height;
         }
 
         if (isNewlineToken(segment)) {
