@@ -196,6 +196,9 @@ export interface VerticalSpacingStyles {
   adjustBaseline?: number;
   topTrim?: number;
 }
+export interface HorizontalSpacingStyles {
+  wordSpacing?: number;
+}
 export interface FontScaleStyles {
   fontScaleWidth?: number;
   fontScaleHeight?: number;
@@ -219,6 +222,7 @@ export interface TextStyleExtended
     TextDecorationStyles,
     VerticalAlignStyles,
     VerticalSpacingStyles,
+    HorizontalSpacingStyles,
     FontScaleStyles,
     TextTransformStyles,
     LineBreakStyles,

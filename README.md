@@ -83,6 +83,7 @@ The style objects are modified versions (supersets) of `PIXI.TextStyle` (referre
 - `fontScaleWidth` - Percentage to scale the font e.g. `0.5` = 50%
 - `fontScaleHeight` - Percentage to scale the font e.g. `1.25` = 125%
 - `letterSpacing` - Additional horizontal spacing between each character in pixels. Can be positive to spread letters apart or negative to bring them closer together. Default is `0`.
+- `wordSpacing` - Additional horizontal spacing for word separators (spaces) in pixels. Adjusts the width of spaces between words. Can be positive to increase spacing or negative to decrease spacing. Default is `0`.
 - `lineSpacing` - Additional vertical spacing between lines of text in pixels. This spacing is added between all lines within a paragraph. Default is `0`.
 - `paragraphSpacing` - Additional spacing between paragraphs that is added when you use an explicit carriage return rather than letting the text wrap at the end of a line. Default is `0`. Can also be negative.
 - `breakLines` - When `breakLines` is `false`, the text in the tag will ignore the `wordWrapWidth` property and never wrap to the next line unless you explicitly include a newline character. It essentially treats the whole tag as a single word. If a nested tag overrides this, only the text inside the nested tag will wrap. Default is `true`.

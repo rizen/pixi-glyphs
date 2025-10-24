@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 - Fix: Sprite/image tokens by tracking tallestSpriteHeight separately and using bounds.height instead of fontProperties.
 - Add: Wired up a second slider on the giant text demo to demonstrate topTrim across multiple styles.
+- Add: wordSpacing. This is a new property that allows you to add space between words.
 
 ### [4.2.1](https://github.com/rizen/pixi-glyphs/compare/v4.2.0...v4.2.1) (2025-10-14)
 

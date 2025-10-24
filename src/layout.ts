@@ -1079,7 +1079,7 @@ export const calculateTokens = (
           );
           fontProperties.ascent += baselineAdjustment;
 
-          const { letterSpacing } = style;
+          const { letterSpacing, wordSpacing } = style;
           if (letterSpacing) {
             bounds.width += letterSpacing;
           }
@@ -1098,6 +1098,10 @@ export const calculateTokens = (
           // Previously we were subtracting stroke width from whitespace which caused
           // stroked words like "debug" and "mode" to overlap
 
+          // Apply wordSpacing to whitespace tokens only
+          if (wordSpacing && isOnlyWhitespace(str)) {
+            convertedToken.bounds.width += wordSpacing;
+          }
 
           return convertedToken;
         });

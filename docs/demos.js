@@ -728,7 +728,7 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
 
   spacing: {
     title: "Spacing",
-    description: "Interactive demo for line, letter, and paragraph spacing. Adjust the sliders to see changes.",
+    description: "Interactive demo for letter, word, line, and paragraph spacing. Adjust the sliders to see changes.",
     code: `const text = "You can <narrow>set line and letter spacing</narrow> to <wide>give your text some drama.</wide>\\nThis line demonstrates lineSpacing between lines in the same paragraph.\\n\\nNotice the extra spacing between paragraphs from paragraphSpacing.\\nParagraph spacing only applies between different paragraphs.";
 
 const styles = {
@@ -796,6 +796,10 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
             <input type="range" id="letter-spacing" min="-5" max="20" value="0" style="width: 300px;">
           </div>
           <div style="margin-bottom: 10px;">
+            <label>Word Spacing: <span id="word-value">0</span>px</label><br>
+            <input type="range" id="word-spacing" min="-20" max="50" value="0" style="width: 300px;">
+          </div>
+          <div style="margin-bottom: 10px;">
             <label>Line Spacing: <span id="line-value">15</span>px</label><br>
             <input type="range" id="line-spacing" min="0" max="50" value="15" style="width: 300px;">
           </div>
@@ -820,6 +824,20 @@ const glyphs = new (window.Glyphs?.default || window.Glyphs?.Glyphs)(text, style
             glyphs.setStyleForTag('default', {
               ...glyphs.tagStyles.default,
               letterSpacing: letterSpacing
+            });
+          });
+
+          // Word spacing slider
+          const wordSlider = document.getElementById('word-spacing');
+          const wordValue = document.getElementById('word-value');
+          wordSlider.addEventListener('input', (e) => {
+            const wordSpacing = parseInt(e.target.value);
+            wordValue.textContent = wordSpacing;
+
+            // Update wordSpacing in default style
+            glyphs.setStyleForTag('default', {
+              ...glyphs.tagStyles.default,
+              wordSpacing: wordSpacing
             });
           });
 
