@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.0.1](https://github.com/rizen/pixi-glyphs/compare/v4.3.0...v5.0.1) (2025-10-25)
+
+
+### Bug Fixes
+
+* Duplicated controls in the demos. ([ddc3264](https://github.com/rizen/pixi-glyphs/commit/ddc326407f1489db067e0f8d18ac28108f7fd358))
+* Icons not lining up at their base. ([86eda58](https://github.com/rizen/pixi-glyphs/commit/86eda588d40378512e014a6d3a577e0d619e4201))
+* Moved baseUrl inside the compilerOptions object where it belongs ([eb8c6d8](https://github.com/rizen/pixi-glyphs/commit/eb8c6d847bda04bd5777d2d7fe1a5f4e2930bd21))
+
+
+### Chore
+
+* **release:** 5.0.0 ([3a8561f](https://github.com/rizen/pixi-glyphs/commit/3a8561fe270e4976996c4970a129aeb74bd6d673))
+
 ## [5.0.0](https://github.com/rizen/pixi-glyphs/compare/v4.3.0...v5.0.0) (2025-10-24)
 
 - Breaking: Removed the default export. Use `import {Glyphs} from 'pixi-glyphs'` instead.
