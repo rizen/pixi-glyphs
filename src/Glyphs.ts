@@ -1062,13 +1062,6 @@ export class Glyphs<
 
     textField.scale.set(finalScaleWidth, finalScaleHeight);
 
-    // Debug: Check if scaling is applied
-    if (textField.style.padding !== undefined && (finalScaleWidth !== 1.0 || finalScaleHeight !== 1.0)) {
-      console.log('[applyFontScale] WARNING: Scaling applied to text with padding!');
-      console.log('  - Scale:', finalScaleWidth, 'x', finalScaleHeight);
-      console.log('  - Padding:', textField.style.padding);
-    }
-
     return textField as TextType;
   }
 

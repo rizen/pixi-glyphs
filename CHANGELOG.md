@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+
+- Fix: Removed debug.
+
+
 ### [5.0.1](https://github.com/rizen/pixi-glyphs/compare/v4.3.0...v5.0.1) (2025-10-25)
 
 - Add: Padding demo.
