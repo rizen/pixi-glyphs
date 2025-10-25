@@ -942,6 +942,103 @@ const glyphs = new (window.Glyphs.Glyphs)(text, styles, options);`,
     }
   },
 
+  padding: {
+    title: "Padding",
+    description: "Padding property adds buffer space around text to prevent clipping of stroke and drop shadow effects. Adjust the slider to add padding.",
+    code: `// Load custom font first
+await new FontFace('Gentleman of Fortune', 'url(Gentleman%20of%20Fortune.ttf)').load()
+  .then(font => document.fonts.add(font));
+
+const text = "Ambushed !!!";
+
+const styles = {
+  default: {
+    fontFamily: "Gentleman of Fortune",
+    fontSize: 60,
+    fill: "#FFD700",
+    stroke: "#8B4513",
+    strokeThickness: 5,
+    dropShadow: true,
+    dropShadowColor: "#000000",
+    dropShadowBlur: 8,
+    dropShadowDistance: 10,
+    dropShadowAngle: Math.PI / 4,
+    padding: 0
+  }
+};
+
+const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
+    init: async function() {
+      // Load custom font first
+      await new FontFace('Gentleman of Fortune', 'url(Gentleman%20of%20Fortune.ttf)').load()
+        .then(font => document.fonts.add(font));
+
+      const text = "Ambushed !!!";
+
+      const styles = {
+        default: {
+          fontFamily: "Gentleman of Fortune",
+          fontSize: 60,
+          fill: "#FFD700",
+          stroke: "#8B4513",
+          strokeThickness: 5,
+          dropShadow: true,
+          dropShadowColor: "#000000",
+          dropShadowBlur: 8,
+          dropShadowDistance: 10,
+          dropShadowAngle: Math.PI / 4,
+          padding: 0
+        }
+      };
+
+      const Glyphs = window.Glyphs.Glyphs;
+      const glyphs = new Glyphs(text, styles);
+
+      // Create interactive controls
+      setTimeout(() => {
+        const canvasSection = document.querySelector('.canvas-section');
+        if (canvasSection) {
+          // Remove any existing controls to prevent duplicates
+          const existing = canvasSection.querySelector('.demo-controls');
+          if (existing) {
+            existing.remove();
+          }
+
+          const controlsDiv = document.createElement('div');
+          controlsDiv.className = 'demo-controls';
+          controlsDiv.style.cssText = 'margin-top: 20px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 5px; color: white; font-family: Arial; font-size: 14px;';
+          controlsDiv.innerHTML = `
+            <div style="margin-bottom: 10px;">
+              <label>Padding: <span id="padding-value">0</span>px</label><br>
+              <input type="range" id="padding-slider" min="0" max="50" value="0" style="width: 300px;">
+              <p style="margin-top: 10px; font-size: 12px; color: #cccccc;">
+                Padding prevents clipping of text effects like stroke and drop shadow.
+              </p>
+            </div>
+          `;
+
+          canvasSection.appendChild(controlsDiv);
+
+          // Padding slider
+          const paddingSlider = document.getElementById('padding-slider');
+          const paddingValue = document.getElementById('padding-value');
+          paddingSlider.addEventListener('input', (e) => {
+            const padding = parseInt(e.target.value);
+            paddingValue.textContent = padding;
+
+            // Update padding
+            glyphs.setStyleForTag('default', {
+              ...glyphs.tagStyles.default,
+              padding: padding
+            });
+          });
+        }
+      }, 100);
+
+      return glyphs;
+    }
+  },
+
   wrapping: {
     title: "Word Wrapping",
     description: "Control word wrapping and text overflow behavior",

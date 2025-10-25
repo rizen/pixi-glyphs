@@ -792,7 +792,32 @@ export class Glyphs<
       this._maskGraphics.clear();
     }
 
-    this._maskGraphics.rect(0, 0, 10000, 10000); // Large rectangle starting at y=0
+    // Find the maximum padding value in all text fields to expand the mask
+    // When text has padding, the rendering texture extends beyond the layout bounds
+    // and we need to account for this in the mask to prevent clipping
+    let maxPadding = 0;
+    tokens.forEach(token => {
+      if (Array.isArray(token)) {
+        token.forEach((t: any) => {
+          if (Array.isArray(t)) {
+            t.forEach((seg: any) => {
+              const padding = seg?.style?.padding ?? 0;
+              maxPadding = Math.max(maxPadding, padding);
+            });
+          } else {
+            const padding = t?.style?.padding ?? 0;
+            maxPadding = Math.max(maxPadding, padding);
+          }
+        });
+      } else {
+        const padding = (token as any)?.style?.padding ?? 0;
+        maxPadding = Math.max(maxPadding, padding);
+      }
+    });
+
+    // Expand the mask to account for padding
+    // Start the mask at -maxPadding to allow padded content to render
+    this._maskGraphics.rect(-maxPadding, -maxPadding, 10000 + maxPadding * 2, 10000 + maxPadding * 2);
     this._maskGraphics.fill({ color: 0xffffff });
 
     // Add the mask to the container hierarchy so it's in the scene graph
@@ -862,8 +887,31 @@ export class Glyphs<
 
   protected createTextField(text: string, style: TextStyleExtended): TextType {
     // In Pixi v8, Text constructor takes an options object
-    // Clean up the style for PIXI v8
-    const cleanedStyle = { ...style };
+    // Clean up the style for PIXI v8 - only include valid PIXI.TextStyle properties
+    const cleanedStyle: any = {};
+
+    // Valid PIXI v8 TextStyle properties for rendering
+    // Note: wordWrap and wordWrapWidth are intentionally excluded as they interfere with padding
+    const validPixiProps = [
+      'align', 'breakWords', 'dropShadow', 'fill', 'fontFamily', 'fontSize',
+      'fontStyle', 'fontVariant', 'fontWeight', 'leading', 'letterSpacing',
+      'lineHeight', 'padding', 'stroke', 'textBaseline', 'trim', 'whiteSpace',
+      // Also include these for compatibility
+      'dropShadowAlpha', 'dropShadowAngle', 'dropShadowBlur', 'dropShadowColor',
+      'dropShadowDistance', 'miterLimit', 'strokeThickness'
+    ];
+
+    // Copy only valid PIXI properties
+    validPixiProps.forEach(prop => {
+      if (style[prop] !== undefined) {
+        cleanedStyle[prop] = style[prop];
+      }
+    });
+
+    // Handle 'color' alias for 'fill'
+    if (style.color !== undefined && style.fill === undefined) {
+      cleanedStyle.fill = style.color;
+    }
 
     // In PIXI v8, stroke needs to be an object if it exists
     // Convert old format (stroke: color, strokeThickness: number) to new format
@@ -879,9 +927,43 @@ export class Glyphs<
       delete cleanedStyle.strokeThickness;
     }
 
+    // In PIXI v8, dropShadow needs to be an object if it's enabled
+    // Convert old format (dropShadow: true, dropShadowColor, etc.) to new format
+    if (cleanedStyle.dropShadow === true) {
+      const dropShadowObj: any = {};
+
+      // Only add properties that are defined
+      if (cleanedStyle.dropShadowColor !== undefined) {
+        dropShadowObj.color = cleanedStyle.dropShadowColor;
+      }
+      if (cleanedStyle.dropShadowBlur !== undefined) {
+        dropShadowObj.blur = cleanedStyle.dropShadowBlur;
+      }
+      if (cleanedStyle.dropShadowDistance !== undefined) {
+        dropShadowObj.distance = cleanedStyle.dropShadowDistance;
+      }
+      if (cleanedStyle.dropShadowAngle !== undefined) {
+        dropShadowObj.angle = cleanedStyle.dropShadowAngle;
+      }
+      if (cleanedStyle.dropShadowAlpha !== undefined) {
+        dropShadowObj.alpha = cleanedStyle.dropShadowAlpha;
+      }
+
+      cleanedStyle.dropShadow = dropShadowObj;
+
+      // Delete old-style properties
+      delete cleanedStyle.dropShadowColor;
+      delete cleanedStyle.dropShadowBlur;
+      delete cleanedStyle.dropShadowDistance;
+      delete cleanedStyle.dropShadowAngle;
+      delete cleanedStyle.dropShadowAlpha;
+    }
+
+    // Pass style directly as a plain object, just like the working PIXI v8 version does
+    // Do NOT create a PIXI.TextStyle object - let PIXI do it internally
     const textField = new PIXI.Text({
       text: text,
-      style: cleanedStyle as Partial<PIXI.TextStyle>
+      style: cleanedStyle
     });
 
     return textField as TextType;
@@ -979,6 +1061,13 @@ export class Glyphs<
     }
 
     textField.scale.set(finalScaleWidth, finalScaleHeight);
+
+    // Debug: Check if scaling is applied
+    if (textField.style.padding !== undefined && (finalScaleWidth !== 1.0 || finalScaleHeight !== 1.0)) {
+      console.log('[applyFontScale] WARNING: Scaling applied to text with padding!');
+      console.log('  - Scale:', finalScaleWidth, 'x', finalScaleHeight);
+      console.log('  - Padding:', textField.style.padding);
+    }
 
     return textField as TextType;
   }

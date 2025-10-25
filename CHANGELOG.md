@@ -4,12 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [5.0.1](https://github.com/rizen/pixi-glyphs/compare/v4.3.0...v5.0.1) (2025-10-25)
 
-
-### Bug Fixes
-
-* Duplicated controls in the demos. ([ddc3264](https://github.com/rizen/pixi-glyphs/commit/ddc326407f1489db067e0f8d18ac28108f7fd358))
-* Icons not lining up at their base. ([86eda58](https://github.com/rizen/pixi-glyphs/commit/86eda588d40378512e014a6d3a577e0d619e4201))
-* Moved baseUrl inside the compilerOptions object where it belongs ([eb8c6d8](https://github.com/rizen/pixi-glyphs/commit/eb8c6d847bda04bd5777d2d7fe1a5f4e2930bd21))
+- Add: Padding demo.
+- Fix: Padding not working with topTrim.
 
 
 ### Chore
