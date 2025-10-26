@@ -1,5 +1,6 @@
 // Import demos
 import { demos } from './demos.js';
+import { VERSION } from './version.js';
 
 // Main application logic
 let currentApp = null;
@@ -312,7 +313,13 @@ ${functionClose}`;
 }
 
 // Setup navigation event listeners
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // Display version
+  const versionElement = document.querySelector('.version');
+  if (versionElement) {
+    versionElement.textContent = `v${VERSION}`;
+  }
+
   // Add click listeners to navigation buttons
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {

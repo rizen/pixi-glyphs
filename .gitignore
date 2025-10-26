@@ -10,3 +10,6 @@ coverage
 
 .vscode
 .wireit
+
+# Auto-generated files
+docs/version.js

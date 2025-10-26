@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+- Fix: Version number displayed in the demo.
+
 ### [5.0.2](https://github.com/rizen/pixi-glyphs/compare/v5.0.1...v5.0.2) (2025-10-26)
 
 - Fix: Make inline icon baseline offset take iconScale into account.
