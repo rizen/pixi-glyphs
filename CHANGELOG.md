@@ -4,20 +4,13 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [5.0.2](https://github.com/rizen/pixi-glyphs/compare/v5.0.1...v5.0.2) (2025-10-26)
 
-
-### Bug Fixes
-
-* Removed debug. ([bfdf26a](https://github.com/rizen/pixi-glyphs/commit/bfdf26affb4a2375129be7e560a323e9711f5559))
+- Fix: Make inline icon baseline offset take iconScale into account.
+- Fix: Removed debug. 
 
 ### [5.0.1](https://github.com/rizen/pixi-glyphs/compare/v4.3.0...v5.0.1) (2025-10-25)
 
 - Add: Padding demo.
 - Fix: Padding not working with topTrim.
-
-
-### Chore
-
-* **release:** 5.0.0 ([3a8561f](https://github.com/rizen/pixi-glyphs/commit/3a8561fe270e4976996c4970a129aeb74bd6d673))
 
 ## [5.0.0](https://github.com/rizen/pixi-glyphs/compare/v4.3.0...v5.0.0) (2025-10-24)
 

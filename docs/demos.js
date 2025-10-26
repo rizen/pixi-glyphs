@@ -1301,16 +1301,18 @@ const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
   debug: {
     title: "Debug Mode",
     description: "Visual debugging tools to understand text layout",
-    code: `// Load icon image
+    code: `// Load icon images
 await PIXI.Assets.load('icon.png');
+await PIXI.Assets.load('might.png');
 const icon = new PIXI.Sprite(PIXI.Texture.from('icon.png'));
+const might = new PIXI.Sprite(PIXI.Texture.from('might.png'));
 
 const text = \`You can use <blue>debug mode</blue> to help you figure out what your text is doing. Include <code>{debug: true} </code> in the options when you create your text.
 You can also set <code>debugConsole: true</code> if you want to log information about the text field to the console.
 
-a b <icon/>
-a <icon/> c
-<icon/> b c\`;
+<big>a b <might/><icon/>
+a <might/><icon/> c
+<might/><icon/> b c</big>\`;
 
 const styles = {
   default: {
@@ -1333,27 +1335,36 @@ const styles = {
     stroke: "#660000",
     strokeThickness: 8
   },
+  big: {
+    fontSize: "50px"
+  },
   icon: {
     imgSrc: "icon",
+    imgDisplay: "icon"
+  },
+  might: {
+    imgSrc: "might",
     imgDisplay: "icon"
   }
 };
 
 const glyphs = new (window.Glyphs.Glyphs)(text, styles, {
   debug: true,
-  imgMap: { icon }
+  imgMap: { icon, might }
 });`,
     init: async function() {
-      // Load icon image
+      // Load icon images
       await PIXI.Assets.load('icon.png');
+      await PIXI.Assets.load('might.png');
       const icon = new PIXI.Sprite(PIXI.Texture.from('icon.png'));
+      const might = new PIXI.Sprite(PIXI.Texture.from('might.png'));
 
       const text = `You can use <blue>debug mode</blue> to help you figure out what your text is doing. Include <code>{debug: true} </code> in the options when you create your text.
 You can also set <code>debugConsole: true</code> if you want to log information about the text field to the console.
 
-a b <icon/>
-a <icon/> c
-<icon/> b c`;
+<big>a b <might/><icon/>
+a <might/><icon/> c
+<might/><icon/> b c</big>`;
 
       const styles = {
         default: {
@@ -1376,8 +1387,15 @@ a <icon/> c
           stroke: "#660000",
           strokeThickness: 8
         },
+        big: {
+          fontSize: "50px"
+        },
         icon: {
           imgSrc: "icon",
+          imgDisplay: "icon"
+        },
+        might: {
+          imgSrc: "might",
           imgDisplay: "icon"
         }
       };
@@ -1385,7 +1403,7 @@ a <icon/> c
       const Glyphs = window.Glyphs.Glyphs;
       const glyphs = new Glyphs(text, styles, {
         debug: true,
-        imgMap: { icon }
+        imgMap: { icon, might }
       });
 
       // Create interactive control for icon scale
@@ -1410,9 +1428,13 @@ a <icon/> c
             const iconScale = parseFloat(e.target.value);
             iconScaleValue.textContent = iconScale.toFixed(1);
 
-            // Update iconScale in icon style
+            // Update iconScale in both icon styles
             glyphs.setStyleForTag('icon', {
               ...glyphs.tagStyles.icon,
+              iconScale: iconScale
+            });
+            glyphs.setStyleForTag('might', {
+              ...glyphs.tagStyles.might,
               iconScale: iconScale
             });
           });

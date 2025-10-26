@@ -765,11 +765,13 @@ export class Glyphs<
         const imgDisplay = t.style['imgDisplay'];
         if (imgDisplay === 'icon') {
           // Push icon down by 0.1em below its baseline position
+          // Account for iconScale so larger icons sit proportionally lower
           let fontSize = t.style.fontSize || 20;
           if (typeof fontSize === 'string') {
             fontSize = parseInt(fontSize.replace('px', ''), 10);
           }
-          const iconOffset = fontSize * 0.1;
+          const iconScale = t.style.iconScale ?? 1.0;
+          const iconOffset = fontSize * 0.1 * iconScale;
           displayObject.y = bounds.y + iconOffset;
 
         }
