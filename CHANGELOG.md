@@ -2,9 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.0.2](https://github.com/rizen/pixi-glyphs/compare/v5.0.1...v5.0.2) (2025-10-26)
 
-- Fix: Removed debug.
 
+### Bug Fixes
+
+* Removed debug. ([bfdf26a](https://github.com/rizen/pixi-glyphs/commit/bfdf26affb4a2375129be7e560a323e9711f5559))
 
 ### [5.0.1](https://github.com/rizen/pixi-glyphs/compare/v4.3.0...v5.0.1) (2025-10-25)
 
