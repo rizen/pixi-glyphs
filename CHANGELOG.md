@@ -2,7 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-- Fix: Version number displayed in the demo.
+### [5.0.3](https://github.com/rizen/pixi-glyphs/compare/v5.0.2...v5.0.3) (2025-11-06)
+
+
+### Bug Fixes
+
+* Version number displayed in the demo. ([306a50a](https://github.com/rizen/pixi-glyphs/commit/306a50a7cfa387c20df5ffc5d7b4dd4d39793c00))
 
 ### [5.0.2](https://github.com/rizen/pixi-glyphs/compare/v5.0.1...v5.0.2) (2025-10-26)
 
