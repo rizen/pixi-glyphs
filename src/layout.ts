@@ -580,8 +580,9 @@ export const verticalAlignInLines = (
       paragraphModifier = tallestToken.style.paragraphSpacing ?? 0;
     }
     if (isSpriteToken(tallestToken)) {
-      tallestHeight += tallestToken.fontProperties.descent;
       // For sprites, use their full height as the ascent for line spacing
+      // Note: baseHeight already includes sprite height from line 554,
+      // so we don't need to add descent here
       tallestAscent = tallestToken.bounds.height;
     }
 
