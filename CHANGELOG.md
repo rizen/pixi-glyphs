@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 - Fix: Icon position is not offset by outline the way text is.
 - Fix: Icons are not getting effects the way text is.
-
+- Add: Added Glow example to padding. 
 
 ### [5.0.3](https://github.com/rizen/pixi-glyphs/compare/v5.0.2...v5.0.3) (2025-11-06)
 

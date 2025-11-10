@@ -949,7 +949,7 @@ const glyphs = new (window.Glyphs.Glyphs)(text, styles, options);`,
 await new FontFace('Gentleman of Fortune', 'url(Gentleman%20of%20Fortune.ttf)').load()
   .then(font => document.fonts.add(font));
 
-const text = "Ambushed !!!";
+const text = "Ambushed !!!\n<glowing>Glowing</glowing>";
 
 const styles = {
   default: {
@@ -964,6 +964,15 @@ const styles = {
     dropShadowDistance: 10,
     dropShadowAngle: Math.PI / 4,
     padding: 0
+  },
+  glowing: {
+    fill: "#FFFF00",
+    stroke: undefined,
+    dropShadow: true,
+    dropShadowColor: "#00FF00",
+    dropShadowBlur: 20,
+    dropShadowDistance: 0,
+    padding: 0
   }
 };
 
@@ -973,7 +982,7 @@ const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
       await new FontFace('Gentleman of Fortune', 'url(Gentleman%20of%20Fortune.ttf)').load()
         .then(font => document.fonts.add(font));
 
-      const text = "Ambushed !!!";
+      const text = "Ambushed !!!\n<glowing>Glowing</glowing>";
 
       const styles = {
         default: {
@@ -987,6 +996,15 @@ const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
           dropShadowBlur: 8,
           dropShadowDistance: 10,
           dropShadowAngle: Math.PI / 4,
+          padding: 0
+        },
+        glowing: {
+          fill: "#FFFF00",
+          stroke: undefined,
+          dropShadow: true,
+          dropShadowColor: "#00FF00",
+          dropShadowBlur: 20,
+          dropShadowDistance: 0,
           padding: 0
         }
       };
@@ -1012,7 +1030,7 @@ const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
               <label>Padding: <span id="padding-value">0</span>px</label><br>
               <input type="range" id="padding-slider" min="0" max="50" value="0" style="width: 300px;">
               <p style="margin-top: 10px; font-size: 12px; color: #cccccc;">
-                Padding prevents clipping of text effects like stroke and drop shadow.
+                Padding prevents clipping of effects like stroke, drop shadow, and glow. Watch both lines as you adjust the slider.
               </p>
             </div>
           `;
@@ -1026,9 +1044,16 @@ const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
             const padding = parseInt(e.target.value);
             paddingValue.textContent = padding;
 
-            // Update padding
+            // Update padding on both default and glowing tags
+            const defaultStyle = glyphs.tagStyles.default;
             glyphs.setStyleForTag('default', {
-              ...glyphs.tagStyles.default,
+              ...defaultStyle,
+              padding: padding
+            });
+
+            const glowingStyle = glyphs.tagStyles.glowing;
+            glyphs.setStyleForTag('glowing', {
+              ...glowingStyle,
               padding: padding
             });
           });
@@ -2001,13 +2026,15 @@ const styles = {
     dropShadowColor: 0x0000FF,
     dropShadowBlur: 4,
     dropShadowAngle: 0.785,
-    dropShadowDistance: 6
+    dropShadowDistance: 6,
+    padding: 15
   },
   outline: {
     fontSize: 28,
     fill: "#FFFFFF",
     stroke: "#FF0000",
-    strokeThickness: 7
+    strokeThickness: 7,
+    padding: 10
   },
   glow: {
     fontSize: 28,
@@ -2015,7 +2042,8 @@ const styles = {
     dropShadow: true,
     dropShadowColor: 0xFFFF00,
     dropShadowBlur: 15,
-    dropShadowDistance: 0
+    dropShadowDistance: 0,
+    padding: 20
   },
   dole: {
     imgSrc: "dole",
@@ -2060,13 +2088,15 @@ const glyphs = new (window.Glyphs.Glyphs)(text, styles, {
           dropShadowColor: 0x0000FF,
           dropShadowBlur: 4,
           dropShadowAngle: 0.785,
-          dropShadowDistance: 6
+          dropShadowDistance: 6,
+          padding: 15
         },
         outline: {
           fontSize: 28,
           fill: "#FFFFFF",
           stroke: "#FF0000",
-          strokeThickness: 7
+          strokeThickness: 7,
+          padding: 10
         },
         glow: {
           fontSize: 28,
@@ -2074,7 +2104,8 @@ const glyphs = new (window.Glyphs.Glyphs)(text, styles, {
           dropShadow: true,
           dropShadowColor: 0xFFFF00,
           dropShadowBlur: 15,
-          dropShadowDistance: 0
+          dropShadowDistance: 0,
+          padding: 20
         },
         dole: {
           imgSrc: "dole",
