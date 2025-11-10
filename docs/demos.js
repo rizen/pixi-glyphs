@@ -1968,13 +1968,17 @@ graphics.stroke();`,
   effects: {
     title: "Effects",
     description: "Text effects including drop shadow, stroke outline, and glow",
-    code: `const text = \`<h1>Text Effects Demo</h1>
+    code: `// Load SVG texture
+await PIXI.Assets.load('dole.svg');
+const dole = new PIXI.Sprite(PIXI.Texture.from('dole.svg'));
 
-<shadow>Drop shadow - with hyphens, spaces & punctuation! It's amazing, isn't it?</shadow>
+const text = \`<h1>Text Effects Demo</h1>
 
-<outline>Stroke outline - multi-word test: "Hello, world!" (works great)</outline>
+<shadow>Drop shadow - with hyphens, 1<dole/>1 spaces & punctuation! It's amazing, isn't it?</shadow>
 
-<glow>Glowing text - features: bright, eye-catching & beautiful!</glow>\`;
+<outline>Stroke outline - multi-word test: 1<dole/>1 "Hello, world!" (works great)</outline>
+
+<glow>Glowing text - features: bright, 1<dole/>1 eye-catching & beautiful!</glow>\`;
 
 const styles = {
   default: {
@@ -1994,7 +1998,7 @@ const styles = {
     fontSize: 28,
     fill: "#FFFFFF",
     dropShadow: true,
-    dropShadowColor: 0x000000,
+    dropShadowColor: 0x0000FF,
     dropShadowBlur: 4,
     dropShadowAngle: 0.785,
     dropShadowDistance: 6
@@ -2002,8 +2006,8 @@ const styles = {
   outline: {
     fontSize: 28,
     fill: "#FFFFFF",
-    stroke: 0x000000,
-    strokeThickness: 4
+    stroke: "#FF0000",
+    strokeThickness: 7
   },
   glow: {
     fontSize: 28,
@@ -2012,18 +2016,28 @@ const styles = {
     dropShadowColor: 0xFFFF00,
     dropShadowBlur: 15,
     dropShadowDistance: 0
+  },
+  dole: {
+    imgSrc: "dole",
+    imgDisplay: "icon"
   }
 };
 
-const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
-    init: function() {
+const glyphs = new (window.Glyphs.Glyphs)(text, styles, {
+  imgMap: { dole }
+});`,
+    init: async function() {
+      // Load SVG texture
+      await PIXI.Assets.load('dole.svg');
+      const dole = new PIXI.Sprite(PIXI.Texture.from('dole.svg'));
+
       const text = `<h1>Text Effects Demo</h1>
 
-<shadow>Drop shadow - with hyphens, spaces & punctuation! It's amazing, isn't it?</shadow>
+<shadow>Drop shadow - with hyphens, 1<dole/>1 spaces & punctuation! It's amazing, isn't it?</shadow>
 
-<outline>Stroke outline - multi-word test: "Hello, world!" (works great)</outline>
+<outline>Stroke outline - multi-word test: 1<dole/>1 "Hello, world!" (works great)</outline>
 
-<glow>Glowing text - features: bright, eye-catching & beautiful!</glow>`;
+<glow>Glowing text - features: bright, 1<dole/>1 eye-catching & beautiful!</glow>`;
 
       const styles = {
         default: {
@@ -2043,7 +2057,7 @@ const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
           fontSize: 28,
           fill: "#FFFFFF",
           dropShadow: true,
-          dropShadowColor: 0x000000,
+          dropShadowColor: 0x0000FF,
           dropShadowBlur: 4,
           dropShadowAngle: 0.785,
           dropShadowDistance: 6
@@ -2051,8 +2065,8 @@ const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
         outline: {
           fontSize: 28,
           fill: "#FFFFFF",
-          stroke: 0x000000,
-          strokeThickness: 4
+          stroke: "#FF0000",
+          strokeThickness: 7
         },
         glow: {
           fontSize: 28,
@@ -2061,11 +2075,17 @@ const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
           dropShadowColor: 0xFFFF00,
           dropShadowBlur: 15,
           dropShadowDistance: 0
+        },
+        dole: {
+          imgSrc: "dole",
+          imgDisplay: "icon"
         }
       };
 
       const Glyphs = window.Glyphs.Glyphs;
-      return new Glyphs(text, styles);
+      return new Glyphs(text, styles, {
+        imgMap: { dole }
+      });
     }
   },
 

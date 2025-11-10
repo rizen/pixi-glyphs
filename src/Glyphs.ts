@@ -751,6 +751,9 @@ export class Glyphs<
       if (isSpriteToken(t)) {
         displayObject = t.content as PIXI.Sprite;
 
+        // Apply effects to sprites based on their style
+        this.applySpriteEffects(displayObject as PIXI.Sprite, t.style);
+
         this.sprites.push(displayObject as PIXI.Sprite);
         spriteContainer.addChild(displayObject);
       }
@@ -774,7 +777,114 @@ export class Glyphs<
           const iconOffset = fontSize * 0.1 * iconScale;
           displayObject.y = bounds.y + iconOffset;
 
+          // Adjust position to account for stroke thickness
+          // The stroke extends equally in all directions, so we need to offset
+          // to keep the visual center in the same place
+          const effects = (displayObject as any)._glyphsEffects;
+          if (effects && effects.stroke) {
+            const strokeThickness = effects.stroke.thickness;
+            // Offset by half the stroke thickness to center the stroked sprite
+            displayObject.x += strokeThickness / 2;
+            displayObject.y += strokeThickness / 2;
+          }
         }
+      }
+    });
+
+    // Draw sprite effects using sprite copies with filters
+    this.sprites.forEach((sprite) => {
+      const effects = (sprite as any)._glyphsEffects;
+      if (!effects) return;
+
+      const spriteIndex = this._spriteContainer.getChildIndex(sprite);
+
+      // Draw drop shadow using a colored sprite copy with blur
+      if (effects.dropShadow) {
+        const shadow = effects.dropShadow;
+        const offsetX = Math.cos(shadow.angle) * shadow.distance;
+        const offsetY = Math.sin(shadow.angle) * shadow.distance;
+
+        const shadowSprite = new PIXI.Sprite(sprite.texture);
+        shadowSprite.anchor.set(sprite.anchor.x, sprite.anchor.y);
+        shadowSprite.scale.set(sprite.scale.x, sprite.scale.y);
+        shadowSprite.x = sprite.x + offsetX;
+        shadowSprite.y = sprite.y + offsetY;
+        shadowSprite.alpha = shadow.alpha * 0.6;
+
+        // Use ColorMatrixFilter to change the sprite to the shadow color
+        const colorMatrix = new PIXI.ColorMatrixFilter();
+        // Convert the sprite to the shadow color by replacing all colors
+        const r = ((shadow.color >> 16) & 0xFF) / 255;
+        const g = ((shadow.color >> 8) & 0xFF) / 255;
+        const b = (shadow.color & 0xFF) / 255;
+
+        // Matrix that converts any color to the target color while preserving alpha
+        colorMatrix.matrix = [
+          0, 0, 0, 0, r,
+          0, 0, 0, 0, g,
+          0, 0, 0, 0, b,
+          0, 0, 0, 1, 0
+        ];
+
+        const filters: any[] = [colorMatrix];
+
+        // Add blur if specified
+        if (shadow.blur > 0) {
+          const blurFilter = new PIXI.BlurFilter({
+            strength: shadow.blur,
+            quality: 4
+          });
+          filters.push(blurFilter);
+        }
+
+        shadowSprite.filters = filters;
+
+        // Insert shadow before the sprite in the container
+        this._spriteContainer.addChildAt(shadowSprite, spriteIndex);
+      }
+
+      // Draw stroke/outline using multiple sprite copies
+      if (effects.stroke) {
+        const stroke = effects.stroke;
+        const thickness = stroke.thickness;
+
+        // Create 8 copies of the sprite offset in different directions
+        const directions = [
+          { x: -thickness, y: 0 },
+          { x: thickness, y: 0 },
+          { x: 0, y: -thickness },
+          { x: 0, y: thickness },
+          { x: -thickness * 0.7, y: -thickness * 0.7 },
+          { x: thickness * 0.7, y: -thickness * 0.7 },
+          { x: -thickness * 0.7, y: thickness * 0.7 },
+          { x: thickness * 0.7, y: thickness * 0.7 }
+        ];
+
+        directions.forEach((dir) => {
+          const outlineSprite = new PIXI.Sprite(sprite.texture);
+          outlineSprite.anchor.set(sprite.anchor.x, sprite.anchor.y);
+          outlineSprite.scale.set(sprite.scale.x, sprite.scale.y);
+          outlineSprite.x = sprite.x + dir.x;
+          outlineSprite.y = sprite.y + dir.y;
+
+          // Use ColorMatrixFilter to change the sprite to the stroke color
+          const colorMatrix = new PIXI.ColorMatrixFilter();
+          const r = ((stroke.color >> 16) & 0xFF) / 255;
+          const g = ((stroke.color >> 8) & 0xFF) / 255;
+          const b = (stroke.color & 0xFF) / 255;
+
+          colorMatrix.matrix = [
+            0, 0, 0, 0, r,
+            0, 0, 0, 0, g,
+            0, 0, 0, 0, b,
+            0, 0, 0, 1, 0
+          ];
+
+          outlineSprite.filters = [colorMatrix];
+
+          // Insert outline before the sprite in the container
+          this._spriteContainer.addChildAt(outlineSprite, spriteIndex);
+        });
       }
     });
 
@@ -1008,6 +1118,67 @@ export class Glyphs<
     highlight.y = y;
 
     return highlight;
+  }
+
+  protected applySpriteEffects(sprite: PIXI.Sprite, style: TextStyleExtended): void {
+    // Store effect configuration on the sprite for later rendering
+    // We'll draw these effects in the draw() method using Graphics
+    (sprite as any)._glyphsEffects = {
+      dropShadow: undefined,
+      stroke: undefined
+    };
+
+    // Store drop shadow configuration
+    if (style.dropShadow) {
+      const dropShadowConfig: any = {};
+
+      // Handle both old format (dropShadow: true + separate properties) and new format (dropShadow as object)
+      if (typeof style.dropShadow === 'object') {
+        dropShadowConfig.color = style.dropShadow.color ?? 0x000000;
+        dropShadowConfig.blur = style.dropShadow.blur ?? 2;
+        dropShadowConfig.distance = style.dropShadow.distance ?? 5;
+        dropShadowConfig.angle = style.dropShadow.angle ?? Math.PI / 4;
+        dropShadowConfig.alpha = style.dropShadow.alpha ?? 1;
+      } else {
+        // Old format with separate properties
+        dropShadowConfig.color = (style as any).dropShadowColor ?? 0x000000;
+        dropShadowConfig.blur = (style as any).dropShadowBlur ?? 2;
+        dropShadowConfig.distance = (style as any).dropShadowDistance ?? 5;
+        dropShadowConfig.angle = (style as any).dropShadowAngle ?? Math.PI / 4;
+        dropShadowConfig.alpha = (style as any).dropShadowAlpha ?? 1;
+      }
+
+      (sprite as any)._glyphsEffects.dropShadow = dropShadowConfig;
+    }
+
+    // Store stroke configuration
+    if (style.stroke) {
+      let strokeColor: number | string = 0x000000;
+      let strokeThickness = 0;
+
+      // Handle both PIXI v8 format (stroke.width) and legacy format (strokeThickness)
+      if (typeof style.stroke === 'object') {
+        strokeColor = (style.stroke as any).color ?? 0x000000;
+        strokeThickness = (style.stroke as any).width ?? 0;
+      } else {
+        strokeColor = style.stroke;
+        strokeThickness = (style as any).strokeThickness ?? 0;
+      }
+
+      // Convert hex string to number if needed
+      if (typeof strokeColor === 'string') {
+        if (strokeColor.indexOf('#') === 0) {
+          strokeColor = parseInt('0x' + strokeColor.substring(1), 16);
+        }
+      }
+
+      if (strokeThickness > 0) {
+        (sprite as any)._glyphsEffects.stroke = {
+          color: strokeColor,
+          thickness: strokeThickness
+        };
+      }
+    }
   }
 
   protected createTextFieldForToken(token: TextSegmentToken): TextType {
