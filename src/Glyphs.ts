@@ -908,28 +908,21 @@ export class Glyphs<
     // When text has padding, the rendering texture extends beyond the layout bounds
     // and we need to account for this in the mask to prevent clipping
     let maxPadding = 0;
-    tokens.forEach(token => {
-      if (Array.isArray(token)) {
-        token.forEach((t: any) => {
-          if (Array.isArray(t)) {
-            t.forEach((seg: any) => {
-              const padding = seg?.style?.padding ?? 0;
-              maxPadding = Math.max(maxPadding, padding);
-            });
-          } else {
-            const padding = t?.style?.padding ?? 0;
-            maxPadding = Math.max(maxPadding, padding);
-          }
-        });
-      } else {
-        const padding = (token as any)?.style?.padding ?? 0;
-        maxPadding = Math.max(maxPadding, padding);
-      }
+    // Also find the minimum x position to handle centered text that overflows to the left
+    let minX = 0;
+    // tokensFlat is already a flat array of SegmentToken objects
+    tokensFlat.forEach((token: SegmentToken) => {
+      const padding = token?.style?.padding ?? 0;
+      maxPadding = Math.max(maxPadding, padding);
+      const x = token?.bounds?.x ?? 0;
+      minX = Math.min(minX, x);
     });
 
-    // Expand the mask to account for padding
-    // Start the mask at -maxPadding to allow padded content to render
-    this._maskGraphics.rect(-maxPadding, -maxPadding, 10000 + maxPadding * 2, 10000 + maxPadding * 2);
+    // Expand the mask to account for padding AND negative x positions (centered overflow)
+    // Start the mask at min(minX, -maxPadding) to allow both padded content and
+    // centered text that extends to the left of the origin
+    const maskStartX = Math.min(minX, -maxPadding) - maxPadding;
+    this._maskGraphics.rect(maskStartX, -maxPadding, 10000 - maskStartX + maxPadding * 2, 10000 + maxPadding * 2);
     this._maskGraphics.fill({ color: 0xffffff });
 
     // Add the mask to the container hierarchy so it's in the scene graph
