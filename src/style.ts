@@ -147,14 +147,16 @@ export const interpretFontSize = (
 export const mapTagsToStyles = (
   tokens: TagTokens,
   styles: TextStyleSet,
-  spriteTemplates?: ImageMap
+  spriteTemplates?: ImageMap,
+  externalStyleCache?: Record<string, TextStyleExtended>
 ): StyledTokens => {
   const defaultStyle: TextStyleExtended = convertDecorationToLineProps(
     styles.default ?? {}
   );
   const tagStack: TagWithAttributes[] = [];
   const fontSizeStack: FontSize[] = [];
-  const styleCache = {};
+  // Use external cache if provided (persists across updates), otherwise create local cache
+  const styleCache = externalStyleCache ?? {};
 
   const convertTagTokenToStyledToken = (
     token: TagToken | TextToken

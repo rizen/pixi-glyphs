@@ -18,11 +18,29 @@ const defaultLogWarning = logWarning();
 // Seems doing one pass will be enough to gather all relevant info.
 // TODO: support self closing tags?
 
+// Cache for compiled regexes to avoid recompiling on every update()
+const regexCache = new Map<string, RegExp>();
+
 /**
  * Generates a regular expression object for identifying tags and attributes.
+ * Uses caching to avoid recompiling the same regex on every update.
  * @param tagNamesToMatch List of tag-names that will be matched by the RegExp
  */
 export const getTagRegex = (tagNamesToMatch: string[] = ["\\w+"]): RegExp => {
+  // Create a cache key - use length + first few + last few tags for fast approximation
+  // This avoids O(n log n) sorting while still being effective for typical usage
+  const len = tagNamesToMatch.length;
+  const cacheKey = len <= 10
+    ? tagNamesToMatch.join("|")
+    : `${len}:${tagNamesToMatch.slice(0, 3).join(",")}:${tagNamesToMatch.slice(-3).join(",")}`;
+
+  const cached = regexCache.get(cacheKey);
+  if (cached) {
+    // Reset lastIndex for global regex reuse
+    cached.lastIndex = 0;
+    return cached;
+  }
+
   const matchingTagNames = tagNamesToMatch.join("|");
 
   const captureGroup = (a: string) => `(${a})`;
@@ -41,7 +59,10 @@ export const getTagRegex = (tagNamesToMatch: string[] = ["\\w+"]): RegExp => {
 
   const pattern = `${TAG_OPEN}|${TAG_CLOSE}`;
 
-  return new RegExp(pattern, "g");
+  const regex = new RegExp(pattern, "g");
+  regexCache.set(cacheKey, regex);
+
+  return regex;
 };
 
 export const EMOJI_TAG = "__EMOJI__";

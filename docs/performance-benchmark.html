@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pixi-Glyphs Performance Benchmark</title>
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@8.5.2/dist/pixi.min.js"></script>
+    <script src="../dist/pixi-glyphs.umd.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        h1 { color: #00d4ff; margin-bottom: 10px; }
+        h2 { color: #ff6b6b; margin-top: 30px; }
+        .subtitle { color: #888; margin-bottom: 20px; }
+        #container {
+            border: 2px solid #444;
+            display: inline-block;
+            margin: 20px 0;
+        }
+        #output {
+            background: #0f0f1a;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .controls {
+            margin: 20px 0;
+        }
+        button {
+            background: #00d4ff;
+            color: #1a1a2e;
+            border: none;
+            padding: 10px 20px;
+            margin-right: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover { background: #00a8cc; }
+        button:disabled { background: #444; color: #888; cursor: not-allowed; }
+        .result-good { color: #4ade80; }
+        .result-bad { color: #f87171; }
+        .result-warning { color: #fbbf24; }
+        table {
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 8px 15px;
+            text-align: right;
+        }
+        th { background: #2a2a4a; }
+        tr:nth-child(even) { background: #1f1f3a; }
+    </style>
+</head>
+<body>
+    <h1>Pixi-Glyphs Performance Benchmark</h1>
+    <p class="subtitle">Testing O(n²) scaling with large styles objects (Issue: 367 icons causing 29x slowdown)</p>
+
+    <div class="controls">
+        <button id="runBtn" onclick="runBenchmark()">Run Full Benchmark</button>
+        <button id="quickBtn" onclick="runQuickTest()">Quick Test (3 sizes)</button>
+        <button id="profileBtn" onclick="runWithProfiling()">Run with Profiling</button>
+    </div>
+
+    <div id="container"></div>
+    <div id="results"></div>
+    <pre id="output">Click "Run Benchmark" to start...</pre>
+
+    <script>
+        const output = document.getElementById('output');
+        const resultsDiv = document.getElementById('results');
+        let app = null;
+        let GlyphsConstructor = null;
+
+        function log(message) {
+            output.textContent += message + '\n';
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearLog() {
+            output.textContent = '';
+        }
+
+        // Create a simple colored texture for testing
+        function createColoredTexture(color, size = 24) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = color;
+            ctx.fillRect(0, 0, size, size);
+            ctx.strokeStyle = '#fff';
+            ctx.strokeRect(0, 0, size, size);
+            return PIXI.Texture.from(canvas);
+        }
+
+        // Generate a random color
+        function randomColor() {
+            return '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+        }
+
+        async function initApp() {
+            if (app) return;
+
+            app = new PIXI.Application();
+            await app.init({
+                width: 800,
+                height: 100,
+                background: 0x333333,
+                antialias: true
+            });
+            document.getElementById('container').appendChild(app.canvas);
+
+            // UMD exports as Glyphs.Glyphs
+            GlyphsConstructor = window.Glyphs?.Glyphs || window.Glyphs?.default || window.Glyphs;
+            log('✓ PIXI Application initialized');
+            log('✓ Glyphs constructor loaded: ' + (typeof GlyphsConstructor));
+        }
+
+        async function measureConstructorTime(iconCount, iterations = 5) {
+            // Create imgMap with specified number of icons
+            const imgMap = {};
+            const styles = {
+                default: {
+                    fontFamily: 'Arial',
+                    fontSize: 18,
+                    fill: 0xffffff,
+                    wordWrap: true,
+                    wordWrapWidth: 250
+                },
+                bold: { fontWeight: 'bold' }
+            };
+
+            // Add icon textures and style entries
+            for (let i = 0; i < iconCount; i++) {
+                const texture = createColoredTexture(randomColor());
+                imgMap[`Icon${i}`] = texture;
+                styles[`Icon${i}`] = {
+                    imgSrc: `Icon${i}`,
+                    imgDisplay: 'icon',
+                    iconScale: 1.0
+                };
+            }
+
+            const times = [];
+
+            for (let i = 0; i < iterations; i++) {
+                const start = performance.now();
+
+                const glyphs = new GlyphsConstructor(
+                    'Simple text without icons',
+                    styles,
+                    {
+                        drawWhitespace: true,
+                        overdrawDecorations: true,
+                        scaleIcons: true,
+                        imgMap
+                    }
+                );
+
+                const end = performance.now();
+                times.push(end - start);
+
+                // Clean up
+                glyphs.destroy();
+            }
+
+            // Return median time (more stable than average)
+            times.sort((a, b) => a - b);
+            const median = times[Math.floor(times.length / 2)];
+            const avg = times.reduce((a, b) => a + b, 0) / times.length;
+
+            return { median, avg, times };
+        }
+
+        async function measureSetTextTime(iconCount, iterations = 50) {
+            // Create imgMap with specified number of icons
+            const imgMap = {};
+            const styles = {
+                default: {
+                    fontFamily: 'Arial',
+                    fontSize: 18,
+                    fill: 0xffffff,
+                    wordWrap: true,
+                    wordWrapWidth: 250
+                },
+                bold: { fontWeight: 'bold' }
+            };
+
+            for (let i = 0; i < iconCount; i++) {
+                const texture = createColoredTexture(randomColor());
+                imgMap[`Icon${i}`] = texture;
+                styles[`Icon${i}`] = {
+                    imgSrc: `Icon${i}`,
+                    imgDisplay: 'icon',
+                    iconScale: 1.0
+                };
+            }
+
+            // Create instance once
+            const glyphs = new GlyphsConstructor('Initial text', styles, {
+                drawWhitespace: true,
+                scaleIcons: true,
+                imgMap
+            });
+
+            // Batch multiple setText calls to get measurable time
+            const batchSize = 10;
+            const times = [];
+
+            for (let i = 0; i < iterations; i++) {
+                const start = performance.now();
+                for (let j = 0; j < batchSize; j++) {
+                    glyphs.setText(`Updated text iteration ${i * batchSize + j}`);
+                }
+                const end = performance.now();
+                times.push((end - start) / batchSize);  // Average per call
+            }
+
+            glyphs.destroy();
+
+            times.sort((a, b) => a - b);
+            const median = times[Math.floor(times.length / 2)];
+            const avg = times.reduce((a, b) => a + b, 0) / times.length;
+
+            return { median, avg, times };
+        }
+
+        async function runBenchmark() {
+            const btn = document.getElementById('runBtn');
+            btn.disabled = true;
+            clearLog();
+
+            try {
+                await initApp();
+
+                log('\n========================================');
+                log('BENCHMARK: Constructor Time vs Icon Count');
+                log('========================================\n');
+
+                const iconCounts = [0, 10, 50, 100, 200, 367, 500];
+                const results = [];
+                let baselineTime = null;
+
+                for (const count of iconCounts) {
+                    log(`Testing with ${count} icons...`);
+                    const { median, avg } = await measureConstructorTime(count, 5);
+
+                    if (baselineTime === null) {
+                        baselineTime = median;
+                    }
+
+                    const multiplier = (median / baselineTime).toFixed(2);
+                    const expected = count === 0 ? 1 : (1 + count * 0.01).toFixed(2); // O(n) expected
+
+                    results.push({
+                        iconCount: count,
+                        time: median,
+                        avg,
+                        multiplier: parseFloat(multiplier),
+                        expected: parseFloat(expected)
+                    });
+
+                    log(`  → ${count} icons: ${median.toFixed(3)}ms (${multiplier}x baseline)`);
+                }
+
+                // Generate results table
+                let tableHTML = `
+                    <h2>Constructor Time Results</h2>
+                    <table>
+                        <tr>
+                            <th>Icon Count</th>
+                            <th>Median Time (ms)</th>
+                            <th>Multiplier vs Baseline</th>
+                            <th>Expected (O(n))</th>
+                            <th>Actual / Expected</th>
+                        </tr>
+                `;
+
+                for (const r of results) {
+                    const ratio = (r.multiplier / r.expected).toFixed(2);
+                    const ratioClass = ratio > 5 ? 'result-bad' : ratio > 2 ? 'result-warning' : 'result-good';
+                    tableHTML += `
+                        <tr>
+                            <td>${r.iconCount}</td>
+                            <td>${r.time.toFixed(3)}</td>
+                            <td>${r.multiplier}x</td>
+                            <td>${r.expected}x</td>
+                            <td class="${ratioClass}">${ratio}x</td>
+                        </tr>
+                    `;
+                }
+                tableHTML += '</table>';
+
+                // Test setText performance
+                log('\n========================================');
+                log('BENCHMARK: setText() Time vs Icon Count');
+                log('========================================\n');
+
+                const setTextResults = [];
+                baselineTime = null;
+
+                for (const count of [0, 50, 200, 367]) {
+                    log(`Testing setText with ${count} icons...`);
+                    const { median } = await measureSetTextTime(count, 10);
+
+                    if (baselineTime === null) {
+                        baselineTime = median;
+                    }
+
+                    const multiplier = (median / baselineTime).toFixed(2);
+                    setTextResults.push({
+                        iconCount: count,
+                        time: median,
+                        multiplier: parseFloat(multiplier)
+                    });
+
+                    log(`  → ${count} icons: ${median.toFixed(3)}ms (${multiplier}x baseline)`);
+                }
+
+                tableHTML += `
+                    <h2>setText() Time Results</h2>
+                    <p>Testing instance reuse performance</p>
+                    <table>
+                        <tr>
+                            <th>Icon Count</th>
+                            <th>Median Time (ms)</th>
+                            <th>Multiplier vs Baseline</th>
+                        </tr>
+                `;
+
+                for (const r of setTextResults) {
+                    tableHTML += `
+                        <tr>
+                            <td>${r.iconCount}</td>
+                            <td>${r.time.toFixed(3)}</td>
+                            <td>${r.multiplier}x</td>
+                        </tr>
+                    `;
+                }
+                tableHTML += '</table>';
+
+                resultsDiv.innerHTML = tableHTML;
+
+                log('\n========================================');
+                log('ANALYSIS');
+                log('========================================\n');
+
+                const r367 = results.find(r => r.iconCount === 367);
+                const r0 = results.find(r => r.iconCount === 0);
+
+                if (r367 && r0) {
+                    const actualRatio = r367.multiplier;
+                    const expectedRatio = 1 + 367 * 0.01;
+
+                    log(`With 367 icons:`);
+                    log(`  Actual slowdown:   ${actualRatio.toFixed(1)}x`);
+                    log(`  Expected (O(n)):   ${expectedRatio.toFixed(1)}x`);
+                    log(`  Deviation:         ${(actualRatio / expectedRatio).toFixed(1)}x worse than O(n)`);
+
+                    if (actualRatio > 20) {
+                        log(`\n⚠️  CONFIRMED: O(n²) or worse scaling detected!`);
+                        log(`   The issue is likely in createSpriteTemplatesFromSourceMap()`);
+                        log(`   which calls setStyleForTag() without skipUpdate=true,`);
+                        log(`   triggering update() for each of the 367 icons.`);
+                    } else if (actualRatio > 5) {
+                        log(`\n⚠️  Performance is suboptimal but better than O(n²)`);
+                    } else {
+                        log(`\n✓ Performance appears to be close to O(n)`);
+                    }
+                }
+
+                log('\n✓ Benchmark complete!');
+
+            } catch (error) {
+                log('\n❌ Error: ' + error.message);
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function runQuickTest() {
+            const btn = document.getElementById('quickBtn');
+            btn.disabled = true;
+            clearLog();
+
+            try {
+                await initApp();
+
+                log('Quick Test: 0, 100, 367 icons\n');
+
+                for (const count of [0, 100, 367]) {
+                    const { median } = await measureConstructorTime(count, 3);
+                    log(`${count} icons: ${median.toFixed(3)}ms`);
+                }
+
+                log('\n✓ Quick test complete');
+            } catch (error) {
+                log('❌ Error: ' + error.message);
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function runWithProfiling() {
+            const btn = document.getElementById('profileBtn');
+            btn.disabled = true;
+            clearLog();
+
+            try {
+                await initApp();
+
+                log('Starting profiled run with 367 icons...');
+                log('Open DevTools > Performance tab to see detailed breakdown\n');
+
+                // Create imgMap with 367 icons
+                const imgMap = {};
+                const styles = {
+                    default: { fontFamily: 'Arial', fontSize: 18, fill: 0xffffff }
+                };
+
+                for (let i = 0; i < 367; i++) {
+                    imgMap[`Icon${i}`] = createColoredTexture(randomColor());
+                    styles[`Icon${i}`] = { imgSrc: `Icon${i}`, imgDisplay: 'icon' };
+                }
+
+                // Start profiling
+                console.profile('Glyphs Constructor with 367 icons');
+
+                const start = performance.now();
+                const glyphs = new GlyphsConstructor('Test text', styles, {
+                    drawWhitespace: true,
+                    scaleIcons: true,
+                    imgMap
+                });
+                const end = performance.now();
+
+                console.profileEnd('Glyphs Constructor with 367 icons');
+
+                log(`Constructor time: ${(end - start).toFixed(3)}ms`);
+                log('\nCheck DevTools > Performance tab for the profile data');
+                log('Look for repeated calls to update() in the flame chart');
+
+                glyphs.destroy();
+
+            } catch (error) {
+                log('❌ Error: ' + error.message);
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
