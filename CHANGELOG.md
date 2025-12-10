@@ -4,10 +4,13 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [5.0.6](https://github.com/rizen/pixi-glyphs/compare/v5.0.5...v5.0.6) (2025-12-10)
 
+- Added a bounds demo.
+- Fixed a bug where the bounds were inaccurately reported when drawWhitespace was enabled.
+
 
 ### Bug Fixes
 
-* Centered text that was too big for the defined area would get clipped on the left, but not on the right. It is no longer clipped. ([b4dfe6f](https://github.com/rizen/pixi-glyphs/commit/b4dfe6fe76703dc8c297f14aaaea2ace2ab27871))
+- Centered text that was too big for the defined area would get clipped on the left, but not on the right. It is no longer clipped. ([b4dfe6f](https://github.com/rizen/pixi-glyphs/commit/b4dfe6fe76703dc8c297f14aaaea2ace2ab27871))
 
 ### [5.0.5](https://github.com/rizen/pixi-glyphs/compare/v5.0.4...v5.0.5) (2025-12-09)
 

@@ -2120,6 +2120,302 @@ const glyphs = new (window.Glyphs.Glyphs)(text, styles, {
     }
   },
 
+  bounds: {
+    title: "Bounds",
+    description: "Demonstrates getLocalBounds() accuracy with wordWrapWidth when drawWhitespace is enabled",
+    code: `// Test text that will wrap
+const text = "and then there were more words that needed to wrap. so many more words. that maybe we need to wrap more and more";
+
+// Test with wordWrapWidth = 100
+const wordWrapWidth = 100;
+
+const styles = {
+  default: {
+    fontSize: 11,
+    fontFamily: 'Arial, sans-serif',
+    wordWrap: true,
+    wordWrapWidth: wordWrapWidth,
+    fill: 0x000000
+  }
+};
+
+const glyphs = new (window.Glyphs.Glyphs)(text, styles, {
+  breakLines: true
+});
+
+// Get bounds
+const bounds = glyphs.getLocalBounds();
+
+// Calculate actual max line width from tokens
+function calculateMaxLineWidth(tokens) {
+  let maxLineWidth = 0;
+  for (const line of tokens) {
+    if (Array.isArray(line)) {
+      let lineMinX = Infinity;
+      let lineMaxX = -Infinity;
+      for (const word of line) {
+        if (Array.isArray(word)) {
+          for (const segment of word) {
+            if (segment.bounds) {
+              lineMinX = Math.min(lineMinX, segment.bounds.x);
+              lineMaxX = Math.max(lineMaxX, segment.bounds.x + segment.bounds.width);
+            }
+          }
+        }
+      }
+      if (lineMinX !== Infinity) {
+        const lineWidth = lineMaxX - lineMinX;
+        maxLineWidth = Math.max(maxLineWidth, lineWidth);
+      }
+    }
+  }
+  return maxLineWidth;
+}
+
+const actualMaxLineWidth = calculateMaxLineWidth(glyphs.tokens);
+
+// Log results
+console.log('=== pixi-glyphs bounds bug demonstration ===');
+console.log('wordWrapWidth:', wordWrapWidth);
+console.log('getLocalBounds().width:', bounds.width.toFixed(2));
+console.log('Actual max line width from tokens:', actualMaxLineWidth.toFixed(2));
+console.log('Overflow:', (bounds.width - wordWrapWidth).toFixed(2));`,
+    init: function() {
+      const Glyphs = window.Glyphs.Glyphs;
+
+      // Test text that will wrap
+      const text = "and then there were more words that needed to wrap. so many more words. that maybe we need to wrap more and more";
+
+      // Default values - using fontSize 11 as in the bug report
+      let wordWrapWidth = 100;
+      let fontSize = 11;
+      let drawWhitespace = true; // This option triggers the bug
+
+      const createGlyphs = (wwWidth, fSize, drawWS) => {
+        const styles = {
+          default: {
+            fontSize: fSize,
+            fontFamily: 'Arial, sans-serif',
+            wordWrap: true,
+            wordWrapWidth: wwWidth,
+            fill: 0xFFFFFF
+          }
+        };
+
+        return new Glyphs(text, styles, {
+          breakLines: true,
+          drawWhitespace: drawWS
+        });
+      };
+
+      // Calculate actual max line width from tokens
+      const calculateMaxLineWidth = (tokens) => {
+        let maxLineWidth = 0;
+        for (const line of tokens) {
+          if (Array.isArray(line)) {
+            let lineMinX = Infinity;
+            let lineMaxX = -Infinity;
+            for (const word of line) {
+              if (Array.isArray(word)) {
+                for (const segment of word) {
+                  if (segment.bounds) {
+                    lineMinX = Math.min(lineMinX, segment.bounds.x);
+                    lineMaxX = Math.max(lineMaxX, segment.bounds.x + segment.bounds.width);
+                  }
+                }
+              }
+            }
+            if (lineMinX !== Infinity) {
+              const lineWidth = lineMaxX - lineMinX;
+              maxLineWidth = Math.max(maxLineWidth, lineWidth);
+            }
+          }
+        }
+        return maxLineWidth;
+      };
+
+      // Create container
+      const container = new PIXI.Container();
+
+      let glyphs = createGlyphs(wordWrapWidth, fontSize, drawWhitespace);
+      container.addChild(glyphs);
+
+      // Create graphics for visual indicators
+      let graphics = new PIXI.Graphics();
+      container.addChild(graphics);
+
+      // Info text display
+      let infoText = null;
+
+      const updateDisplay = () => {
+        // Remove old glyphs and graphics
+        container.removeChild(glyphs);
+        container.removeChild(graphics);
+        if (infoText) {
+          container.removeChild(infoText);
+        }
+
+        // Recreate glyphs
+        glyphs = createGlyphs(wordWrapWidth, fontSize, drawWhitespace);
+        container.addChild(glyphs);
+
+        // Get measurements
+        const bounds = glyphs.getLocalBounds();
+        const actualMaxLineWidth = calculateMaxLineWidth(glyphs.tokens);
+        const overflow = bounds.width - wordWrapWidth;
+
+        // Recreate graphics
+        graphics = new PIXI.Graphics();
+
+        // Draw wordWrapWidth boundary (green dashed line)
+        graphics.setStrokeStyle({ width: 2, color: 0x00FF00 });
+        const dashLength = 5;
+        const gapLength = 3;
+        let y = 0;
+        const height = bounds.height + 20;
+        while (y < height) {
+          graphics.moveTo(wordWrapWidth, y);
+          graphics.lineTo(wordWrapWidth, Math.min(y + dashLength, height));
+          y += dashLength + gapLength;
+        }
+        graphics.stroke();
+
+        // Draw actual bounds (red solid line)
+        graphics.setStrokeStyle({ width: 2, color: 0xFF0000 });
+        graphics.rect(bounds.x, bounds.y, bounds.width, bounds.height);
+        graphics.stroke();
+
+        // Draw actual max line width from tokens (blue dashed line)
+        graphics.setStrokeStyle({ width: 2, color: 0x4488FF });
+        y = 0;
+        while (y < height) {
+          graphics.moveTo(actualMaxLineWidth, y);
+          graphics.lineTo(actualMaxLineWidth, Math.min(y + dashLength, height));
+          y += dashLength + gapLength;
+        }
+        graphics.stroke();
+
+        container.addChild(graphics);
+
+        // Create info display using PIXI.Text
+        const infoString = [
+          `wordWrapWidth: ${wordWrapWidth}px`,
+          `fontSize: ${fontSize}px`,
+          `drawWhitespace: ${drawWhitespace}`,
+          ``,
+          `getLocalBounds().width: ${bounds.width.toFixed(2)}px`,
+          `Actual max line width: ${actualMaxLineWidth.toFixed(2)}px`,
+          ``,
+          `Overflow: ${overflow.toFixed(2)}px`,
+          overflow > 0 ? `BUG: bounds exceed wordWrapWidth!` : `OK: bounds within wordWrapWidth`
+        ].join('\n');
+
+        infoText = new PIXI.Text({
+          text: infoString,
+          style: {
+            fontFamily: 'Arial',
+            fontSize: 14,
+            fill: overflow > 0 ? 0xFF6666 : 0x66FF66,
+            align: 'left'
+          }
+        });
+        infoText.x = 0;
+        infoText.y = bounds.height + 40;
+        container.addChild(infoText);
+
+        // Console log
+        console.log('=== pixi-glyphs bounds bug demonstration ===');
+        console.log('wordWrapWidth:', wordWrapWidth);
+        console.log('fontSize:', fontSize);
+        console.log('drawWhitespace:', drawWhitespace);
+        console.log('getLocalBounds().width:', bounds.width.toFixed(2));
+        console.log('Actual max line width from tokens:', actualMaxLineWidth.toFixed(2));
+        console.log('Overflow:', overflow.toFixed(2));
+        if (overflow > 0) {
+          console.log('BUG: getLocalBounds().width exceeds wordWrapWidth by', overflow.toFixed(2), 'px');
+        }
+      };
+
+      // Initial display
+      updateDisplay();
+
+      // Create interactive controls
+      setTimeout(() => {
+        const canvasSection = document.querySelector('.canvas-section');
+        if (canvasSection) {
+          // Remove any existing controls
+          const existing = canvasSection.querySelector('.demo-controls');
+          if (existing) {
+            existing.remove();
+          }
+
+          const controlsDiv = document.createElement('div');
+          controlsDiv.className = 'demo-controls';
+          controlsDiv.style.cssText = 'margin-top: 20px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 5px; color: white; font-family: Arial; font-size: 14px;';
+          controlsDiv.innerHTML = `
+            <div style="margin-bottom: 15px;">
+              <label>wordWrapWidth: <span id="wrapwidth-value">${wordWrapWidth}</span>px</label><br>
+              <input type="range" id="wrapwidth-slider" min="50" max="500" value="${wordWrapWidth}" style="width: 300px;">
+            </div>
+            <div style="margin-bottom: 15px;">
+              <label>fontSize: <span id="fontsize-value">${fontSize}</span>px</label><br>
+              <input type="range" id="fontsize-slider" min="8" max="70" value="11" style="width: 300px;">
+            </div>
+            <div style="margin-bottom: 15px;">
+              <label>
+                <input type="checkbox" id="drawwhitespace-checkbox" checked style="margin-right: 8px;">
+                drawWhitespace (this option triggers the bug)
+              </label>
+            </div>
+            <div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 3px;">
+              <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                <div style="width: 20px; height: 3px; background: #00FF00; margin-right: 10px;"></div>
+                <span>wordWrapWidth boundary</span>
+              </div>
+              <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                <div style="width: 20px; height: 3px; background: #FF0000; margin-right: 10px;"></div>
+                <span>getLocalBounds() (red = bug if past green)</span>
+              </div>
+              <div style="display: flex; align-items: center;">
+                <div style="width: 20px; height: 3px; background: #4488FF; margin-right: 10px;"></div>
+                <span>Actual max line width from tokens</span>
+              </div>
+            </div>
+          `;
+
+          canvasSection.appendChild(controlsDiv);
+
+          // Wrap width slider
+          const wrapWidthSlider = document.getElementById('wrapwidth-slider');
+          const wrapWidthValue = document.getElementById('wrapwidth-value');
+          wrapWidthSlider.addEventListener('input', (e) => {
+            wordWrapWidth = parseInt(e.target.value);
+            wrapWidthValue.textContent = wordWrapWidth;
+            updateDisplay();
+          });
+
+          // Font size slider
+          const fontSizeSlider = document.getElementById('fontsize-slider');
+          const fontSizeValue = document.getElementById('fontsize-value');
+          fontSizeSlider.addEventListener('input', (e) => {
+            fontSize = parseInt(e.target.value);
+            fontSizeValue.textContent = fontSize;
+            updateDisplay();
+          });
+
+          // drawWhitespace checkbox
+          const drawWhitespaceCheckbox = document.getElementById('drawwhitespace-checkbox');
+          drawWhitespaceCheckbox.addEventListener('change', (e) => {
+            drawWhitespace = e.target.checked;
+            updateDisplay();
+          });
+        }
+      }, 100);
+
+      return container;
+    }
+  },
+
   giantText: {
     title: "Giant Text",
     description: "Demonstration of large text with custom font and styling",

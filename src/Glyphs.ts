@@ -721,6 +721,12 @@ export class Glyphs<
 
     tokens.forEach((t, index) => {
       if (isTextToken(t)) {
+        // Skip whitespace tokens that have been collapsed (width = 0)
+        // These are trailing whitespace at end of wrapped lines
+        if (isWhitespaceToken(t) && t.bounds.width === 0) {
+          return;
+        }
+
         displayObject = this.createTextFieldForToken(t as TextSegmentToken);
 
         textContainer.addChild(displayObject);
