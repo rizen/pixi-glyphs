@@ -89,8 +89,14 @@ export const addChildrenToContainer = (
   container: PIXI.Container
 ): void => children.forEach((child) => container.addChild(child));
 
-export const cloneSprite = (sprite: PIXI.Sprite): PIXI.Sprite =>
-  new PIXI.Sprite(sprite.texture);
+export const cloneSprite = (sprite: PIXI.Sprite): PIXI.Sprite => {
+  const clone = new PIXI.Sprite(sprite.texture);
+  // Ensure linear filtering for smooth scaling
+  if (clone.texture?.source) {
+    clone.texture.source.scaleMode = "linear";
+  }
+  return clone;
+};
 
 export const fontSizeStringToNumber = (size: string): number => {
   const [valueString, unit] = size.split(/(%|pt|px|r?em)/);

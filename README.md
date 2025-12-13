@@ -148,6 +148,15 @@ The third parameter in the Glyphs constructor is a set of options.
 - `debugConsole` - If `true`, logs debug information to the console during `draw()`. default is `false`.
 - `splitStyle` - Allows you to specify how the text should be split into `PIXI.Text` objects when rendered. This would affect things like animations that operate on each individual piece of text within the component. Possible values are are `"words"` (default) and `"characters"`.
 - `imgMap` - An object that maps string ids like `"myImage"` to Sprite objects like `PIXI.Sprite.from("./myImage.png")`. This id will be used in the `imgSrc` style property to make a tag with that id render the sprite. As of v2.1.4, in addition to Sprites, you can also use any value supported by `Sprite.from()` or `Texture.from()` (including ImageHTMLElement or url strings). When a style contains `imgSrc="myImage"`, the matching sprite is used. By default, each of the keys you provide here will automatically be added as a style in the `tagStyles` (equivalent to `{ myImage: { imgSrc: "myImage"}}`) so you can add a tag `<myImage />`. default is `{}`.
+
+  **Note on icon scaling:** pixi-glyphs automatically enables linear filtering and mipmaps on textures to ensure icons scale smoothly. However, if a texture has already been rendered to the GPU before being passed to pixi-glyphs, mipmaps may not generate correctly. If you experience pixelated icons, load your textures with mipmaps enabled:
+  ```javascript
+  const texture = await PIXI.Assets.load({
+    src: 'icon.png',
+    data: { scaleMode: 'linear', autoGenerateMipmaps: true }
+  });
+  const icon = new PIXI.Sprite(texture);
+  ```
 - `adjustFontBaseline` - For fonts that do not align correctly with the baseline, this adjusts the position of the text relative to the baseline. This should be an object with font names for keys and a value which is a string percentage (of the font's _ascent_, or height above the baseline) or a numerical value in pixels to adjust the offset. E.g. `{"arial": "80%"}`. Since this value changes for each `fontFamily` and for each `fontSize` it's recomended that you use the percentage values. Default is no adjustments.
 - `scaleIcons` - When `true`, images in the imgMap that use `imgDisplay: icon` will scale with the text when `fontScaleWidth` or `fontScaleHeight` are set. Default is `true`.
 - `drawWhitespace` - When `true`, whitespace characters are rendered as their own Text objects. Default is `false`.

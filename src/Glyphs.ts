@@ -552,6 +552,10 @@ export class Glyphs<
       // In PIXI v8, listen on the source instead of baseTexture
       if (texture.source) {
         texture.source.addListener("update", onTextureUpdate);
+        // Use linear filtering and mipmaps for smooth icon scaling
+        texture.source.scaleMode = "linear";
+        texture.source.autoGenerateMipmaps = true;
+        texture.source.updateMipmaps();
       }
 
       this.spriteTemplates[key] = sprite;

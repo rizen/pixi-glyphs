@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [5.0.8](https://github.com/rizen/pixi-glyphs/compare/v5.0.7...v5.0.8) (2025-12-13)
 
+- Enabled linear scaling for smoother icon scaling. 
+
 ### [5.0.7](https://github.com/rizen/pixi-glyphs/compare/v5.0.6...v5.0.7) (2025-12-10)
 
 - Added a performance benchmarking tool.

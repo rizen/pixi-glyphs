@@ -122,8 +122,8 @@ async function loadDemo(demoId) {
 
   // Initialize PIXI demo
   const pixiContainer = document.getElementById('pixi-container');
-  // Use white background for webFonts demo
-  const backgroundColor = demoId === 'webFonts' ? 0xFFFFFF : 0x333333;
+  // Use demo-specific background color if provided, otherwise default to dark gray
+  const backgroundColor = demoConfig.backgroundColor ?? (demoId === 'webFonts' ? 0xFFFFFF : 0x333333);
   currentApp = await createPixiApp(pixiContainer, 600, 600, backgroundColor);
 
   // Initialize the demo (handle both sync and async)
@@ -220,8 +220,11 @@ function getFullCode(code, demoId) {
   const width = currentApp?.screen?.width || 600;
   const height = currentApp?.screen?.height || 600;
 
-  // Determine background color based on demo
-  const backgroundColor = demoId === 'webFonts' ? '0xFFFFFF' : '0x333333';
+  // Determine background color based on demo config or fallback
+  const demoConfig = demos[demoId];
+  const backgroundColor = demoConfig?.backgroundColor !== undefined
+    ? '0x' + demoConfig.backgroundColor.toString(16).toUpperCase().padStart(6, '0')
+    : (demoId === 'webFonts' ? '0xFFFFFF' : '0x333333');
 
   // Check if the demo uses async/await (for texture loading)
   const needsAsync = code.includes('await') || code.includes('PIXI.Assets.load') || demoId === 'webFonts';
