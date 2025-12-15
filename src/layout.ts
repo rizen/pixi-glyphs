@@ -575,7 +575,10 @@ export const verticalAlignInLines = (
     paragraphModifier = 0;
 
     const lastToken = line[line.length - 1][0];
-    if (isNewlineToken(lastToken)) {
+    // Only apply paragraphSpacing for truly empty lines (paragraph breaks from \n\n)
+    // A line with just whitespace (like \n \n) should NOT trigger paragraph spacing
+    const isEmptyLine = line.flat(2).every(seg => isNewlineToken(seg));
+    if (isNewlineToken(lastToken) && isEmptyLine) {
       // Note, this will get applied on the NEXT line
       paragraphModifier = tallestToken.style.paragraphSpacing ?? 0;
     }

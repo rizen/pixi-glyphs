@@ -876,6 +876,10 @@ const glyphs = new (window.Glyphs.Glyphs)(text, styles, options);`,
               <label>Paragraph Spacing: <span id="paragraph-value">40</span>px</label><br>
               <input type="range" id="paragraph-spacing" min="0" max="100" value="40" style="width: 300px;">
             </div>
+            <div style="margin-top: 15px;">
+              <label>Text:</label><br>
+              <textarea id="text-input" style="width: 300px; height: 100px; margin-top: 5px; font-family: Arial; font-size: 12px; padding: 8px; border-radius: 4px; border: 1px solid #555; background: #222; color: white; resize: vertical;">You can <narrow>set line and letter spacing</narrow> to <wide>give your text some drama.</wide>\nThis line demonstrates lineSpacing between lines in the same paragraph.\n\nNotice the extra spacing between paragraphs from paragraphSpacing.\nParagraph spacing only applies between different paragraphs.</textarea>
+            </div>
           `;
 
           canvasSection.appendChild(controlsDiv);
@@ -934,6 +938,14 @@ const glyphs = new (window.Glyphs.Glyphs)(text, styles, options);`,
               ...glyphs.defaultStyle,
               paragraphSpacing: paragraphSpacing
             });
+          });
+
+          // Text input textarea
+          const textInput = document.getElementById('text-input');
+          textInput.addEventListener('input', (e) => {
+            // Convert escaped \n to actual newlines
+            const newText = e.target.value.replace(/\\n/g, '\n');
+            glyphs.setText(newText);
           });
         }
       }, 100);

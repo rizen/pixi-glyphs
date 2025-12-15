@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [5.0.9](https://github.com/rizen/pixi-glyphs/compare/v5.0.8...v5.0.9) (2025-12-15)
 
+- Updated the Spacing demo to be able to change the text.
+- Fixed a bug in paragraph spacing where \n was treated the same as \n\n, and \n \n. Now those 3 things are different.
+
 ### [5.0.8](https://github.com/rizen/pixi-glyphs/compare/v5.0.7...v5.0.8) (2025-12-13)
 
 - Enabled linear scaling for smoother icon scaling. 
