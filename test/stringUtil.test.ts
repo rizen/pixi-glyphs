@@ -1,5 +1,9 @@
 import { isOnlyWhitespace } from "./../src/stringUtil";
 import * as stringUtil from "../src/stringUtil";
+import {
+  escapeTagCharacters,
+  unescapeTagCharacters,
+} from "../src/stringUtil";
 
 describe("srtingUtil", () => {
   describe("capitalize()", () => {
@@ -75,6 +79,57 @@ describe("srtingUtil", () => {
       expect(f("-1-1")).toBeFalsy();
       expect(f("1-1")).toBeFalsy();
       expect(f("1-")).toBeFalsy();
+    });
+  });
+
+  describe("escapeTagCharacters()", () => {
+    it("Should replace \\< with placeholder", () => {
+      expect(escapeTagCharacters("\\<")).toBe("__ESCAPED_LT__");
+      expect(escapeTagCharacters("Hello \\<b\\>")).toBe(
+        "Hello __ESCAPED_LT__b__ESCAPED_GT__"
+      );
+    });
+    it("Should replace \\> with placeholder", () => {
+      expect(escapeTagCharacters("\\>")).toBe("__ESCAPED_GT__");
+    });
+    it("Should replace \\\\ with placeholder", () => {
+      expect(escapeTagCharacters("\\\\")).toBe("__ESCAPED_BACKSLASH__");
+    });
+    it("Should handle multiple escapes", () => {
+      expect(escapeTagCharacters("\\<\\>\\<\\>")).toBe(
+        "__ESCAPED_LT____ESCAPED_GT____ESCAPED_LT____ESCAPED_GT__"
+      );
+    });
+    it("Should handle escaped backslash before bracket", () => {
+      expect(escapeTagCharacters("\\\\<b>")).toBe("__ESCAPED_BACKSLASH__<b>");
+    });
+    it("Should not affect unescaped brackets", () => {
+      expect(escapeTagCharacters("<b>text</b>")).toBe("<b>text</b>");
+    });
+  });
+
+  describe("unescapeTagCharacters()", () => {
+    it("Should restore < from placeholder", () => {
+      expect(unescapeTagCharacters("__ESCAPED_LT__")).toBe("<");
+    });
+    it("Should restore > from placeholder", () => {
+      expect(unescapeTagCharacters("__ESCAPED_GT__")).toBe(">");
+    });
+    it("Should restore \\ from placeholder", () => {
+      expect(unescapeTagCharacters("__ESCAPED_BACKSLASH__")).toBe("\\");
+    });
+    it("Should restore multiple placeholders", () => {
+      expect(
+        unescapeTagCharacters(
+          "Hello __ESCAPED_LT__b__ESCAPED_GT__world"
+        )
+      ).toBe("Hello <b>world");
+    });
+    it("Should be the inverse of escapeTagCharacters", () => {
+      const input = "Hello \\<b\\> world \\\\<real>";
+      expect(unescapeTagCharacters(escapeTagCharacters(input))).toBe(
+        "Hello <b> world \\<real>"
+      );
     });
   });
 });

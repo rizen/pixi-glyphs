@@ -39,6 +39,7 @@ You can get the text with tags stripped out with the `.untaggedText` implicit ge
 - Attibutes added to tags will override any existing styles on the tag. `<b>bold</b> <b fontStyle="italic">bold italic</b>`
 - Tags that do not have a matching style are NOT treated as tags. `<i><bold>just italic!</bold></i>` would render as _&lt;bold&gt;just italic!&lt;/bold&gt;_ if there were a style for `i` but not `bold`.
 - No tag definitions are included by default. e.g. `<b>` won't be bold unless you include a style for `b` tags.
+- Use backslash to escape tag characters and display them literally: `\<` renders as `<` and `\>` renders as `>`. For example, `\<b\>` displays the literal text `<b>` instead of being parsed as a tag. Use `\\` to display a literal backslash before a `<` or `>`.
 
 #### Styles
 

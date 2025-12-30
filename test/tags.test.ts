@@ -479,5 +479,40 @@ describe("tags module", () => {
         }).toThrow(/.*attribute.*/g);
       });
     });
+
+    describe("Escaped Characters", () => {
+      it("Should render escaped tags as literal text", () => {
+        expect(tags.parseTagsNew("Hello \\<b\\>world", ["b"])).toMatchObject({
+          children: ["Hello <b>world"],
+        });
+      });
+      it("Should handle mixed escaped and real tags", () => {
+        expect(
+          tags.parseTagsNew("\\<b\\>bold<b>text</b>", ["b"])
+        ).toMatchObject({
+          children: ["<b>bold", { tag: "b", children: ["text"] }],
+        });
+      });
+      it("Should handle escaped closing tag inside real tag", () => {
+        expect(tags.parseTagsNew("<b>\\</b\\></b>", ["b"])).toMatchObject({
+          children: [{ tag: "b", children: ["</b>"] }],
+        });
+      });
+      it("Should handle escaped backslash before real tag", () => {
+        expect(tags.parseTagsNew("\\\\<b>text</b>", ["b"])).toMatchObject({
+          children: ["\\", { tag: "b", children: ["text"] }],
+        });
+      });
+      it("Should handle just escaped brackets", () => {
+        expect(tags.parseTagsNew("\\<\\>", [])).toMatchObject({
+          children: ["<>"],
+        });
+      });
+      it("Should handle escaped tags with no tag styles defined", () => {
+        expect(tags.parseTagsNew("Show \\<this\\> text", [])).toMatchObject({
+          children: ["Show <this> text"],
+        });
+      });
+    });
   });
 });

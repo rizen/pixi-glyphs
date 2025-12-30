@@ -3,6 +3,10 @@ import { logWarning } from "./errorMessaging";
 
 import { last } from "./functionalUtils";
 import {
+  escapeTagCharacters,
+  unescapeTagCharacters,
+} from "./stringUtil";
+import {
   TagMatchData,
   AttributesList,
   TagWithAttributes,
@@ -280,6 +284,24 @@ export const containsEmoji = (input: string): boolean =>
   getEmojiRegex().test(input);
 
 /**
+ * Recursively restores escaped characters in text tokens.
+ */
+const unescapeTokens = (
+  tokens: (TagToken | TextToken)[]
+): (TagToken | TextToken)[] => {
+  return tokens.map((token) => {
+    if (typeof token === "string") {
+      return unescapeTagCharacters(token);
+    }
+    // Recursively process children
+    return {
+      ...token,
+      children: unescapeTokens(token.children),
+    };
+  });
+};
+
+/**
  * Converts a string into a list of tokens that match segments of text with styles.
  *
  * @param input Input string with XML-style tags.
@@ -293,6 +315,9 @@ export const parseTagsNew = (
   logWarningFunction = defaultLogWarning
 ): CompositeToken<TagToken | TextToken> => {
   // TODO: Warn the user if tags were found that are not defined in the tagStyles.
+
+  // Replace escaped tag characters with placeholders before any processing
+  input = escapeTagCharacters(input);
 
   if (shouldWrapEmoji && containsEmoji(input)) {
     input = wrapEmoji(input);
@@ -314,5 +339,8 @@ export const parseTagsNew = (
 
   const tokens = createTokensNew(segments, tagMatches, logWarningFunction);
 
-  return { children: tokens };
+  // Restore escaped characters in all text tokens
+  const unescapedTokens = unescapeTokens(tokens);
+
+  return { children: unescapedTokens };
 };
