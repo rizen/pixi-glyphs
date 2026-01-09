@@ -1122,12 +1122,15 @@ export const calculateTokens = (
         // Stroke is handled in verticalAlignInLines for line height calculation
 
         if (isIcon) {
-          // Set to minimum of 1 to avoid devide by zero.
-          // if it's height is zero or one it probably hasn't loaded yet.
+          // Reset scale to get original sprite dimensions for recalculation
+          sprite.scale.set(1);
+
+          // Set to minimum of 1 to avoid divide by zero.
+          // If height is zero or one it probably hasn't loaded yet.
           // It will get refreshed after it loads.
           const h = Math.max(sprite.height, 1);
 
-          if (h > 1 && sprite.scale.y === 1) {
+          if (h > 1) {
             const { iconScale = 1.0 } = style;
             // Use fontSize directly for more consistent scaling
             // The ascent measurement is too small in PIXI v8 compared to v6
@@ -1135,7 +1138,6 @@ export const calculateTokens = (
             const ratio =
               (effectiveFontSize / h) * ICON_SCALE_BASE * iconScale;
             sprite.scale.set(ratio);
-
           }
 
           if (scaleIcons) {

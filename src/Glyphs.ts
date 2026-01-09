@@ -212,6 +212,10 @@ export class Glyphs<
     if (this._cachedTagKeys !== null && this.tagStyles[tag] === undefined) {
       this._cachedTagKeys = null;
     }
+
+    // Clear style cache since a style changed - cached combined styles are now stale
+    this._styleCache = {};
+
     this.tagStyles[tag] = styles;
 
     // TODO: warn user when trying to set styles on a tag that doesn't support it...

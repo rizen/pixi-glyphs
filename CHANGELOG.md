@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [5.0.11](https://github.com/rizen/pixi-glyphs/compare/v5.0.10...v5.0.11) (2026-01-09)
 
+- Fixed a problem with scaling icons when scaling styles.
+
 ### [5.0.10](https://github.com/rizen/pixi-glyphs/compare/v5.0.9...v5.0.10) (2025-12-30)
 
 - Added the ability to use backslashes to escape tags for easy display of tags.
