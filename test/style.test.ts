@@ -504,20 +504,13 @@ describe("style module", () => {
             },
           ],
         };
-        const result = {
-          children: [
-            "foo ",
-            {
-              style: styles.img,
-              tags: "img",
-              children: [icon],
-            },
-          ],
-        };
 
-        expect(style.mapTagsToStyles(input, styles, imageMap)).toMatchObject(
-          result
-        );
+        const mapped = style.mapTagsToStyles(input, styles, imageMap);
+        expect(mapped.children[0]).toBe("foo ");
+        const imgNode = mapped.children[1] as { style: unknown; tags: string; children: unknown[] };
+        expect(imgNode.style).toMatchObject(styles.img);
+        expect(imgNode.tags).toBe("img");
+        expect(imgNode.children[0]).toBeInstanceOf(PIXI.Sprite);
       });
       it("Should place text inside an image tag to the right of the image.", () => {
         const input = {
@@ -528,19 +521,13 @@ describe("style module", () => {
             },
           ],
         };
-        const result = {
-          children: [
-            {
-              style: styles.img,
-              tags: "img",
-              children: [icon, "text inside img tag"],
-            },
-          ],
-        };
 
-        expect(style.mapTagsToStyles(input, styles, imageMap)).toMatchObject(
-          result
-        );
+        const mapped = style.mapTagsToStyles(input, styles, imageMap);
+        const imgNode = mapped.children[0] as { style: unknown; tags: string; children: unknown[] };
+        expect(imgNode.style).toMatchObject(styles.img);
+        expect(imgNode.tags).toBe("img");
+        expect(imgNode.children[0]).toBeInstanceOf(PIXI.Sprite);
+        expect(imgNode.children[1]).toBe("text inside img tag");
       });
     });
 
@@ -995,9 +982,10 @@ describe("style module", () => {
             fontProps
           );
 
+          // v8 formula: offset + ascent + descent/2 + 4
           expect(metrics[0].bounds).toHaveProperty(
             "y",
-            fontProps.ascent + offset + fontProps.descent / 2
+            fontProps.ascent + offset + fontProps.descent / 2 + 4
           );
         });
         it("Should position overline above the ascent.", () => {
@@ -1006,18 +994,21 @@ describe("style module", () => {
             wordBounds,
             fontProps
           );
-          expect(metrics[0].bounds).toHaveProperty("y", 0 + offset);
+          // v8 formula: offset + 1
+          expect(metrics[0].bounds).toHaveProperty("y", offset + 1);
         });
-        it("Should position lineThrough halfway through the xHeight.", () => {
+        it("Should position lineThrough halfway between overline and underline.", () => {
           const metrics = style.extractDecorations(
             lineThrough,
             wordBounds,
             fontProps
           );
-          const xHeight = fontProps.ascent - fontProps.descent;
+          // v8 formula: offset + (1 + ascent + descent/2 + 4) / 2
+          const overlineY = 1;
+          const underlineY = fontProps.ascent + fontProps.descent / 2 + 4;
           expect(metrics[0].bounds).toHaveProperty(
             "y",
-            fontProps.ascent - xHeight / 2 + offset
+            offset + (overlineY + underlineY) / 2
           );
         });
       });

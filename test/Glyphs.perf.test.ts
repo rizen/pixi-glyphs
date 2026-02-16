@@ -1,4 +1,4 @@
-import Glyphs from "../src/Glyphs";
+import { Glyphs } from "../src/Glyphs";
 
 describe("Glyphs - performance", () => {
   describe("skipUpdates & skipDraw", () => {

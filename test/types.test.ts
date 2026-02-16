@@ -151,21 +151,21 @@ describe("Type validation", () => {
       });
     });
     describe("isBaseTexture()", () => {
-      it("Should return true if the object is a pixi base texture", () => {
-        expect(isBaseTexture(new PIXI.BaseTexture())).toBeTruthy();
+      it("Should return true if the object is a pixi Texture", () => {
+        expect(isBaseTexture(new PIXI.Texture())).toBeTruthy();
       });
     });
     describe("isTextureSource()", () => {
       it("Should return true if the object can be used as the source for a texture.", () => {
         expect(isTextureSource(new Image())).toBeTruthy();
-        expect(isTextureSource(new PIXI.BaseTexture())).toBeTruthy();
+        expect(isTextureSource(new PIXI.Texture())).toBeTruthy();
       });
     });
     describe("isSpriteSource()", () => {
       it("Should return true if the object is any kind of sprite source.", () => {
         expect(isSpriteSource("my url")).toBeTruthy();
         expect(
-          isSpriteSource(new PIXI.Texture(new PIXI.BaseTexture()))
+          isSpriteSource(new PIXI.Texture())
         ).toBeTruthy();
         expect(isSpriteSource(document.createElement("canvas"))).toBeTruthy();
         expect(isSpriteSource(document.createElement("video"))).toBeTruthy();
