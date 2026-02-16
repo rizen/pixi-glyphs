@@ -407,9 +407,9 @@ export class Glyphs<
   public destroy(options?: boolean | PIXI.DestroyOptions): void {
     let destroyOptions: PIXI.DestroyOptions;
     if (options === undefined || options === true) {
-      destroyOptions = {};
-    } else if (options === false) {
       destroyOptions = DEFAULT_DESTROY_OPTIONS;
+    } else if (options === false) {
+      destroyOptions = { children: false, texture: false, textureSource: false, context: false };
     } else {
       destroyOptions = { ...DEFAULT_DESTROY_OPTIONS, ...options };
     }
