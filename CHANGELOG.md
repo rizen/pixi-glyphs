@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.0.12](https://github.com/rizen/pixi-glyphs/compare/v5.0.11...v5.0.12) (2026-02-16)
+
 ### [5.0.11](https://github.com/rizen/pixi-glyphs/compare/v5.0.10...v5.0.11) (2026-01-09)
 
 - Fixed a problem with scaling icons when scaling styles.
