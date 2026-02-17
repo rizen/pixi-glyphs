@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [5.1.1](https://github.com/rizen/pixi-glyphs/compare/v5.1.0...v5.1.1) (2026-02-17)
 
+- Fixed Highlights so that they also cover in-line images.
+
 ## [5.1.0](https://github.com/rizen/pixi-glyphs/compare/v5.0.12...v5.1.0) (2026-02-17)
 
 - Added new properties to change highlights. 

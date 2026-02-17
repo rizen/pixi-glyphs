@@ -716,7 +716,7 @@ export class Glyphs<
     let i = 0;
     while (i < tokensFlat.length) {
       const token = tokensFlat[i];
-      if (isTextToken(token) && token.style.highlightColor !== undefined) {
+      if (token.style.highlightColor !== undefined) {
         const highlightColor = token.style.highlightColor;
         const highlightSpaces = token.style.highlightSpaces !== false;
         const roundness = token.style.highlightRoundness ?? 0;
@@ -738,9 +738,8 @@ export class Glyphs<
         while (j < tokensFlat.length) {
           const nextToken = tokensFlat[j];
 
-          // Must be a text token with same highlight color on same line
-          if (!isTextToken(nextToken) ||
-              nextToken.style.highlightColor !== highlightColor ||
+          // Must have same highlight color and be on same line
+          if (nextToken.style.highlightColor !== highlightColor ||
               Math.abs(nextToken.bounds.y - token.bounds.y) >= 5) {
             break;
           }

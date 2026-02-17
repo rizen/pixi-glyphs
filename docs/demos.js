@@ -1747,7 +1747,7 @@ const styles = {
 const glyphs = new (window.Glyphs.Glyphs)(text, styles);
 
 // Interactive highlight options demo (displayed below)
-const text2 = "The <hl>quick brown fox jumps over the lazy dog</hl> and then " +
+const text2 = "The <hl>quick brown fox <icon/> jumps over the lazy dog</hl> and then " +
   "the <hl>fox ran through the forest</hl> to find its den.\\n\\n" +
   "You can also <hl>highlight individual words</hl> with different settings.";
 
@@ -1765,12 +1765,21 @@ const styles2 = {
     highlightRoundness: 0,
     highlightAlpha: 1,
     highlightSpaces: true
+  },
+  icon: {
+    imgSrc: "thinking",
+    imgDisplay: "icon"
   }
 };
 
-const glyphs2 = new (window.Glyphs.Glyphs)(text2, styles2);
+const glyphs2 = new (window.Glyphs.Glyphs)(text2, styles2, {
+  imgMap: { thinking }
+});
 // Use controls to adjust: highlightColor, highlightRoundness, highlightAlpha, highlightSpaces`,
-    init: function() {
+    init: async function() {
+      await PIXI.Assets.load(['icon.png']);
+      const thinking = PIXI.Texture.from("icon.png");
+
       const text = "You can <yellow>highlight text</yellow> to make it stand out!\n\n" +
         "Use <blue>different colors</blue> for <green>different meanings</green>.\n" +
         "Combine highlights with <bold>other styles</bold> like <italic>italic text</italic>.\n\n" +
@@ -1831,7 +1840,7 @@ const glyphs2 = new (window.Glyphs.Glyphs)(text2, styles2);
       glyphs1.y = 30;
 
       // Interactive highlight options below
-      const text2 = "The <hl>quick brown fox jumps over the lazy dog</hl> and then " +
+      const text2 = "The <hl>quick brown fox <icon/> jumps over the lazy dog</hl> and then " +
         "the <hl>fox ran through the forest</hl> to find its den.\n\n" +
         "You can also <hl>highlight individual words</hl> with different settings.";
 
@@ -1849,10 +1858,16 @@ const glyphs2 = new (window.Glyphs.Glyphs)(text2, styles2);
           highlightRoundness: 0,
           highlightAlpha: 1,
           highlightSpaces: true
+        },
+        icon: {
+          imgSrc: "thinking",
+          imgDisplay: "icon"
         }
       };
 
-      const glyphs2 = new Glyphs(text2, styles2);
+      const glyphs2 = new Glyphs(text2, styles2, {
+        imgMap: { thinking }
+      });
       glyphs2.x = 30;
       glyphs2.y = 330;
 
