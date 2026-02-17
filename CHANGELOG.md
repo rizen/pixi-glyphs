@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.1.1](https://github.com/rizen/pixi-glyphs/compare/v5.1.0...v5.1.1) (2026-02-17)
+
 ## [5.1.0](https://github.com/rizen/pixi-glyphs/compare/v5.0.12...v5.1.0) (2026-02-17)
 
 - Added new properties to change highlights. 
