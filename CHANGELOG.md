@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [5.1.0](https://github.com/rizen/pixi-glyphs/compare/v5.0.12...v5.1.0) (2026-02-17)
 
+- Added new properties to change highlights. 
+
 ### [5.0.12](https://github.com/rizen/pixi-glyphs/compare/v5.0.11...v5.0.12) (2026-02-16)
 
 - Fixed a reference count problem on Canvas text. Bottom line, this is a huge memory improvement because we are no longer creating orphans. 

@@ -1744,7 +1744,32 @@ const styles = {
   }
 };
 
-const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
+const glyphs = new (window.Glyphs.Glyphs)(text, styles);
+
+// Interactive highlight options demo (displayed below)
+const text2 = "The <hl>quick brown fox jumps over the lazy dog</hl> and then " +
+  "the <hl>fox ran through the forest</hl> to find its den.\\n\\n" +
+  "You can also <hl>highlight individual words</hl> with different settings.";
+
+const styles2 = {
+  default: {
+    fontFamily: "Arial",
+    fontSize: 24,
+    fill: "#cccccc",
+    wordWrap: true,
+    wordWrapWidth: 550
+  },
+  hl: {
+    highlightColor: "#FFEB3B",
+    fill: "#000000",
+    highlightRoundness: 0,
+    highlightAlpha: 1,
+    highlightSpaces: true
+  }
+};
+
+const glyphs2 = new (window.Glyphs.Glyphs)(text2, styles2);
+// Use controls to adjust: highlightColor, highlightRoundness, highlightAlpha, highlightSpaces`,
     init: function() {
       const text = "You can <yellow>highlight text</yellow> to make it stand out!\n\n" +
         "Use <blue>different colors</blue> for <green>different meanings</green>.\n" +
@@ -1801,7 +1826,112 @@ const glyphs = new (window.Glyphs.Glyphs)(text, styles);`,
       };
 
       const Glyphs = window.Glyphs.Glyphs;
-      return new Glyphs(text, styles);
+      const glyphs1 = new Glyphs(text, styles);
+      glyphs1.x = 30;
+      glyphs1.y = 30;
+
+      // Interactive highlight options below
+      const text2 = "The <hl>quick brown fox jumps over the lazy dog</hl> and then " +
+        "the <hl>fox ran through the forest</hl> to find its den.\n\n" +
+        "You can also <hl>highlight individual words</hl> with different settings.";
+
+      const styles2 = {
+        default: {
+          fontFamily: "Arial",
+          fontSize: 24,
+          fill: "#cccccc",
+          wordWrap: true,
+          wordWrapWidth: 550
+        },
+        hl: {
+          highlightColor: "#FFEB3B",
+          fill: "#000000",
+          highlightRoundness: 0,
+          highlightAlpha: 1,
+          highlightSpaces: true
+        }
+      };
+
+      const glyphs2 = new Glyphs(text2, styles2);
+      glyphs2.x = 30;
+      glyphs2.y = 330;
+
+      // Create interactive controls for the second Glyphs instance
+      setTimeout(() => {
+        const canvasSection = document.querySelector('.canvas-section');
+        if (canvasSection) {
+          const existing = canvasSection.querySelector('.demo-controls');
+          if (existing) {
+            existing.remove();
+          }
+
+          const controlsDiv = document.createElement('div');
+          controlsDiv.className = 'demo-controls';
+          controlsDiv.style.cssText = 'margin-top: 20px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 5px; color: white; font-family: Arial; font-size: 14px;';
+          controlsDiv.innerHTML = `
+            <div style="margin-bottom: 10px;">
+              <label>Highlight Color:</label>
+              <input type="color" id="hl-color" value="#FFEB3B" style="vertical-align: middle; margin-left: 8px;">
+            </div>
+            <div style="margin-bottom: 10px;">
+              <label>Roundness: <span id="roundness-value">0</span>px</label><br>
+              <input type="range" id="hl-roundness" min="0" max="20" value="0" style="width: 300px;">
+            </div>
+            <div style="margin-bottom: 10px;">
+              <label>Opacity: <span id="alpha-value">100</span>%</label><br>
+              <input type="range" id="hl-alpha" min="0" max="100" value="100" style="width: 300px;">
+            </div>
+            <div style="margin-bottom: 10px;">
+              <label>
+                <input type="checkbox" id="hl-spaces" checked>
+                Highlight Spaces
+              </label>
+            </div>
+          `;
+
+          canvasSection.appendChild(controlsDiv);
+
+          const colorInput = document.getElementById('hl-color');
+          colorInput.addEventListener('input', (e) => {
+            glyphs2.setStyleForTag('hl', {
+              ...glyphs2.tagStyles.hl,
+              highlightColor: e.target.value
+            });
+          });
+
+          const roundnessSlider = document.getElementById('hl-roundness');
+          const roundnessValue = document.getElementById('roundness-value');
+          roundnessSlider.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            roundnessValue.textContent = val;
+            glyphs2.setStyleForTag('hl', {
+              ...glyphs2.tagStyles.hl,
+              highlightRoundness: val
+            });
+          });
+
+          const alphaSlider = document.getElementById('hl-alpha');
+          const alphaValue = document.getElementById('alpha-value');
+          alphaSlider.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            alphaValue.textContent = val;
+            glyphs2.setStyleForTag('hl', {
+              ...glyphs2.tagStyles.hl,
+              highlightAlpha: val / 100
+            });
+          });
+
+          const spacesCheckbox = document.getElementById('hl-spaces');
+          spacesCheckbox.addEventListener('change', (e) => {
+            glyphs2.setStyleForTag('hl', {
+              ...glyphs2.tagStyles.hl,
+              highlightSpaces: e.target.checked
+            });
+          });
+        }
+      }, 100);
+
+      return [glyphs1, glyphs2];
     }
   },
 

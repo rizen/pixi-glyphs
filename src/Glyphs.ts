@@ -15,6 +15,7 @@ import {
   isNotWhitespaceToken,
   isNewlineToken,
   isWhitespaceToken,
+  _isWhitespaceToken,
   Point,
   ParagraphToken,
   TextDecorationMetrics,
@@ -716,8 +717,18 @@ export class Glyphs<
     while (i < tokensFlat.length) {
       const token = tokensFlat[i];
       if (isTextToken(token) && token.style.highlightColor !== undefined) {
-        // Find all consecutive tokens with the same highlight color
         const highlightColor = token.style.highlightColor;
+        const highlightSpaces = token.style.highlightSpaces !== false;
+        const roundness = token.style.highlightRoundness ?? 0;
+        const alpha = token.style.highlightAlpha ?? 1;
+
+        // If spaces are excluded and this token is whitespace, skip it
+        if (!highlightSpaces && _isWhitespaceToken(token)) {
+          i++;
+          continue;
+        }
+
+        // Start a new highlight group
         let startX = token.bounds.x;
         let minY = token.bounds.y;
         let maxY = token.bounds.y + token.bounds.height;
@@ -726,17 +737,23 @@ export class Glyphs<
         let j = i + 1;
         while (j < tokensFlat.length) {
           const nextToken = tokensFlat[j];
-          // Check if next token has the same highlight color and is on the same line
-          if (isTextToken(nextToken) &&
-              nextToken.style.highlightColor === highlightColor &&
-              Math.abs(nextToken.bounds.y - token.bounds.y) < 5) { // Same line check
-            endX = nextToken.bounds.x + nextToken.bounds.width;
-            minY = Math.min(minY, nextToken.bounds.y);
-            maxY = Math.max(maxY, nextToken.bounds.y + nextToken.bounds.height);
-            j++;
-          } else {
+
+          // Must be a text token with same highlight color on same line
+          if (!isTextToken(nextToken) ||
+              nextToken.style.highlightColor !== highlightColor ||
+              Math.abs(nextToken.bounds.y - token.bounds.y) >= 5) {
             break;
           }
+
+          // If spaces excluded and next token is whitespace, break the group
+          if (!highlightSpaces && _isWhitespaceToken(nextToken)) {
+            break;
+          }
+
+          endX = nextToken.bounds.x + nextToken.bounds.width;
+          minY = Math.min(minY, nextToken.bounds.y);
+          maxY = Math.max(maxY, nextToken.bounds.y + nextToken.bounds.height);
+          j++;
         }
 
         // Create a single highlight box for the group
@@ -745,7 +762,9 @@ export class Glyphs<
           startX,
           minY,
           endX - startX,
-          maxY - minY
+          maxY - minY,
+          roundness,
+          alpha
         );
         if (highlight) {
           highlightContainer.addChild(highlight);
@@ -1127,7 +1146,9 @@ export class Glyphs<
     x: number,
     y: number,
     width: number,
-    height: number
+    height: number,
+    roundness?: number,
+    alpha?: number
   ): PIXI.Graphics | null {
     if (!highlightColor || width <= 0 || height <= 0) {
       return null;
@@ -1151,8 +1172,14 @@ export class Glyphs<
     }
 
     // Draw the highlight box
-    highlight.rect(0, 0, width, height)
-      .fill({ color: color as number });
+    const fillStyle = { color: color as number, alpha: alpha ?? 1 };
+    if (roundness && roundness > 0) {
+      highlight.roundRect(0, 0, width, height, roundness)
+        .fill(fillStyle);
+    } else {
+      highlight.rect(0, 0, width, height)
+        .fill(fillStyle);
+    }
 
     // Position the highlight
     highlight.x = x;

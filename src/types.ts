@@ -213,6 +213,9 @@ export interface LineBreakStyles {
 
 export interface HighlightStyles {
   highlightColor?: Color;
+  highlightRoundness?: number;
+  highlightAlpha?: number;
+  highlightSpaces?: boolean;
 }
 
 export interface TextStyleExtended
