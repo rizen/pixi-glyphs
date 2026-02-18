@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [5.1.2](https://github.com/rizen/pixi-glyphs/compare/v5.1.1...v5.1.2) (2026-02-18)
 
+- Fix: When a line's tallest element was an inline icon following a paragraph break, the sprite height override discarded the negative paragraphSpacing modifier, collapsing lines on top of each other.
+
 ### [5.1.1](https://github.com/rizen/pixi-glyphs/compare/v5.1.0...v5.1.1) (2026-02-17)
 
 - Fixed Highlights so that they also cover in-line images.

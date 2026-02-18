@@ -586,7 +586,7 @@ export const verticalAlignInLines = (
       // For sprites, use their full height as the ascent for line spacing
       // Note: baseHeight already includes sprite height from line 554,
       // so we don't need to add descent here
-      tallestAscent = tallestToken.bounds.height;
+      tallestAscent = tallestToken.bounds.height + valignParagraphModifier;
     }
 
     if (tallestHeight === 0) {
