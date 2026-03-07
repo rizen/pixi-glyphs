@@ -969,222 +969,232 @@ export const calculateTokens = (
         style: sizerStyle as any
       });
 
-      if (typeof token === "string") {
-        // split into pieces and convert into tokens.
+      try {
+        if (typeof token === "string") {
+          // split into pieces and convert into tokens.
 
-        const textSegments = splitText(token, splitStyle);
+          const textSegments = splitText(token, splitStyle);
 
-        const textTokens = textSegments.map((str): SegmentToken => {
+          const textTokens = textSegments.map((str): SegmentToken => {
 
-          switch (style.textTransform) {
-            case "uppercase":
-              localSizer.text = str.toUpperCase();
-              break;
-            case "lowercase":
-              localSizer.text = str.toLowerCase();
-              break;
-            case "capitalize":
-              localSizer.text = capitalize(str);
-              break;
-            default:
-              localSizer.text = str;
+            switch (style.textTransform) {
+              case "uppercase":
+                localSizer.text = str.toUpperCase();
+                break;
+              case "lowercase":
+                localSizer.text = str.toLowerCase();
+                break;
+              case "capitalize":
+                localSizer.text = capitalize(str);
+                break;
+              default:
+                localSizer.text = str;
+            }
+
+
+            fontProperties = { ...getFontPropertiesOfText(localSizer, true) };
+
+            // DON'T add stroke to fontProperties.ascent here!
+            // The ascent is used for baseline calculation and should be the font's natural ascent
+            // Stroke will be accounted for when calculating line height in verticalAlignInLines
+
+            const sw = style.fontScaleWidth ?? 1.0;
+            const sh = style.fontScaleHeight ?? 1.0;
+            // clamp negative or NaN fontScales to 0
+            const scaleWidth = isNaN(sw) || sw < 0 ? 0.0 : sw;
+            const scaleHeight = isNaN(sh) || sh < 0 ? 0.0 : sh;
+
+            localSizer.scale.set(scaleWidth, scaleHeight);
+
+            fontProperties.ascent *= scaleHeight;
+            fontProperties.descent *= scaleHeight;
+            fontProperties.fontSize *= scaleHeight;
+
+            // For whitespace, we need special handling since PIXI.Text sometimes returns NaN
+            let bounds: Bounds;
+
+            if (isOnlyWhitespace(str)) {
+              // For whitespace, calculate width based on font metrics
+              // Use approximately 0.3em per space character
+              const fontSize = typeof localSizer.style.fontSize === 'string'
+                ? parseInt(localSizer.style.fontSize)
+                : localSizer.style.fontSize || 24;
+
+              const spaceWidth = fontSize * 0.3 * str.length;
+              let height = fontProperties.fontSize;
+
+              // CRITICAL: Add stroke to whitespace height so spaces align with stroked text
+              // Without this, spaces inside stroked tags would be positioned higher than the text
+              if (strokeThickness && strokeThickness > 0) {
+                height += strokeThickness;
+              }
+
+              bounds = new PIXI.Rectangle(0, 0, spaceWidth, height);
+
+            } else {
+              // Use a fresh sizer instance for measurement
+              const measureSizer = new PIXI.Text({
+                text: localSizer.text,
+                style: { ...localSizer.style } as any
+              });
+
+              try {
+                measureSizer.scale.set(localSizer.scale.x, localSizer.scale.y);
+                bounds = rectFromContainer(measureSizer);
+              } finally {
+                measureSizer.destroy();
+              }
+
+              // Add stroke width to measurements since we removed it from the sizer
+              // PIXI measures text including stroke, so we need to add it back
+              if (strokeThickness && strokeThickness > 0) {
+                bounds.width += strokeThickness;
+                bounds.height += strokeThickness;
+              }
+            }
+
+
+
+            // Final sanity check - ensure bounds are valid
+            if (isNaN(bounds.width) || isNaN(bounds.height)) {
+              console.error(`[ERROR] NaN bounds after all attempts for token "${str}" with tags="${tags}"`);
+              // Use a reasonable fallback
+              if (isOnlyWhitespace(str)) {
+                bounds = new PIXI.Rectangle(0, 0, fontProperties.fontSize * 0.3 * str.length, fontProperties.fontSize);
+              } else {
+                bounds = new PIXI.Rectangle(0, 0, 0, fontProperties.fontSize);
+              }
+            }
+
+
+            const textDecorations = extractDecorations(
+              style,
+              bounds,
+              fontProperties
+            );
+
+            const baselineAdjustment = getBaselineAdjustment(
+              style,
+              adjustFontBaseline,
+              fontProperties.ascent
+            );
+            fontProperties.ascent += baselineAdjustment;
+
+            const { letterSpacing, wordSpacing } = style;
+            if (letterSpacing) {
+              bounds.width += letterSpacing;
+            }
+
+            const convertedToken = {
+              content: str,
+              style,
+              tags,
+              bounds,
+              fontProperties,
+              textDecorations,
+            };
+
+            // For whitespace with stroke, we should NOT reduce the width
+            // The whitespace needs to maintain proper spacing between stroked words
+            // Previously we were subtracting stroke width from whitespace which caused
+            // stroked words like "debug" and "mode" to overlap
+
+            // Apply wordSpacing to whitespace tokens only
+            if (wordSpacing && isOnlyWhitespace(str)) {
+              convertedToken.bounds.width += wordSpacing;
+            }
+
+            return convertedToken;
+          });
+
+          output = output.concat(textTokens);
+        } else if (token instanceof PIXI.Sprite) {
+          const sprite = token;
+          const imgDisplay = style[IMG_DISPLAY_PROPERTY];
+          // const isBlockImage = imgDisplay === "block";
+          const isIcon = imgDisplay === "icon";
+
+          // For icons, we need to measure text properties with actual text
+          // Empty text gives incorrect font metrics
+          if (localSizer.text === "") {
+            localSizer.text = "Mg"; // Use Mg to get proper ascent/descent
           }
 
+          // Debug: Check what localSizer style has
 
           fontProperties = { ...getFontPropertiesOfText(localSizer, true) };
 
-          // DON'T add stroke to fontProperties.ascent here!
-          // The ascent is used for baseline calculation and should be the font's natural ascent
-          // Stroke will be accounted for when calculating line height in verticalAlignInLines
+          // Icons scale based on the font's natural metrics
+          // Stroke is handled in verticalAlignInLines for line height calculation
 
-          const sw = style.fontScaleWidth ?? 1.0;
-          const sh = style.fontScaleHeight ?? 1.0;
-          // clamp negative or NaN fontScales to 0
-          const scaleWidth = isNaN(sw) || sw < 0 ? 0.0 : sw;
-          const scaleHeight = isNaN(sh) || sh < 0 ? 0.0 : sh;
+          if (isIcon) {
+            // Reset scale to get original sprite dimensions for recalculation
+            sprite.scale.set(1);
 
-          localSizer.scale.set(scaleWidth, scaleHeight);
+            // Set to minimum of 1 to avoid divide by zero.
+            // If height is zero or one it probably hasn't loaded yet.
+            // It will get refreshed after it loads.
+            const h = Math.max(sprite.height, 1);
 
-          fontProperties.ascent *= scaleHeight;
-          fontProperties.descent *= scaleHeight;
-          fontProperties.fontSize *= scaleHeight;
-
-          // For whitespace, we need special handling since PIXI.Text sometimes returns NaN
-          let bounds: Bounds;
-
-          if (isOnlyWhitespace(str)) {
-            // For whitespace, calculate width based on font metrics
-            // Use approximately 0.3em per space character
-            const fontSize = typeof localSizer.style.fontSize === 'string'
-              ? parseInt(localSizer.style.fontSize)
-              : localSizer.style.fontSize || 24;
-
-            const spaceWidth = fontSize * 0.3 * str.length;
-            let height = fontProperties.fontSize;
-
-            // CRITICAL: Add stroke to whitespace height so spaces align with stroked text
-            // Without this, spaces inside stroked tags would be positioned higher than the text
-            if (strokeThickness && strokeThickness > 0) {
-              height += strokeThickness;
+            if (h > 1) {
+              const { iconScale = 1.0 } = style;
+              // Use fontSize directly for more consistent scaling
+              // The ascent measurement is too small in PIXI v8 compared to v6
+              const effectiveFontSize = fontProperties.fontSize || 20;
+              const ratio =
+                (effectiveFontSize / h) * ICON_SCALE_BASE * iconScale;
+              sprite.scale.set(ratio);
             }
 
-            bounds = new PIXI.Rectangle(0, 0, spaceWidth, height);
-
-          } else {
-            // Use a fresh sizer instance for measurement
-            const measureSizer = new PIXI.Text({
-              text: localSizer.text,
-              style: { ...localSizer.style } as any
-            });
-            measureSizer.scale.set(localSizer.scale.x, localSizer.scale.y);
-            bounds = rectFromContainer(measureSizer);
-
-            // Add stroke width to measurements since we removed it from the sizer
-            // PIXI measures text including stroke, so we need to add it back
-            if (strokeThickness && strokeThickness > 0) {
-              bounds.width += strokeThickness;
-              bounds.height += strokeThickness;
+            if (scaleIcons) {
+              const {
+                fontScaleWidth: scaleX = 1.0,
+                fontScaleHeight: scaleY = 1.0,
+              } = style;
+              sprite.scale.x *= scaleX;
+              sprite.scale.y *= scaleY;
             }
           }
 
+          // handle images
+          const bounds = rectFromContainer(sprite);
 
-
-          // Final sanity check - ensure bounds are valid
-          if (isNaN(bounds.width) || isNaN(bounds.height)) {
-            console.error(`[ERROR] NaN bounds after all attempts for token "${str}" with tags="${tags}"`);
-            // Use a reasonable fallback
-            if (isOnlyWhitespace(str)) {
-              bounds = new PIXI.Rectangle(0, 0, fontProperties.fontSize * 0.3 * str.length, fontProperties.fontSize);
-            } else {
-              bounds = new PIXI.Rectangle(0, 0, 0, fontProperties.fontSize);
-            }
-          }
-
-
-          const textDecorations = extractDecorations(
-            style,
-            bounds,
-            fontProperties
-          );
-
-          const baselineAdjustment = getBaselineAdjustment(
-            style,
-            adjustFontBaseline,
-            fontProperties.ascent
-          );
-          fontProperties.ascent += baselineAdjustment;
-
-          const { letterSpacing, wordSpacing } = style;
-          if (letterSpacing) {
+          const { letterSpacing } = style;
+          if (letterSpacing && isIcon) {
             bounds.width += letterSpacing;
           }
 
-          const convertedToken = {
-            content: str,
+          output.push({
+            content: sprite,
             style,
             tags,
             bounds,
             fontProperties,
-            textDecorations,
-          };
+            textDecorations: undefined,
+          });
+        } else {
+          // token is a composite
+          const styledToken = token as StyledToken;
+          const { children } = styledToken;
+          // set tags and styles for children of this composite token.
+          const newStyle = styledToken.style;
+          const newTags = styledToken.tags;
 
-          // For whitespace with stroke, we should NOT reduce the width
-          // The whitespace needs to maintain proper spacing between stroked words
-          // Previously we were subtracting stroke width from whitespace which caused
-          // stroked words like "debug" and "mode" to overlap
-
-          // Apply wordSpacing to whitespace tokens only
-          if (wordSpacing && isOnlyWhitespace(str)) {
-            convertedToken.bounds.width += wordSpacing;
+          if (newStyle === undefined) {
+            throw new Error(
+              `Expected to find a 'style' property on ${styledToken}`
+            );
           }
 
-          return convertedToken;
-        });
-
-        output = output.concat(textTokens);
-      } else if (token instanceof PIXI.Sprite) {
-        const sprite = token;
-        const imgDisplay = style[IMG_DISPLAY_PROPERTY];
-        // const isBlockImage = imgDisplay === "block";
-        const isIcon = imgDisplay === "icon";
-
-        // For icons, we need to measure text properties with actual text
-        // Empty text gives incorrect font metrics
-        if (localSizer.text === "") {
-          localSizer.text = "Mg"; // Use Mg to get proper ascent/descent
-        }
-
-        // Debug: Check what localSizer style has
-
-        fontProperties = { ...getFontPropertiesOfText(localSizer, true) };
-
-        // Icons scale based on the font's natural metrics
-        // Stroke is handled in verticalAlignInLines for line height calculation
-
-        if (isIcon) {
-          // Reset scale to get original sprite dimensions for recalculation
-          sprite.scale.set(1);
-
-          // Set to minimum of 1 to avoid divide by zero.
-          // If height is zero or one it probably hasn't loaded yet.
-          // It will get refreshed after it loads.
-          const h = Math.max(sprite.height, 1);
-
-          if (h > 1) {
-            const { iconScale = 1.0 } = style;
-            // Use fontSize directly for more consistent scaling
-            // The ascent measurement is too small in PIXI v8 compared to v6
-            const effectiveFontSize = fontProperties.fontSize || 20;
-            const ratio =
-              (effectiveFontSize / h) * ICON_SCALE_BASE * iconScale;
-            sprite.scale.set(ratio);
-          }
-
-          if (scaleIcons) {
-            const {
-              fontScaleWidth: scaleX = 1.0,
-              fontScaleHeight: scaleY = 1.0,
-            } = style;
-            sprite.scale.x *= scaleX;
-            sprite.scale.y *= scaleY;
-          }
-        }
-
-        // handle images
-        const bounds = rectFromContainer(sprite);
-
-        const { letterSpacing } = style;
-        if (letterSpacing && isIcon) {
-          bounds.width += letterSpacing;
-        }
-
-        output.push({
-          content: sprite,
-          style,
-          tags,
-          bounds,
-          fontProperties,
-          textDecorations: undefined,
-        });
-      } else {
-        // token is a composite
-        const styledToken = token as StyledToken;
-        const { children } = styledToken;
-        // set tags and styles for children of this composite token.
-        const newStyle = styledToken.style;
-        const newTags = styledToken.tags;
-
-        if (newStyle === undefined) {
-          throw new Error(
-            `Expected to find a 'style' property on ${styledToken}`
+          output = output.concat(
+            children.flatMap(generateTokensFormStyledToken(newStyle, newTags))
           );
         }
 
-        output = output.concat(
-          children.flatMap(generateTokensFormStyledToken(newStyle, newTags))
-        );
+        return output;
+      } finally {
+        localSizer.destroy();
       }
-      return output;
     };
 
   // when starting out, use the default style

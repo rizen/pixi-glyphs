@@ -736,6 +736,26 @@ describe("layout module", () => {
       }).toThrow();
     });
 
+    it("destroys temporary PIXI.Text measurement objects after token calculation", () => {
+      const destroySpy = jest.spyOn(PIXI.Text.prototype, "destroy");
+      try {
+        const styledTokens: StyledTokens = {
+          children: ["Measured text"],
+          tags: "",
+          style: {
+            fontFamily: "Arial",
+            fontSize: 18,
+          },
+        };
+
+        layout.calculateTokens(styledTokens);
+
+        expect(destroySpy.mock.calls.length).toBeGreaterThanOrEqual(2);
+      } finally {
+        destroySpy.mockRestore();
+      }
+    });
+
     describe("wordWrap and wordWrapWidth properties", () => {
       describe("Should respect the wordWrap property", () => {
         const lorem =

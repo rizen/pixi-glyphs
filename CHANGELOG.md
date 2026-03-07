@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [5.1.3](https://github.com/rizen/pixi-glyphs/compare/v5.1.2...v5.1.3) (2026-03-07)
 
+- Fix: Was leaking PIXI.Text objects.
 
 ### Bug Fixes
 
