@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.1.3](https://github.com/rizen/pixi-glyphs/compare/v5.1.2...v5.1.3) (2026-03-07)
+
+
+### Bug Fixes
+
+* When a line's tallest element was an inline icon following a paragraph break, the sprite height override discarded the negative paragraphSpacing modifier, collapsing lines on top of each other. ([a9337cc](https://github.com/rizen/pixi-glyphs/commit/a9337cc612270cc0c52c3864ef6675648c2fae78))
+
 ### [5.1.2](https://github.com/rizen/pixi-glyphs/compare/v5.1.1...v5.1.2) (2026-02-18)
 
 - Fix: When a line's tallest element was an inline icon following a paragraph break, the sprite height override discarded the negative paragraphSpacing modifier, collapsing lines on top of each other.
