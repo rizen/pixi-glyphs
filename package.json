@@ -82,6 +82,7 @@
   },
   "scripts": {
     "prepare": "install-peers",
+    "postinstall": "node scripts/fix-rpt2-filter.js",
     "dev": "node scripts/generate-version.js && microbundle watch -f umd --name Glyphs --external 'pixi.js' --globals 'pixi.js'=PIXI",
     "test": "jest",
     "test:watch": "jest --watch",
