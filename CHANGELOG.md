@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.1.5](https://github.com/rizen/pixi-glyphs/compare/v5.1.4...v5.1.5) (2026-03-28)
+
 ### [5.1.4](https://github.com/rizen/pixi-glyphs/compare/v5.1.3...v5.1.4) (2026-03-28)
 
 * Glyphs is now usable in a worker, just like Pixi itself.

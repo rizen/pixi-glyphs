@@ -1,6 +1,6 @@
 {
   "name": "pixi-glyphs",
-  "version": "5.1.4",
+  "version": "5.1.5",
   "description": "Glyphs - Advanced text rendering for pixi.js",
   "author": "Mims Wright, JT Smith, tleunen",
   "license": "MIT",
@@ -82,7 +82,7 @@
   },
   "scripts": {
     "prepare": "install-peers",
-    "postinstall": "node scripts/fix-rpt2-filter.js",
+    "prebuild": "node scripts/fix-rpt2-filter.js",
     "dev": "node scripts/generate-version.js && microbundle watch -f umd --name Glyphs --external 'pixi.js' --globals 'pixi.js'=PIXI",
     "test": "jest",
     "test:watch": "jest --watch",
