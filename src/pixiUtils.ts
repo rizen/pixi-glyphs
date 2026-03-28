@@ -1,4 +1,5 @@
 import * as PIXI from "pixi.js";
+import { DOMAdapter } from "pixi.js";
 import { IFontMetrics } from "./types";
 
 const PX_PER_EM = 16;
@@ -23,7 +24,7 @@ export const measureFont = (font: string): IFontMetrics => {
   }
 
   // In Pixi v8, we need to create a canvas context to measure fonts
-  const canvas = document.createElement('canvas');
+  const canvas = DOMAdapter.get().createCanvas();
   const context = canvas.getContext('2d');
   if (!context) throw new Error('Cannot get 2D context');
   context.font = font;
