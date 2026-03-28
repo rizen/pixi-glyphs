@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.1.4](https://github.com/rizen/pixi-glyphs/compare/v5.1.3...v5.1.4) (2026-03-28)
+
+
+### Bug Fixes
+
+* Was leaking PIXI.Text objects. ([8f57f23](https://github.com/rizen/pixi-glyphs/commit/8f57f233c682c53477cd1611d2cea4d12d68fa45))
+
 ### [5.1.3](https://github.com/rizen/pixi-glyphs/compare/v5.1.2...v5.1.3) (2026-03-07)
 
 - Fix: Was leaking PIXI.Text objects.
