@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.1.6](https://github.com/rizen/pixi-glyphs/compare/v5.1.5...v5.1.6) (2026-04-23)
+
 ### [5.1.5](https://github.com/rizen/pixi-glyphs/compare/v5.1.4...v5.1.5) (2026-03-28)
 
 * Fixed a bug with postinstall scripts.
