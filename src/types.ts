@@ -387,7 +387,6 @@ export const isPercent = (s: string): boolean => s.trim().endsWith("%");
 
 export const pixelToNumber = (s: string): number =>
   Number(s.trim().slice(0, -2));
-export const emToNumber = pixelToNumber;
 
 export const percentStringToNumber = (s: string): number =>
   isPercent(s) ? Number(s.trim().slice(0, -1)) / 100 : NaN;

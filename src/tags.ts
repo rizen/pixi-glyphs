@@ -123,14 +123,6 @@ export const createTagMatchData = (match: RegExpExecArray): TagMatchData => {
   };
 };
 
-/** Converts TagMatchData to TagWithAttributes */
-export const tagMatchDataToTagWithAttributes = (
-  tag: TagMatchData
-): TagWithAttributes => ({
-  tagName: tag.tagName,
-  attributes: tag.attributes,
-});
-
 /**
  * Splits original text into an untagged list of string segments.
  * @param input Original text input

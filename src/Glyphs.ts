@@ -3,7 +3,6 @@ import {
   TaggedTextOptions,
   TextStyleSet,
   TextStyleExtended,
-  TagWithAttributes,
   AttributesList,
   ImageMap,
   ImageSourceMap,
@@ -27,7 +26,6 @@ import {
 
 import { parseTagsNew, removeTags, EMOJI_TAG } from "./tags";
 import {
-  combineAllStyles,
   convertUnsupportedAlignment,
   getStyleForTag as getStyleForTagExt,
   mapTagsToStyles,
@@ -186,13 +184,6 @@ export class Glyphs<
     attributes: AttributesList = {}
   ): TextStyleExtended | undefined {
     return getStyleForTagExt(tag, this.tagStyles, attributes);
-  }
-
-  public getStyleForTags(tags: TagWithAttributes[]): TextStyleExtended {
-    const styles = tags.map(({ tagName, attributes }) =>
-      this.getStyleForTag(tagName, attributes)
-    );
-    return combineAllStyles(styles);
   }
 
   /**
