@@ -559,6 +559,23 @@ describe("layout module", () => {
         "b",
       ]);
     });
+    it("Should split after hyphens, keeping hyphen attached to left segment.", () => {
+      expect(layout.splitAroundWhitespace("a-foo-ball")).toMatchObject([
+        "a-",
+        "foo-",
+        "ball",
+      ]);
+    });
+    it("Should handle hyphens and whitespace together.", () => {
+      expect(layout.splitAroundWhitespace("hello a-b world")).toMatchObject([
+        "hello",
+        " ",
+        "a-",
+        "b",
+        " ",
+        "world",
+      ]);
+    });
   });
 
   describe("splitText()", () => {

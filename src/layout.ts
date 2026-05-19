@@ -26,6 +26,7 @@ import {
   isWhitespaceToken,
   IMG_DISPLAY_PROPERTY,
   isSpriteToken,
+  _isTextToken,
   ParagraphToken,
   LineToken,
   WordToken,
@@ -760,6 +761,8 @@ const layout = (
     // always immediately add whitespace to the line.
     if ((isWhitespace && normalLineBreaks) || isNewline) {
       positionWordBufferAndAddToLine();
+    } else if (isHyphenEndingToken(token) && normalLineBreaks) {
+      positionWordBufferAndAddToLine();
     }
 
     // If the token is a newline character,
@@ -879,6 +882,10 @@ const layout = (
     return token.style.breakLines ?? true;
   }
 
+  function isHyphenEndingToken(token: SegmentToken): boolean {
+    return _isTextToken(token) && token.content.endsWith("-");
+  }
+
   function addTokenToWordAndUpdateWordWidth(token: SegmentToken): void {
     // add the token to the current word buffer.
     word.push(token);
@@ -897,6 +904,7 @@ const SPLIT_MARKER = `_🔪_`;
 export const splitAroundWhitespace = (s: string): string[] =>
   s
     .replace(/\s/g, `${SPLIT_MARKER}$&${SPLIT_MARKER}`)
+    .replace(/-/g, `$&${SPLIT_MARKER}`)
     .split(SPLIT_MARKER)
     .filter((s) => s !== "");
 

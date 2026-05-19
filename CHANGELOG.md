@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file. See [standa
 ### [5.1.6](https://github.com/rizen/pixi-glyphs/compare/v5.1.5...v5.1.6) (2026-04-23)
 
 * Removed some dead code. 
+* Now wrapped text breaks on hyphens. 
 
 ### [5.1.5](https://github.com/rizen/pixi-glyphs/compare/v5.1.4...v5.1.5) (2026-03-28)
 

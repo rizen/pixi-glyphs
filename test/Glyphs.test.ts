@@ -785,13 +785,14 @@ Line 4`);
       });
 
       it("Should create underline objects for each case where there is a line drawn.", () => {
-        // fixme: I actually expected this to be 5 since ther eare two lines drawn on the multi line.
-        expect(t.decorations).toHaveLength(4);
+        // "line-through" splits into "line-" and "through" since hyphens are break opportunities,
+        // producing 5 decoration segments: underline, overline, line-through(x2), multi
+        expect(t.decorations).toHaveLength(5);
       });
 
       it("Should add the decorations to the decoration container.", () => {
         // v8: decorations are stored in decorationContainer, not as children of textFields
-        expect(t.decorationContainer?.children).toHaveLength(4);
+        expect(t.decorationContainer?.children).toHaveLength(5);
         expect(t.decorationContainer?.getChildAt(0)).toBeInstanceOf(
           PIXI.Graphics
         );
