@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [5.1.7](https://github.com/rizen/pixi-glyphs/compare/v5.1.6...v5.1.7) (2026-05-20)
 
+* Fixed a problem where hyphenation Could end up making the line too long for word wrap. 
+
 ### [5.1.6](https://github.com/rizen/pixi-glyphs/compare/v5.1.5...v5.1.6) (2026-04-23)
 
 * Removed some dead code. 

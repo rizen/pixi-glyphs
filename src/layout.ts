@@ -762,6 +762,9 @@ const layout = (
     if ((isWhitespace && normalLineBreaks) || isNewline) {
       positionWordBufferAndAddToLine();
     } else if (isHyphenEndingToken(token) && normalLineBreaks) {
+      if (wordInBufferExceedsLineLength() && line.length > 0) {
+        addLineToListOfLinesAndMoveCursorToNextLine(token);
+      }
       positionWordBufferAndAddToLine();
     }
 
