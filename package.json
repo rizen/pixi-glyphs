@@ -1,6 +1,7 @@
 {
   "name": "pixi-glyphs",
   "version": "5.1.8",
+  "private": true,
   "description": "Glyphs - Advanced text rendering for pixi.js",
   "author": "Mims Wright, JT Smith, tleunen",
   "license": "MIT",
@@ -65,7 +66,6 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
     "http-server": "^14.0.0",
-    "install-peers-cli": "^2.2.0",
     "jest": "^26",
     "jest-canvas-mock": "^2.3.1",
     "jsdom": "^24.0.0",
@@ -81,7 +81,7 @@
     "vite": "^7.1.5"
   },
   "scripts": {
-    "prepare": "install-peers",
+    "prepare": "npm run build",
     "prebuild": "node scripts/fix-rpt2-filter.js",
     "dev": "node scripts/generate-version.js && microbundle watch -f umd --name Glyphs --external 'pixi.js' --globals 'pixi.js'=PIXI",
     "test": "jest",
@@ -98,6 +98,7 @@
     "prepublishOnly": "npm run build",
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",
-    "release:major": "standard-version --release-as major"
+    "release:major": "standard-version --release-as major",
+    "publish": "git push --follow-tags origin main"
   }
 }

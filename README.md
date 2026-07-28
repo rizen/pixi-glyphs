@@ -1,10 +1,22 @@
 # pixi-glyphs
 
-[![NPM](https://nodei.co/npm/pixi-glyphs.png)](https://nodei.co/npm/pixi-glyphs/)
-
 `Glyphs` is a multi-style text component for [pixi.js](https://github.com/GoodBoyDigital/pixi.js) that supports multiple `TextStyle`s using HTML-like tags. Includes many additional features not found in `PIXI.Text` such as embedded images (sprites), underlines, justified layout, and more.
 
 Inspired by the original [pixi-multistyle-text](https://github.com/tleunen/pixi-multistyle-text) and is the spiritual successor to [pixi-tagged-text](https://github.com/mimshwright/pixi-tagged-text). The difference in pixi-glyphs vs pixi-tagged-text is that pixi-glyphs is designed from the ground up for Pixi 8, whereas pixi-tagged-text was built for Pixi 6.
+
+## Installation
+
+pixi-glyphs is distributed as a Git dependency from versioned GitHub tags rather than through the npm registry. Pin the release you want in your application's `package.json`:
+
+```json
+{
+  "dependencies": {
+    "pixi-glyphs": "github:rizen/pixi-glyphs#vX.Y.Z"
+  }
+}
+```
+
+Replace `vX.Y.Z` with the release tag you want, then install normally with npm, pnpm, or Yarn. The Git tag is the released version. Installation scripts must be enabled because the package's `prepare` script builds the ignored `dist/` directory before installation.
 
 ## Usage
 
@@ -288,6 +300,20 @@ npm should automatically install peer dependencies (including the very important
 ### VSCode Users
 
 If you're using the [vscode-jest extension](https://marketplace.visualstudio.com/items?itemName=Orta.vscode-jest), you may need [some additional packages](https://github.com/Automattic/node-canvas#compiling) to get the tests to run in your IDE. If you're on a Mac you can use `brew bundle install` to install these packages.
+
+## Releasing
+
+Releases are Git tags consumed directly by downstream applications. Before releasing, make sure the test suite passes, then use the appropriate release command:
+
+```bash
+npm test
+npm run release         # patch
+npm run release:minor
+npm run release:major
+npm run publish
+```
+
+The release command updates the package version and changelog, creates the release commit, and tags it as `vX.Y.Z`. `npm run publish` pushes the release commit and version tag to GitHub. The package is marked private to prevent an accidental `npm publish` to the npm registry; consumers install the tag from GitHub.
 
 ## Demo
 

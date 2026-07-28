@@ -1,0 +1,82 @@
+name: install-matrix
+
+on:
+  pull_request:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    name: ${{ matrix.manager }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        manager: [npm, pnpm, yarn]
+    steps:
+      - name: Checkout pixi-glyphs
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Set up package managers
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.15.0 yarn@1.22.22 --activate
+
+      - name: Publish the commit under test as a local Git remote
+        env:
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          BARE="${RUNNER_TEMP}/pixi-glyphs-under-test.git"
+          rm -rf "$BARE"
+          git clone --bare "$GITHUB_WORKSPACE" "$BARE"
+          git -C "$BARE" branch -f commit-under-test "$SHA"
+          git -C "$BARE" config uploadpack.allowAnySHA1InWant true
+
+      - name: Install pixi-glyphs as a Git dependency
+        env:
+          MANAGER: ${{ matrix.manager }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          DEP="git+file://${RUNNER_TEMP}/pixi-glyphs-under-test.git#${SHA}"
+          CONSUMER="${RUNNER_TEMP}/consumer"
+          rm -rf "$CONSUMER"
+          mkdir -p "$CONSUMER"
+          cd "$CONSUMER"
+          npm init -y >/dev/null
+
+          case "$MANAGER" in
+            npm)
+              npm install --no-audit --no-fund "pixi.js@^8.0.0"
+              npm install --no-audit --no-fund "$DEP"
+              ;;
+            pnpm)
+              pnpm add "pixi.js@^8.0.0"
+              pnpm add "$DEP"
+              ;;
+            yarn)
+              yarn add "pixi.js@^8.0.0"
+              yarn add "$DEP"
+              ;;
+          esac
+
+      - name: Assert the installed package is built and importable
+        run: |
+          set -euo pipefail
+          cd "${RUNNER_TEMP}/consumer"
+          test -f node_modules/pixi-glyphs/dist/pixi-glyphs.modern.js
+          test -f node_modules/pixi-glyphs/dist/index.d.ts
+          node -e 'import("pixi-glyphs").then((module) => { if (typeof module.Glyphs !== "function") throw new Error("Glyphs export is missing") })'
