@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.1.9](https://github.com/rizen/pixi-glyphs/compare/v5.1.8...v5.1.9) (2026-07-28)
+
 ### [5.1.8](https://github.com/rizen/pixi-glyphs/compare/v5.1.7...v5.1.8) (2026-07-28)
 
 * Fixed an inline icon middle alignment scaling problem.
