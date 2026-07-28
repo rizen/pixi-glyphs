@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [5.1.8](https://github.com/rizen/pixi-glyphs/compare/v5.1.7...v5.1.8) (2026-07-28)
 
+* Fixed an inline icon middle alignment scaling problem.
+
 ### [5.1.7](https://github.com/rizen/pixi-glyphs/compare/v5.1.6...v5.1.7) (2026-05-20)
 
 * Fixed a problem where hyphenation Could end up making the line too long for word wrap. 

@@ -429,80 +429,163 @@ let justify = new Glyphs(
 
   valign: {
     title: "Vertical Alignment",
-    description: "Control vertical alignment of text: top, middle, bottom, baseline",
-    code: `// Load texture first in Pixi v8
-await PIXI.Assets.load('./icon.png');
+    description: "Compare a tightly cropped test icon across valign modes. White marks the sprite center; cyan marks its calculated layout bounds and center.",
+    code: `await document.fonts.ready;
 
-const valignImg = new PIXI.Sprite(PIXI.Texture.from("./icon.png"));
+// Use a tightly cropped, symmetric texture so transparent padding and
+// uneven artwork cannot hide or exaggerate the positioning difference.
+const iconCanvas = document.createElement("canvas");
+iconCanvas.width = 64;
+iconCanvas.height = 64;
+const context = iconCanvas.getContext("2d");
+context.fillStyle = "#e83e8c";
+context.fillRect(0, 0, 64, 64);
+context.fillStyle = "#ffffff";
+context.fillRect(29, 0, 6, 64);
+context.fillRect(0, 29, 64, 6);
 
-const text = \`<top><code>Top</code> <small>Vertical</small> <img/> Alignment.</top>
+const valignImg = new PIXI.Sprite(PIXI.Texture.from(iconCanvas));
 
-<middle><code>Middle</code> <small>Vertical</small> <img /> Alignment.</middle>
+const text = \`<heading>Middle alignment (compare scales)</heading>
+<middle><label>iconScale 1.0</label>  BLOCK <icon1/><icon1/></middle>
+<middle><label>iconScale 1.4</label>  BLOCK <icon14/><icon14/></middle>
+<middle><label>iconScale 2.0</label>  BLOCK <icon2/><icon2/></middle>
 
-<bottom><code>Bottom</code> <small>Vertical</small> <img/> Alignment.</bottom>
-
-<baseline><code>Baseline</code> <small>Vertical</small> <img/> Alignment.</baseline>\`;
+<heading>Other alignments at iconScale 1.4</heading>
+<top><label>top</label>       BLOCK <icon14/><icon14/></top>
+<bottom><label>bottom</label>    BLOCK <icon14/><icon14/></bottom>
+<baseline><label>baseline</label>  BLOCK <icon14/><icon14/></baseline>\`;
 
 const styles = {
   default: {
     fontFamily: "Arial",
     fontSize: "24px",
     fill: "#cccccc",
-    align: "center"
+    align: "left",
+    lineSpacing: 8,
+    wordWrap: false
   },
-  code: {
-    fontFamily: "Courier",
-    fontSize: "36px",
-    fill: "#ff8888"
-  },
-  small: { fontSize: "14px" },
+  heading: { fontSize: "16px", fill: "#58a6ff" },
+  label: { fontFamily: "Courier", fontSize: "16px", fill: "#ff8888" },
   top: { valign: "top" },
   middle: { valign: "middle" },
   bottom: { valign: "bottom" },
   baseline: { valign: "baseline" },
-  img: { imgSrc: "valignImg", imgDisplay: "icon" }
+  icon1: {
+    imgSrc: "valignImg",
+    imgDisplay: "icon",
+    iconScale: 1.0
+  },
+  icon14: {
+    imgSrc: "valignImg",
+    imgDisplay: "icon",
+    iconScale: 1.4
+  },
+  icon2: {
+    imgSrc: "valignImg",
+    imgDisplay: "icon",
+    iconScale: 2.0
+  }
 };
 
 const glyphs = new (window.Glyphs.Glyphs)(text, styles, {
   imgMap: { valignImg }
-});`,
+});
+
+// Draw each icon's calculated layout bounds in cyan. The sprite is
+// positioned later during draw(), so any offset appears outside this box.
+const guides = new PIXI.Graphics();
+for (const token of glyphs.tokensFlat) {
+  if (token.content instanceof PIXI.Sprite) {
+    const { x, y, width, height } = token.bounds;
+    const centerY = y + height / 2;
+    guides.rect(x, y, width, height)
+      .stroke({ width: 1, color: 0x00e5ff, alpha: 1 });
+    guides.moveTo(x - 3, centerY).lineTo(x + width + 3, centerY)
+      .stroke({ width: 1, color: 0x00e5ff, alpha: 1 });
+  }
+}
+glyphs.addChild(guides);`,
     init: async function() {
-      // Load texture first in Pixi v8
-      await PIXI.Assets.load('./icon.png');
+      await document.fonts.ready;
 
-      const valignImg = new PIXI.Sprite(PIXI.Texture.from("./icon.png"));
+      // Use a tightly cropped, symmetric texture so transparent padding and
+      // uneven artwork cannot hide or exaggerate the positioning difference.
+      const iconCanvas = document.createElement("canvas");
+      iconCanvas.width = 64;
+      iconCanvas.height = 64;
+      const context = iconCanvas.getContext("2d");
+      context.fillStyle = "#e83e8c";
+      context.fillRect(0, 0, 64, 64);
+      context.fillStyle = "#ffffff";
+      context.fillRect(29, 0, 6, 64);
+      context.fillRect(0, 29, 64, 6);
 
-      const text = `<top><code>Top</code> <small>Vertical</small> <img/> Alignment.</top>
+      const valignImg = new PIXI.Sprite(PIXI.Texture.from(iconCanvas));
 
-<middle><code>Middle</code> <small>Vertical</small> <img /> Alignment.</middle>
+      const text = `<heading>Middle alignment (compare scales)</heading>
+<middle><label>iconScale 1.0</label>  BLOCK <icon1/><icon1/></middle>
+<middle><label>iconScale 1.4</label>  BLOCK <icon14/><icon14/></middle>
+<middle><label>iconScale 2.0</label>  BLOCK <icon2/><icon2/></middle>
 
-<bottom><code>Bottom</code> <small>Vertical</small> <img/> Alignment.</bottom>
-
-<baseline><code>Baseline</code> <small>Vertical</small> <img/> Alignment.</baseline>`;
+<heading>Other alignments at iconScale 1.4</heading>
+<top><label>top</label>       BLOCK <icon14/><icon14/></top>
+<bottom><label>bottom</label>    BLOCK <icon14/><icon14/></bottom>
+<baseline><label>baseline</label>  BLOCK <icon14/><icon14/></baseline>`;
 
       const styles = {
         default: {
           fontFamily: "Arial",
           fontSize: "24px",
           fill: "#cccccc",
-          align: "center"
+          align: "left",
+          lineSpacing: 8,
+          wordWrap: false
         },
-        code: {
-          fontFamily: "Courier",
-          fontSize: "36px",
-          fill: "#ff8888"
-        },
-        small: { fontSize: "14px" },
+        heading: { fontSize: "16px", fill: "#58a6ff" },
+        label: { fontFamily: "Courier", fontSize: "16px", fill: "#ff8888" },
         top: { valign: "top" },
         middle: { valign: "middle" },
         bottom: { valign: "bottom" },
         baseline: { valign: "baseline" },
-        img: { imgSrc: "valignImg", imgDisplay: "icon" }
+        icon1: {
+          imgSrc: "valignImg",
+          imgDisplay: "icon",
+          iconScale: 1.0
+        },
+        icon14: {
+          imgSrc: "valignImg",
+          imgDisplay: "icon",
+          iconScale: 1.4
+        },
+        icon2: {
+          imgSrc: "valignImg",
+          imgDisplay: "icon",
+          iconScale: 2.0
+        }
       };
 
-      const Glyphs = window.Glyphs.Glyphs; return new Glyphs(text, styles, {
+      const Glyphs = window.Glyphs.Glyphs;
+      const glyphs = new Glyphs(text, styles, {
         imgMap: { valignImg }
       });
+
+      // Draw each icon's calculated layout bounds in cyan. The sprite is
+      // positioned later during draw(), so any offset appears outside this box.
+      const guides = new PIXI.Graphics();
+      for (const token of glyphs.tokensFlat) {
+        if (token.content instanceof PIXI.Sprite) {
+          const { x, y, width, height } = token.bounds;
+          const centerY = y + height / 2;
+          guides.rect(x, y, width, height)
+            .stroke({ width: 1, color: 0x00e5ff, alpha: 1 });
+          guides.moveTo(x - 3, centerY).lineTo(x + width + 3, centerY)
+            .stroke({ width: 1, color: 0x00e5ff, alpha: 1 });
+        }
+      }
+      glyphs.addChild(guides);
+
+      return glyphs;
     }
   },
 

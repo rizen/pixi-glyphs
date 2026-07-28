@@ -206,6 +206,76 @@ describe("Glyphs", () => {
           });
         });
 
+        describe("Icon vertical alignment", () => {
+          const createAlignedIcon = (valign: VAlign, iconScale = 1.0) => {
+            const glyphs = new Glyphs(
+              `<align>BLOCK <icon /></align>`,
+              {
+                default: { fontSize: 24 },
+                align: { valign },
+                icon: { imgDisplay: "icon", iconScale },
+              },
+              { imgMap: { icon } }
+            );
+            const token = glyphs.tokensFlat.find((candidate) =>
+              candidate.content instanceof PIXI.Sprite
+            );
+
+            expect(token).toBeDefined();
+            expect(glyphs.sprites).toHaveLength(1);
+
+            return { token: token!, sprite: glyphs.sprites[0] };
+          };
+
+          test.each([
+            ["middle", 1.0],
+            ["middle", 1.4],
+            ["top", 1.4],
+            ["bottom", 1.4],
+          ] as const)(
+            "%s-aligned icons at scale %s retain their layout position",
+            (valign, iconScale) => {
+              const { token, sprite } = createAlignedIcon(valign, iconScale);
+
+              expect(sprite.y).toBeCloseTo(token.bounds.y);
+            }
+          );
+
+          it("retains the optical offset for baseline-aligned icons", () => {
+            const iconScale = 1.4;
+            const { token, sprite } = createAlignedIcon("baseline", iconScale);
+
+            expect(sprite.y).toBeCloseTo(
+              token.bounds.y + 24 * 0.1 * iconScale
+            );
+          });
+
+          it("retains stroke centering for non-baseline icons", () => {
+            const strokeWidth = 4;
+            const glyphs = new Glyphs(
+              `<middle>BLOCK <icon /></middle>`,
+              {
+                default: { fontSize: 24 },
+                middle: { valign: "middle" },
+                icon: {
+                  imgDisplay: "icon",
+                  iconScale: 1.4,
+                  stroke: { color: 0x000000, width: strokeWidth },
+                },
+              },
+              { imgMap: { icon } }
+            );
+            const token = glyphs.tokensFlat.find((candidate) =>
+              candidate.content instanceof PIXI.Sprite
+            );
+
+            expect(token).toBeDefined();
+            expect(glyphs.sprites[0].y).toBeCloseTo(
+              token!.bounds.y + strokeWidth / 2
+            );
+          });
+        });
+
         describe("imgSrc using non-Sprite references", () => {
           it("Should load images from a Texture object", () => {
             const texTest = new Glyphs(

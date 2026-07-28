@@ -824,15 +824,19 @@ export class Glyphs<
       if (isSpriteToken(t)) {
         const imgDisplay = t.style['imgDisplay'];
         if (imgDisplay === 'icon') {
-          // Push icon down by 0.1em below its baseline position
-          // Account for iconScale so larger icons sit proportionally lower
-          let fontSize = t.style.fontSize || 20;
-          if (typeof fontSize === 'string') {
-            fontSize = parseInt(fontSize.replace('px', ''), 10);
+          const valign = t.style.valign ?? 'baseline';
+
+          // Push baseline-aligned icons down by 0.1em. Other valign modes
+          // have already been fully positioned by verticalAlignInLines().
+          if (valign === 'baseline') {
+            let fontSize = t.style.fontSize || 20;
+            if (typeof fontSize === 'string') {
+              fontSize = parseInt(fontSize.replace('px', ''), 10);
+            }
+            const iconScale = t.style.iconScale ?? 1.0;
+            const iconOffset = fontSize * 0.1 * iconScale;
+            displayObject.y += iconOffset;
           }
-          const iconScale = t.style.iconScale ?? 1.0;
-          const iconOffset = fontSize * 0.1 * iconScale;
-          displayObject.y = bounds.y + iconOffset;
 
           // Adjust position to account for stroke thickness
           // The stroke extends equally in all directions, so we need to offset
