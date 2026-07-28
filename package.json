@@ -99,6 +99,6 @@
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",
     "release:major": "standard-version --release-as major",
-    "publish": "git push --follow-tags origin main"
+    "publish": "node scripts/publish.js"
   }
 }
